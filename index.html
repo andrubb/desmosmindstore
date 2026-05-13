@@ -3432,6 +3432,116 @@ img { transition: opacity 0.4s ease; }
 }
 .prod-card:hover .swatch-more { color: var(--text); }
 
+/* ═══════════════════════════════════════════════════════════
+   FEATURE 6 ── LOOKBOOK 3-IMAGE HOVER CYCLE
+   imgs[0] = front · imgs[1] = back · imgs[2] = lifestyle
+   Gracefully degrades when fewer images are present.
+═══════════════════════════════════════════════════════════ */
+.prod-img-lifestyle {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: scale(1.05);
+  transition: opacity 0.6s cubic-bezier(.4,0,.2,1),
+              transform 0.7s cubic-bezier(.4,0,.2,1);
+}
+.prod-card[data-lookbook="3"]:hover .prod-img-main {
+  animation: lookbook-1 4.8s cubic-bezier(.4,0,.2,1) infinite;
+  opacity: 1;
+  transform: scale(1);
+}
+.prod-card[data-lookbook="3"]:hover .prod-img-hover {
+  animation: lookbook-2 4.8s cubic-bezier(.4,0,.2,1) infinite;
+  opacity: 0;
+}
+.prod-card[data-lookbook="3"]:hover .prod-img-lifestyle {
+  animation: lookbook-3 4.8s cubic-bezier(.4,0,.2,1) infinite;
+}
+@keyframes lookbook-1 {
+  0%, 25%   { opacity: 1; transform: scale(1.02); }
+  33%, 92%  { opacity: 0; transform: scale(1.05); }
+  100%      { opacity: 1; transform: scale(1.02); }
+}
+@keyframes lookbook-2 {
+  0%, 25%   { opacity: 0; transform: scale(1.05); }
+  33%, 58%  { opacity: 1; transform: scale(1.01); }
+  66%, 100% { opacity: 0; transform: scale(1.05); }
+}
+@keyframes lookbook-3 {
+  0%, 58%   { opacity: 0; transform: scale(1.05); }
+  66%, 92%  { opacity: 1; transform: scale(1.02); }
+  100%      { opacity: 0; transform: scale(1.05); }
+}
+
+/* Lookbook progress dots (Instagram-story style) */
+.lookbook-dots {
+  position: absolute;
+  bottom: 0.6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  z-index: 4;
+  pointer-events: none;
+}
+.prod-card[data-lookbook="3"]:hover .lookbook-dots { opacity: 0.9; }
+.lookbook-dots span {
+  width: 18px;
+  height: 2px;
+  background: rgba(255,255,255,0.22);
+  border-radius: 1px;
+  overflow: hidden;
+  position: relative;
+}
+.lookbook-dots span::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--red);
+  box-shadow: 0 0 6px var(--red);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+.prod-card[data-lookbook="3"]:hover .lookbook-dots span:nth-child(1)::after {
+  animation: dot-fill-1 4.8s cubic-bezier(.4,0,.2,1) infinite;
+}
+.prod-card[data-lookbook="3"]:hover .lookbook-dots span:nth-child(2)::after {
+  animation: dot-fill-2 4.8s cubic-bezier(.4,0,.2,1) infinite;
+}
+.prod-card[data-lookbook="3"]:hover .lookbook-dots span:nth-child(3)::after {
+  animation: dot-fill-3 4.8s cubic-bezier(.4,0,.2,1) infinite;
+}
+@keyframes dot-fill-1 {
+  0%   { transform: scaleX(0); }
+  29%  { transform: scaleX(1); }
+  31%  { transform: scaleX(0); }
+  100% { transform: scaleX(0); }
+}
+@keyframes dot-fill-2 {
+  0%, 31%  { transform: scaleX(0); }
+  62%      { transform: scaleX(1); }
+  64%      { transform: scaleX(0); }
+  100%     { transform: scaleX(0); }
+}
+@keyframes dot-fill-3 {
+  0%, 64%  { transform: scaleX(0); }
+  95%      { transform: scaleX(1); }
+  100%     { transform: scaleX(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .prod-card[data-lookbook="3"]:hover .prod-img-main,
+  .prod-card[data-lookbook="3"]:hover .prod-img-hover,
+  .prod-card[data-lookbook="3"]:hover .prod-img-lifestyle,
+  .prod-card[data-lookbook="3"]:hover .lookbook-dots span::after {
+    animation: none !important;
+  }
+}
+
 /* Scroll wrapper — gives height for the sticky effect */
 .hero-scroll-stage {
   position: relative;
@@ -3562,6 +3672,388 @@ img { transition: opacity 0.4s ease; }
   height: 60px;
   z-index: 3;
   pointer-events: none;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FEATURE 7 ── MOBILE STICKY MODAL CTA BAR
+   Visible only on mobile (≤700px). Pinned at bottom of modal-inner.
+═══════════════════════════════════════════════════════════ */
+.modal-sticky-bar { display: none; }
+
+@media (max-width: 700px) {
+  .modal-inner {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  .modal-sticky-bar {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 0.85rem;
+    background: linear-gradient(180deg, rgba(8,8,8,0.96), rgba(4,4,4,0.99));
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid rgba(220,17,17,0.35);
+    box-shadow: 0 -10px 30px rgba(0,0,0,0.7), 0 -1px 0 rgba(220,17,17,0.18);
+    position: relative;
+    z-index: 10;
+  }
+  .modal-sticky-bar::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 80px; height: 2px;
+    background: var(--red);
+    box-shadow: 0 0 10px var(--red);
+  }
+  /* Hide the in-flow modal actions on mobile to avoid duplication */
+  .modal-actions { display: none !important; }
+  .modal-body { padding-bottom: 1rem !important; }
+}
+
+.msb-price {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  letter-spacing: 0.04em;
+  color: var(--white);
+  flex-shrink: 0;
+  line-height: 1;
+  text-shadow: 0 0 18px rgba(220,17,17,0.4);
+}
+.msb-size-chip {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: 1px solid rgba(220,17,17,0.35);
+  color: var(--text);
+  padding: 0.55rem 0.75rem;
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.45rem;
+}
+.msb-size-chip span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.msb-size-chip:active { transform: scale(0.97); }
+.msb-size-chip.has-value {
+  border-color: var(--red);
+  color: var(--white);
+  background: rgba(220,17,17,0.08);
+  box-shadow: inset 0 0 14px rgba(220,17,17,0.05);
+}
+.msb-size-chip.missing { display: none; }
+.msb-add {
+  background: var(--red);
+  color: white;
+  border: none;
+  padding: 0.85rem 1.1rem;
+  font-family: var(--font-body);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  transition: background 0.25s, transform 0.15s;
+  box-shadow: 0 4px 18px rgba(220,17,17,0.4);
+}
+.msb-add:hover { background: var(--red-bright); }
+.msb-add:active { transform: scale(0.97); }
+
+#modal-sizes-wrap.size-pulse {
+  animation: size-pulse-glow 1.2s ease-out;
+}
+@keyframes size-pulse-glow {
+  0%   { box-shadow: 0 0 0 0 rgba(220,17,17,0); }
+  20%  { box-shadow: 0 0 0 4px rgba(220,17,17,0.32); }
+  100% { box-shadow: 0 0 0 0 rgba(220,17,17,0); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FEATURE 9 ── WISHLIST HEART (localStorage-backed)
+═══════════════════════════════════════════════════════════ */
+.wishlist-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 5;
+  width: 32px;
+  height: 32px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: border-color 0.25s ease, background 0.25s ease,
+              transform 0.25s cubic-bezier(.16,1,.3,1),
+              box-shadow 0.3s ease;
+}
+.wishlist-btn:hover {
+  border-color: var(--red);
+  background: rgba(0,0,0,0.78);
+  transform: scale(1.1);
+}
+.wishlist-btn svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: var(--white);
+  stroke-width: 2;
+  transition: fill 0.3s ease, stroke 0.3s ease;
+}
+.wishlist-btn.active {
+  border-color: var(--red);
+  background: rgba(220,17,17,0.14);
+  box-shadow: 0 0 18px rgba(220,17,17,0.5);
+}
+.wishlist-btn.active svg {
+  fill: var(--red);
+  stroke: var(--red);
+}
+.wishlist-btn.popping svg {
+  animation: heart-pop 0.45s cubic-bezier(.16,1,.3,1);
+}
+@keyframes heart-pop {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.4); }
+  55%  { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
+/* Push the product flag column below the heart so they don't overlap */
+.prod-card .prod-flags {
+  top: 50px !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FEATURE 10 ── IMPROVED SKELETON LOADERS
+   Layered structure mirrors the real card (badge + heart + swatches)
+   with staggered shimmer per card and a sweeping red top accent.
+═══════════════════════════════════════════════════════════ */
+.skel-card {
+  animation: skel-card-pulse 2.6s ease-in-out infinite;
+  animation-delay: calc(var(--skel-i, 0) * 90ms);
+}
+@keyframes skel-card-pulse {
+  0%, 100% { border-color: rgba(220,17,17,0.06); box-shadow: none; }
+  50%      { border-color: rgba(220,17,17,0.22); box-shadow: 0 0 24px rgba(220,17,17,0.04); }
+}
+.skel-card .skel-img,
+.skel-card .skel-line {
+  animation-delay: calc(var(--skel-i, 0) * 90ms);
+}
+.skel-img {
+  position: relative;
+}
+.skel-top-line {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(220,17,17,0.55), transparent);
+  background-size: 200% 100%;
+  animation: skel-top-sweep 2.6s ease-in-out infinite;
+  animation-delay: calc(var(--skel-i, 0) * 90ms);
+  z-index: 2;
+}
+@keyframes skel-top-sweep {
+  0%   { background-position: 200% 0; opacity: 0.3; }
+  50%  { background-position: 0% 0;  opacity: 1; }
+  100% { background-position: -200% 0; opacity: 0.3; }
+}
+.skel-badge-mock {
+  position: absolute;
+  top: 12px; left: 12px;
+  width: 70px;
+  height: 18px;
+  background: rgba(220,17,17,0.14);
+  border: 1px solid rgba(220,17,17,0.25);
+  z-index: 2;
+}
+.skel-heart-mock {
+  position: absolute;
+  top: 10px; right: 10px;
+  width: 32px;
+  height: 32px;
+  background: rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,255,255,0.1);
+  z-index: 2;
+}
+.skel-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.4rem;
+}
+.skel-swatch-mock {
+  display: flex;
+  gap: 5px;
+}
+.skel-swatch-mock i {
+  display: block;
+  width: 13px;
+  height: 13px;
+  border: 1px solid rgba(220,17,17,0.22);
+  background: linear-gradient(90deg,
+    rgba(220,17,17,0.05) 0%,
+    rgba(220,17,17,0.18) 50%,
+    rgba(220,17,17,0.05) 100%);
+  background-size: 200% 100%;
+  animation: skel-shimmer 1.6s ease-in-out infinite;
+  animation-delay: calc(var(--skel-i, 0) * 90ms);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FEATURE 11 ── SORT DROPDOWN
+═══════════════════════════════════════════════════════════ */
+.products-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  position: relative;
+  flex-shrink: 0;
+}
+.products-sort-label {
+  font-family: var(--font-body);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted2);
+}
+.products-sort select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: transparent;
+  border: 1px solid rgba(220,17,17,0.22);
+  color: var(--text);
+  padding: 0.55rem 2.2rem 0.55rem 1rem;
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.25s ease,
+              background 0.25s ease,
+              color 0.25s ease,
+              box-shadow 0.3s ease;
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px),
+                     calc(100% - 6px) 100%, 0 100%, 0 6px);
+}
+.products-sort select:hover,
+.products-sort select:focus {
+  border-color: var(--red);
+  color: var(--white);
+  outline: none;
+  background: rgba(220,17,17,0.05);
+  box-shadow: inset 0 0 14px rgba(220,17,17,0.05);
+}
+.products-sort::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 0.95rem;
+  width: 7px;
+  height: 7px;
+  border-right: 1.5px solid var(--red);
+  border-bottom: 1.5px solid var(--red);
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+  transition: transform 0.25s ease;
+}
+.products-sort:hover::after {
+  transform: translateY(-50%) rotate(45deg);
+}
+.products-sort select option {
+  background: var(--bg2);
+  color: var(--text);
+  font-family: var(--font-body);
+  padding: 0.5rem;
+}
+@media (max-width: 700px) {
+  .products-sort-label { display: none; }
+  .products-sort select { padding: 0.5rem 2rem 0.5rem 0.85rem; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FEATURE 12 ── "X PEOPLE VIEWING" SOCIAL PROOF
+═══════════════════════════════════════════════════════════ */
+.prod-social-proof {
+  position: absolute;
+  bottom: 0.7rem;
+  left: 0.7rem;
+  z-index: 4;
+  background: rgba(0,0,0,0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(220,17,17,0.3);
+  padding: 0.3rem 0.65rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: var(--font-body);
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.92);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: psp-rise 0.55s cubic-bezier(.16,1,.3,1) 0.45s forwards;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+}
+.psp-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--red);
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(220,17,17,0.8), 0 0 14px rgba(220,17,17,0.4);
+  position: relative;
+}
+.psp-dot::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 1px solid var(--red);
+  opacity: 0.7;
+  animation: psp-ping 1.6s cubic-bezier(.4,0,.6,1) infinite;
+}
+@keyframes psp-ping {
+  0%   { transform: scale(1);   opacity: 0.7; }
+  80%  { transform: scale(2.2); opacity: 0; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+.psp-num { color: var(--red-bright); font-weight: 800; }
+@keyframes psp-rise {
+  to { opacity: 1; transform: translateY(0); }
+}
+/* Hide on hover so lookbook/quick-add aren't obscured */
+.prod-card:hover .prod-social-proof {
+  opacity: 0;
+  transition: opacity 0.25s ease;
 }
 </style>
 </head>
@@ -3885,6 +4377,19 @@ img { transition: opacity 0.4s ease; }
         </button>
       </div>
     </div>
+
+    <!-- Mobile-only sticky bottom CTA bar (hidden on desktop via CSS) -->
+    <div class="modal-sticky-bar" id="modal-sticky-bar" aria-hidden="false">
+      <div class="msb-price" id="msb-price">—</div>
+      <button class="msb-size-chip" id="msb-size-chip" type="button" onclick="scrollToModalSizes()">
+        <span id="msb-size-label">Elegí talla</span>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <button class="msb-add" type="button" onclick="addProductToCart()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
+        Agregar
+      </button>
+    </div>
   </div>
 </div>
 
@@ -3918,6 +4423,15 @@ img { transition: opacity 0.4s ease; }
         <button class="filter-btn" onclick="filterProducts('ropa',this)">Ropa</button>
         <button class="filter-btn" onclick="filterProducts('suplementos',this)">Suplementos</button>
         <button class="filter-btn" onclick="filterProducts('accesorios',this)">Accesorios</button>
+      </div>
+      <div class="products-sort">
+        <span class="products-sort-label">Ordenar:</span>
+        <select id="product-sort" onchange="setSort(this.value)" aria-label="Ordenar productos">
+          <option value="trending">Trending</option>
+          <option value="newest">Más nuevo</option>
+          <option value="price-asc">Precio ↑</option>
+          <option value="price-desc">Precio ↓</option>
+        </select>
       </div>
     </div>
 
@@ -4530,6 +5044,38 @@ function renderMarquee(){
 // ════════════════════════════════════
 // RENDER PRODUCTS
 // ════════════════════════════════════
+// ════════════════════════════════════════════════════════════
+// WISHLIST (localStorage-backed Set of product IDs)
+// ════════════════════════════════════════════════════════════
+const WISHLIST_KEY = 'desmos_wishlist_v1';
+let wishlist = new Set();
+try {
+  wishlist = new Set(JSON.parse(localStorage.getItem(WISHLIST_KEY) || '[]'));
+} catch(e) { wishlist = new Set(); }
+
+function saveWishlist(){
+  try { localStorage.setItem(WISHLIST_KEY, JSON.stringify([...wishlist])); }
+  catch(e) { /* storage full or disabled */ }
+}
+function isWishlisted(id){ return wishlist.has(id); }
+function toggleWishlist(id, btn){
+  if (wishlist.has(id)) {
+    wishlist.delete(id);
+    btn.classList.remove('active');
+    if (typeof showToast === 'function') showToast('Removido de favoritos');
+  } else {
+    wishlist.add(id);
+    btn.classList.add('active');
+    if (typeof showToast === 'function') showToast('Agregado a favoritos');
+  }
+  // Pop animation
+  btn.classList.remove('popping');
+  void btn.offsetWidth;
+  btn.classList.add('popping');
+  setTimeout(() => btn.classList.remove('popping'), 500);
+  saveWishlist();
+}
+
 // Color name → hex mapping for swatches.
 // Falls back to muted gray for unknown names (e.g. supplement flavors with no good color).
 const COLOR_HEX = {
@@ -4568,6 +5114,30 @@ const COLOR_HEX = {
 function colorToHex(name){
   const k = (name || '').toLowerCase().trim();
   return COLOR_HEX[k] || '#6a6a62';
+}
+
+// ════════════════════════════════════════════════════════════
+// SOCIAL PROOF — "X people viewing now"
+// Deterministic count based on product id (stable across renders),
+// gently shifts every ~minute so it feels alive.
+// Only shown for bestsellers / new / discounted items.
+// ════════════════════════════════════════════════════════════
+function shouldShowSocialProof(p){
+  return Boolean(p.bestseller || p.isNew || (p.originalPrice && p.originalPrice > p.price));
+}
+function getViewingCount(productId){
+  const seed = (productId * 7 + 11) % 28 + 5;       // base 5-32
+  const drift = (Math.floor(Date.now() / 60000) * 3 + productId) % 7 - 3; // ±3 per minute
+  return Math.max(3, seed + drift);
+}
+function renderSocialProofHtml(p){
+  if (!shouldShowSocialProof(p)) return '';
+  const n = getViewingCount(p.id);
+  return `
+    <div class="prod-social-proof" aria-hidden="true">
+      <span class="psp-dot"></span>
+      <span><span class="psp-num">${n}</span> viendo ahora</span>
+    </div>`;
 }
 
 function renderSwatchesHtml(productId, colors){
@@ -4609,16 +5179,28 @@ function openProductWithColor(id, colorName){
 function renderSkeletons(count = 8){
   const grid = document.getElementById('products-grid');
   if (!grid) return;
+  // Vary widths for organic feel
+  const NAME_WIDTHS = [82, 68, 90, 74, 86, 70, 80, 78];
+  const SHORT_WIDTHS = [52, 60, 44, 56, 48, 64, 50, 58];
   const cards = [];
   for (let i = 0; i < count; i++){
+    const nameW = NAME_WIDTHS[i % NAME_WIDTHS.length];
+    const shortW = SHORT_WIDTHS[i % SHORT_WIDTHS.length];
     cards.push(`
-      <div class="skel-card" aria-hidden="true">
-        <div class="skel-img"></div>
+      <div class="skel-card" style="--skel-i:${i}" aria-hidden="true">
+        <div class="skel-img">
+          <div class="skel-top-line"></div>
+          <div class="skel-badge-mock"></div>
+          <div class="skel-heart-mock"></div>
+        </div>
         <div class="skel-info">
           <div class="skel-line skel-brand"></div>
-          <div class="skel-line skel-name"></div>
-          <div class="skel-line skel-name-short"></div>
-          <div class="skel-line skel-price"></div>
+          <div class="skel-line" style="width:${nameW}%"></div>
+          <div class="skel-line" style="width:${shortW}%;margin-bottom:0.85rem;"></div>
+          <div class="skel-row">
+            <div class="skel-line skel-price"></div>
+            <div class="skel-swatch-mock"><i></i><i></i><i></i></div>
+          </div>
         </div>
       </div>`);
   }
@@ -4638,10 +5220,13 @@ function renderProducts(filter='all'){
     grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:4rem;color:var(--muted2);font-family:var(--font-body);font-weight:600;font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;">NO HAY PRODUCTOS EN ESTA CATEGORÍA</div>';
     return;
   }
-  grid.innerHTML = filtered.map((p,i)=>{
+  const sorted = (typeof sortProducts === 'function') ? sortProducts(filtered) : filtered;
+  grid.innerHTML = sorted.map((p,i)=>{
     const imgs = Array.isArray(p.imgs) && p.imgs.length ? p.imgs : [p.img];
     const mainImg = imgs[0] || 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600';
     const hoverImg = imgs[1] || mainImg;
+    const lifestyleImg = imgs[2] || imgs[1] || mainImg;
+    const lookbookCount = Math.min(imgs.filter(Boolean).length, 3); // 1, 2, or 3
     const hasDiscount = p.originalPrice && p.originalPrice > p.price;
     const discountPct = hasDiscount ? Math.round((1-p.price/p.originalPrice)*100) : 0;
 
@@ -4653,14 +5238,24 @@ function renderProducts(filter='all'){
     if(hasDiscount) badges.push(`<span class="prod-flag flag-sale">-${discountPct}%</span>`);
 
     return `
-    <div class="prod-card reveal" style="transition-delay:${i*0.06}s">
+    <div class="prod-card reveal" data-lookbook="${lookbookCount}" style="transition-delay:${i*0.06}s">
       <div class="prod-img-wrap" onclick="openProduct(${p.id})">
         <img class="prod-img-main" src="${mainImg}" alt="${p.name}" loading="lazy"
           onerror="this.src='https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600'">
         <img class="prod-img-hover" src="${hoverImg}" alt="${p.name}" loading="lazy"
           onerror="this.src='${mainImg}'">
+        ${lookbookCount === 3 ? `<img class="prod-img-lifestyle" src="${lifestyleImg}" alt="${p.name}" loading="lazy" onerror="this.src='${mainImg}'">` : ''}
+        ${lookbookCount === 3 ? '<div class="lookbook-dots" aria-hidden="true"><span></span><span></span><span></span></div>' : ''}
+        <button class="wishlist-btn ${isWishlisted(p.id) ? 'active' : ''}"
+          data-product-id="${p.id}"
+          onclick="event.stopPropagation();toggleWishlist(${p.id}, this)"
+          aria-label="${isWishlisted(p.id) ? 'Quitar de favoritos' : 'Agregar a favoritos'}"
+          type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+        </button>
         <span class="prod-badge ${p.type==='stock'?'badge-stock':'badge-encargo'}">${p.type==='stock'?'EN STOCK':'POR ENCARGO'}</span>
         ${badges.length ? `<div class="prod-flags">${badges.join('')}</div>` : ''}
+        ${renderSocialProofHtml(p)}
         <button class="prod-quick-add" onclick="event.stopPropagation();openProduct(${p.id})">VER PRODUCTO</button>
       </div>
       <div class="prod-info" onclick="openProduct(${p.id})" style="cursor:pointer;">
@@ -4676,9 +5271,62 @@ function renderProducts(filter='all'){
   grid.querySelectorAll('.reveal').forEach(el=>revealObserver.observe(el));
 }
 
+// Sort state (shared with sort dropdown)
+let currentFilter = 'all';
+let currentSort   = 'trending';
+
+function setSort(value){
+  currentSort = value;
+  // Show a quick skeleton flash to confirm the change (unless reduced-motion)
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduceMotion) {
+    renderProducts(currentFilter);
+    return;
+  }
+  renderSkeletons(8);
+  setTimeout(() => renderProducts(currentFilter), 200);
+}
+
+function sortProducts(arr){
+  const sorted = arr.slice();
+  switch (currentSort) {
+    case 'trending':
+      // Bestseller first; tie-break by id desc (newer additions float up)
+      sorted.sort((a, b) => {
+        const aB = a.bestseller ? 1 : 0;
+        const bB = b.bestseller ? 1 : 0;
+        if (bB !== aB) return bB - aB;
+        return (b.id || 0) - (a.id || 0);
+      });
+      break;
+    case 'newest':
+      sorted.sort((a, b) => {
+        const aN = a.isNew ? 1 : 0;
+        const bN = b.isNew ? 1 : 0;
+        if (bN !== aN) return bN - aN;
+        return (b.id || 0) - (a.id || 0);
+      });
+      break;
+    case 'price-asc':
+      sorted.sort((a, b) => (a.price || 0) - (b.price || 0));
+      break;
+    case 'price-desc':
+      sorted.sort((a, b) => (b.price || 0) - (a.price || 0));
+      break;
+  }
+  return sorted;
+}
+
 function filterProducts(cat, btn){
+  currentFilter = cat;
   document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
+  if (btn) btn.classList.add('active');
+  else {
+    // External call (e.g. category card click) — find matching button
+    const match = Array.from(document.querySelectorAll('.filter-btn'))
+      .find(b => b.getAttribute('onclick') && b.getAttribute('onclick').includes(`'${cat}'`));
+    if (match) match.classList.add('active');
+  }
   // Skeleton flash for tactile feedback (skipped on reduced-motion)
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (reduceMotion) {
@@ -4731,15 +5379,28 @@ function openProduct(id){
     discEl.textContent = `-${Math.round((1-p.price/p.originalPrice)*100)}%`;
     discEl.style.display='inline-block';
   } else { oldEl.style.display='none'; discEl.style.display='none'; }
+  // Mobile sticky bar — price sync
+  const msbPrice = document.getElementById('msb-price');
+  if (msbPrice) msbPrice.textContent = `₡${p.price.toLocaleString()}`;
 
   // Sizes
   const sizesWrap = document.getElementById('modal-sizes-wrap');
   const sizesEl = document.getElementById('modal-sizes');
+  const msbChip = document.getElementById('msb-size-chip');
+  const msbLabel = document.getElementById('msb-size-label');
   if(p.sizes && p.sizes.length){
     sizesWrap.style.display='block';
     sizesEl.innerHTML = p.sizes.map(s=>`<button class="size-btn" onclick="selectSize(this,'${s}')">${s}</button>`).join('');
     sizesEl.querySelector('.size-btn').classList.add('active');
-  } else { sizesWrap.style.display='none'; }
+    if (msbChip && msbLabel) {
+      msbChip.classList.remove('missing');
+      msbChip.classList.add('has-value');
+      msbLabel.textContent = `Talla: ${p.sizes[0]}`;
+    }
+  } else {
+    sizesWrap.style.display='none';
+    if (msbChip) msbChip.classList.add('missing');
+  }
 
   // Colors
   const colorsWrap = document.getElementById('modal-colors-wrap');
@@ -4782,6 +5443,25 @@ function closeModal(){
 function selectSize(btn,s){
   btn.closest('.size-btns').querySelectorAll('.size-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
+  // Sync mobile sticky bar chip
+  const msbChip = document.getElementById('msb-size-chip');
+  const msbLabel = document.getElementById('msb-size-label');
+  if (msbChip && msbLabel) {
+    msbChip.classList.add('has-value');
+    msbLabel.textContent = `Talla: ${s}`;
+  }
+}
+
+function scrollToModalSizes(){
+  const target = document.getElementById('modal-sizes-wrap');
+  const body = document.querySelector('.modal-body');
+  if (!target || !body) return;
+  const top = target.offsetTop - 20;
+  body.scrollTo({ top, behavior: 'smooth' });
+  target.classList.remove('size-pulse');
+  void target.offsetWidth;
+  target.classList.add('size-pulse');
+  setTimeout(() => target.classList.remove('size-pulse'), 1200);
 }
 function selectColor(btn,c){
   btn.closest('.color-btns').querySelectorAll('.color-btn').forEach(b=>b.classList.remove('active'));
@@ -6771,6 +7451,60 @@ openProductForm = function(id){
   window.addEventListener('scroll', onScroll, { passive: true });
   // Run once on load in case page is already scrolled
   tick();
+})();
+
+// ════════════════════════════════════════════════════════════
+// FEATURE 8 ── PRODUCT CARD 3D TILT
+// Max 6° from neutral. Hover only. Skips touch / reduced-motion.
+// Auto-attaches to existing + dynamically rendered .prod-card elements.
+// ════════════════════════════════════════════════════════════
+(function initProductTilt(){
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isTouch      = window.matchMedia('(hover: none)').matches;
+  if (reduceMotion || isTouch) return;
+
+  const MAX_DEG = 6;
+  const LIFT    = -4;        // px lift while tilting
+  const PERSPECTIVE = 1100;  // px
+
+  function attach(card){
+    if (card.dataset.tilt) return;
+    card.dataset.tilt = '1';
+
+    card.addEventListener('mouseenter', () => {
+      card.style.transition = 'transform 0.18s cubic-bezier(.4,0,.2,1), border-color 0.4s, box-shadow 0.4s';
+    });
+
+    card.addEventListener('mousemove', (e) => {
+      const r = card.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width;
+      const py = (e.clientY - r.top)  / r.height;
+      const rx = (0.5 - py) * MAX_DEG * 2;
+      const ry = (px - 0.5) * MAX_DEG * 2;
+      card.style.transform = `perspective(${PERSPECTIVE}px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) translateY(${LIFT}px)`;
+    });
+
+    card.addEventListener('mouseleave', () => {
+      card.style.transition = 'transform 0.5s cubic-bezier(.16,1,.3,1), border-color 0.4s, box-shadow 0.4s';
+      card.style.transform  = '';
+      // Clear inline transition after settle so subsequent enters get the fast feel
+      setTimeout(() => {
+        if (card.style.transform === '') card.style.transition = '';
+      }, 520);
+    });
+  }
+
+  function scan(){
+    document.querySelectorAll('.prod-card').forEach(attach);
+  }
+
+  scan();
+
+  // Re-attach when products grid re-renders (filter / Supabase load)
+  const grid = document.getElementById('products-grid');
+  if (grid) {
+    new MutationObserver(scan).observe(grid, { childList: true });
+  }
 })();
 </script>
 </body>
