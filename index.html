@@ -3292,6 +3292,277 @@ img { transition: opacity 0.4s ease; }
 
 /* 49 ── Smooth section anchors offset for navbar */
 :target { scroll-margin-top: 80px; }
+
+/* ═══════════════════════════════════════════════════════════
+   FEATURE 1 ── CART FLY ANIMATION + BADGE PUNCH
+═══════════════════════════════════════════════════════════ */
+.fly-clone {
+  position: fixed;
+  z-index: 10000;
+  pointer-events: none;
+  border-radius: 4px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.7), 0 0 30px rgba(220,17,17,0.5);
+  object-fit: cover;
+  transform-origin: center center;
+  will-change: transform, opacity;
+}
+@keyframes cart-btn-punch {
+  0%   { transform: scale(1); box-shadow: 0 4px 24px rgba(220,17,17,0.5); }
+  30%  { transform: scale(1.22); box-shadow: 0 10px 44px rgba(220,17,17,0.95), 0 0 24px rgba(255,40,40,0.9); }
+  100% { transform: scale(1); box-shadow: 0 4px 24px rgba(220,17,17,0.5); }
+}
+#cart-btn.cart-punch {
+  animation: cart-btn-punch 0.55s cubic-bezier(.16,1,.3,1);
+}
+@keyframes badge-punch {
+  0%   { transform: scale(1); }
+  35%  { transform: scale(1.7); background: var(--red-bright); box-shadow: 0 0 14px rgba(255,40,40,0.95); }
+  100% { transform: scale(1); }
+}
+#cart-count.badge-punch {
+  animation: badge-punch 0.55s cubic-bezier(.16,1,.3,1);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FEATURE 3 ── SCROLL REVEAL (sections + stagger items)
+═══════════════════════════════════════════════════════════ */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal-section {
+    opacity: 0;
+    transform: translateY(36px);
+    transition: opacity .9s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1);
+    will-change: opacity, transform;
+  }
+  .reveal-section.in {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .reveal-item {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1);
+    transition-delay: var(--reveal-delay, 0ms);
+    will-change: opacity, transform;
+  }
+  .reveal-item.in {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FEATURE 4 ── PRODUCT GRID SKELETON LOADERS
+═══════════════════════════════════════════════════════════ */
+.skel-card {
+  background: var(--bg2);
+  border: 1px solid rgba(220,17,17,0.08);
+  position: relative;
+  overflow: hidden;
+}
+.skel-img {
+  width: 100%;
+  aspect-ratio: 3/4;
+  background: linear-gradient(90deg,
+    rgba(220,17,17,0.03) 0%,
+    rgba(220,17,17,0.09) 50%,
+    rgba(220,17,17,0.03) 100%);
+  background-size: 200% 100%;
+  animation: skel-shimmer 1.6s ease-in-out infinite;
+}
+.skel-info { padding: 1.2rem 1.4rem 1.4rem; }
+.skel-line {
+  height: 10px;
+  margin-bottom: 0.55rem;
+  background: linear-gradient(90deg,
+    rgba(220,17,17,0.05) 0%,
+    rgba(220,17,17,0.14) 50%,
+    rgba(220,17,17,0.05) 100%);
+  background-size: 200% 100%;
+  animation: skel-shimmer 1.6s ease-in-out infinite;
+}
+.skel-brand { width: 35%; height: 7px; opacity: 0.7; }
+.skel-name  { width: 78%; height: 12px; margin: 0.7rem 0 0.55rem; }
+.skel-name-short { width: 50%; height: 12px; margin-bottom: 0.85rem; }
+.skel-price { width: 40%; height: 18px; margin-top: 0.3rem; }
+@keyframes skel-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FEATURE 5 ── PRODUCT CARD COLOR SWATCHES
+═══════════════════════════════════════════════════════════ */
+.prod-swatches {
+  display: flex;
+  gap: 6px;
+  margin-top: 0.7rem;
+  align-items: center;
+}
+.swatch {
+  width: 14px;
+  height: 14px;
+  border: 1px solid rgba(220,17,17,0.28);
+  background: var(--bg3);
+  cursor: pointer;
+  padding: 0;
+  position: relative;
+  transition: transform .22s cubic-bezier(.16,1,.3,1),
+              border-color .22s ease,
+              box-shadow .22s ease;
+}
+.swatch:hover {
+  transform: scale(1.22);
+  border-color: var(--red);
+  box-shadow: 0 0 10px rgba(220,17,17,0.55), 0 0 2px rgba(255,40,40,0.6);
+  z-index: 3;
+}
+.swatch:focus-visible {
+  outline: 1px solid var(--red);
+  outline-offset: 3px;
+}
+.swatch-more {
+  font-family: var(--font-body);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--muted2);
+  padding: 0 0.25rem;
+  transition: color .25s ease;
+}
+.prod-card:hover .swatch-more { color: var(--text); }
+
+/* Scroll wrapper — gives height for the sticky effect */
+.hero-scroll-stage {
+  position: relative;
+  height: 180vh;
+}
+.hero-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── HERO PARTICLES ── */
+#hero-particles {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* ── HERO TITLE GLITCH ── */
+.hero-title-desmos {
+  position: relative;
+  display: inline-block;
+}
+.hero-title-desmos::before,
+.hero-title-desmos::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  opacity: 0;
+}
+.hero-title-desmos::before {
+  color: #ff1a1a;
+  clip-path: polygon(0 15%, 100% 15%, 100% 40%, 0 40%);
+  animation: glitch-top 3s infinite linear;
+}
+.hero-title-desmos::after {
+  color: #00ffcc;
+  clip-path: polygon(0 60%, 100% 60%, 100% 82%, 0 82%);
+  animation: glitch-bot 3s infinite linear;
+  animation-delay: 0.15s;
+}
+@keyframes glitch-top {
+  0%, 78%, 100% { opacity: 0; transform: translateX(0); }
+  79%  { opacity: 1; transform: translateX(-8px); clip-path: polygon(0 10%, 100% 10%, 100% 30%, 0 30%); }
+  80%  { opacity: 0; }
+  83%  { opacity: 0.9; transform: translateX(6px); clip-path: polygon(0 20%, 100% 20%, 100% 45%, 0 45%); }
+  84%  { opacity: 1; transform: translateX(-4px); }
+  85%  { opacity: 0; }
+  90%  { opacity: 0.6; transform: translateX(10px); clip-path: polygon(0 5%, 100% 5%, 100% 25%, 0 25%); }
+  91%  { opacity: 0; }
+}
+@keyframes glitch-bot {
+  0%, 80%, 100% { opacity: 0; transform: translateX(0); }
+  81%  { opacity: 1; transform: translateX(8px); clip-path: polygon(0 60%, 100% 60%, 100% 80%, 0 80%); }
+  82%  { opacity: 0; }
+  85%  { opacity: 0.8; transform: translateX(-6px); clip-path: polygon(0 70%, 100% 70%, 100% 90%, 0 90%); }
+  86%  { opacity: 1; transform: translateX(4px); }
+  87%  { opacity: 0; }
+  92%  { opacity: 0.5; transform: translateX(-10px); clip-path: polygon(0 55%, 100% 55%, 100% 75%, 0 75%); }
+  93%  { opacity: 0; }
+}
+
+/* ── HERO TITLE MIND — glitch igual que DESMOS ── */
+.hero-title-mind {
+  position: relative;
+  display: inline-block;
+  color: var(--white);
+}
+.hero-title-mind::before,
+.hero-title-mind::after {
+  content: 'MIND';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  font-style: inherit;
+  opacity: 0;
+}
+.hero-title-mind::before {
+  color: #ff1a1a;
+  clip-path: polygon(0 15%, 100% 15%, 100% 40%, 0 40%);
+  animation: glitch-top 3s infinite linear;
+  animation-delay: 0.2s;
+}
+.hero-title-mind::after {
+  color: #00ffcc;
+  clip-path: polygon(0 60%, 100% 60%, 100% 82%, 0 82%);
+  animation: glitch-bot 3s infinite linear;
+  animation-delay: 0.35s;
+}
+
+/* ── HERO SCAN LINE ── */
+.hero::before {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, rgba(220,17,17,0.15) 20%, rgba(220,17,17,0.5) 50%, rgba(220,17,17,0.15) 80%, transparent 100%);
+  animation: hero-scan 6s ease-in-out infinite;
+  z-index: 2;
+  pointer-events: none;
+}
+@keyframes hero-scan {
+  0%   { top: 0%; opacity: 0; }
+  5%   { opacity: 1; }
+  95%  { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+/* ── HERO CORNER ORNAMENTS ── */
+.hero-corner {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  z-index: 3;
+  pointer-events: none;
+}
 </style>
 </head>
 <body>
@@ -3339,7 +3610,7 @@ img { transition: opacity 0.4s ease; }
 </div>
 
 <!-- ═══ HERO — PREMIUM ═══ -->
-<section class="hero" id="inicio">
+<div class="hero-scroll-stage"><div class="hero-sticky"><section class="hero" id="inicio">
 
   <!-- Layer 1: Bat image -->
 
@@ -3359,6 +3630,15 @@ img { transition: opacity 0.4s ease; }
   <!-- Layer 4: Bottom fade -->
   <div class="hero-bottom-fade"></div>
 
+  <!-- Hero Particles Canvas -->
+  <canvas id="hero-particles" aria-hidden="true"></canvas>
+
+  <!-- Corner ornaments -->
+  <div class="hero-corner tl" aria-hidden="true"></div>
+  <div class="hero-corner tr" aria-hidden="true"></div>
+  <div class="hero-corner bl" aria-hidden="true"></div>
+  <div class="hero-corner br" aria-hidden="true"></div>
+
   <!-- Layer 5: Content -->
   <div class="hero-content">
 
@@ -3369,7 +3649,7 @@ img { transition: opacity 0.4s ease; }
     </div>
 
     <h1 class="hero-title">
-      <span id="hero-title-text" class="hero-title-desmos">DESMOS</span>
+      <span id="hero-title-text" class="hero-title-desmos" data-text="DESMOS">DESMOS</span>
       <span class="hero-title-divider" aria-hidden="true"></span>
       <em class="hero-title-mind">MIND</em>
     </h1>
@@ -3405,7 +3685,7 @@ img { transition: opacity 0.4s ease; }
     <span class="scroll-label">Scroll</span>
   </div>
 
-</section>
+</section></div></div>
 
 <!-- ═══ BRANDS MARQUEE ═══ -->
 <div class="brands-band">
@@ -4151,7 +4431,7 @@ async function sbFetch(table, method='GET', body=null, filter=''){
     'Content-Type': 'application/json',
   };
   if(method==='GET') headers['Prefer']='';
-  else if(method==='DELETE') headers['Prefer']='';
+  else if(method==='DELETE') headers['Prefer']='return=representation';
   else headers['Prefer']='return=representation';
   const opts = { method, headers };
   if(body) opts.body = JSON.stringify(body);
@@ -4174,21 +4454,7 @@ async function sbFetch(table, method='GET', body=null, filter=''){
 // ════════════════════════════════════
 // DATA STORE (fallback while loading)
 // ════════════════════════════════════
-const DEFAULT_PRODUCTS = [
-  {id:1,name:"Tank Immortal Series",brand:"YOUNGLA",category:"ropa",type:"stock",bestseller:true,price:28000,originalPrice:35000,sizes:["S","M","L","XL"],colors:["Negro","Blanco","Grafito"],desc:"Tank muscle-fit ultra-ligera de YoungLA. Tela de alto rendimiento con corte que resalta cada músculo. El favorito de los atletas de élite.",img:"https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=600&q=80"},
-  {id:2,name:"Jogger Phantom Tapered",brand:"YOUNGLA",category:"ropa",type:"encargo",isNew:true,price:42000,originalPrice:52000,sizes:["S","M","L","XL","XXL"],colors:["Negro","Carbón"],desc:"Jogger cónico premium de YoungLA. Tela French Terry 380GSM, cintura elástica con cordón. El jogger definitivo para gym y street.",img:"https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&q=80"},
-  {id:3,name:"Crest Hoodie Oversized",brand:"GYMSHARK",category:"ropa",type:"encargo",price:68000,originalPrice:null,sizes:["XS","S","M","L","XL"],colors:["Negro","Blanco Roto","Verde Musgo"],desc:"Hoodie de Gymshark en corte oversized. Tela brushed fleece premium, capucha doble capa. El hoodie que define el post-entreno.",img:"https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=600&q=80"},
-  {id:4,name:"Shorts Warfare 7\"",brand:"YOUNGLA",category:"ropa",type:"stock",price:26000,originalPrice:32000,sizes:["S","M","L","XL","XXL"],colors:["Negro","Carbón","Oliva Militar"],desc:"Shorts de entrenamiento 7 pulgadas. Tela 4-way stretch, forro interior, bolsillos profundos con cierre. Máxima libertad de movimiento.",img:"https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600&q=80"},
-  {id:5,name:"Velocity Seamless Leggings",brand:"ALPHALETE",category:"ropa",type:"encargo",price:58000,originalPrice:null,sizes:["XS","S","M","L"],colors:["Negro","Midnight Navy","Sand Dune"],desc:"Leggings seamless de Alphalete. Tela sin costuras para máxima comodidad, compresión de soporte medio-alto. Diseño minimalista premium.",img:"https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=600&q=80"},
-  {id:6,name:"Training Jacket Shadow",brand:"GYMSHARK",category:"ropa",type:"encargo",price:72000,originalPrice:null,sizes:["S","M","L","XL"],colors:["Negro","Charcoal"],desc:"Jacket de entrenamiento Gymshark con tecnología moisture-wicking. Corte slim, zipper completo. Del gym a la calle sin sacrificar estilo.",img:"https://images.unsplash.com/photo-1553481187-be93c21490a9?w=600&q=80"},
-  {id:7,name:"Gold Standard Whey 5LB",brand:"OPTIMUM NUTRITION",category:"suplementos",type:"stock",bestseller:true,price:54000,originalPrice:62000,sizes:[],colors:["Chocolate Extremo","Doble Vainilla","Fresa Banan"],desc:"La proteína más vendida del mundo durante más de 20 años. 24g de proteína, 5.5g de BCAAs, 4g de glutamina por servicio. Sin compromiso.",img:"https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=600&q=80"},
-  {id:8,name:"Pre-Workout C4 Original",brand:"CELLUCOR",category:"suplementos",type:"stock",price:38000,originalPrice:46000,sizes:[],colors:["Watermelon","Fruit Punch","Cherry Limeade"],desc:"El pre-entreno más vendido en USA. 150mg de cafeína, beta-alanina para resistencia y arginina para flujo sanguíneo. Resultados desde el primer día.",img:"https://images.unsplash.com/photo-1594737625785-a6cbdabd333c?w=600&q=80"},
-  {id:9,name:"Creatina Monohidrato 500G",brand:"OPTIMUM NUTRITION",category:"suplementos",type:"stock",price:24000,originalPrice:null,sizes:[],colors:["Micronizada"],desc:"Creatina monohidrato micronizada de grado farmacéutico. Sin aditivos, sin colorantes. 5g por servicio para máximo rendimiento y recuperación.",img:"https://images.unsplash.com/photo-1571019613531-3a0a1b014e28?w=600&q=80"},
-  {id:10,name:"Cinturón Powerlifting Pro",brand:"RYDERWEAR",category:"accesorios",type:"stock",price:34000,originalPrice:null,sizes:["S","M","L","XL"],colors:["Negro","Tan"],desc:"Cinturón de levantamiento 10mm de cuero genuino. Soporte lumbar máximo para squats y deadlifts pesados. El estándar de los powerlifters.",img:"https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=600&q=80"},
-  {id:11,name:"Lifting Straps Heavy Duty",brand:"RYDERWEAR",category:"accesorios",type:"stock",price:13000,originalPrice:null,sizes:[],colors:["Negro","Rojo"],desc:"Straps de levantamiento con neopreno acolchado 7mm. Cierre de velcro reforzado. Máximo agarre para jalones y levantamientos.",img:"https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=600&q=80"},
-  {id:12,name:"Shaker Stainless 900ML",brand:"GYMSHARK",category:"accesorios",type:"stock",price:18000,originalPrice:22000,sizes:[],colors:["Negro Mate","Gunmetal"],desc:"Shaker de acero inoxidable premium 900ML. Doble pared para mantener temperatura. Bola mezcladora incluida. Anti-fugas garantizado.",img:"https://images.unsplash.com/photo-1523362628745-0c100150b504?w=600&q=80"},
-];
-
+const DEFAULT_PRODUCTS = [];
 let products = [...DEFAULT_PRODUCTS];
 let currentModalProduct = null;
 let siteContent = {};
@@ -4264,9 +4530,109 @@ function renderMarquee(){
 // ════════════════════════════════════
 // RENDER PRODUCTS
 // ════════════════════════════════════
+// Color name → hex mapping for swatches.
+// Falls back to muted gray for unknown names (e.g. supplement flavors with no good color).
+const COLOR_HEX = {
+  // Core
+  'negro':'#0a0a0a','black':'#0a0a0a',
+  'blanco':'#f0ece4','white':'#f0ece4',
+  'blanco roto':'#e8e3d8',
+  'gris':'#5a5a5a','grey':'#5a5a5a','gray':'#5a5a5a',
+  'rojo':'#DC1111','red':'#DC1111',
+  'azul':'#1f3a5f','blue':'#1f3a5f',
+  'amarillo':'#d4b842','yellow':'#d4b842',
+  'rosa':'#d76b8a','pink':'#d76b8a',
+  'naranja':'#e26a1f','orange':'#e26a1f',
+  'verde':'#2d5a3d','green':'#2d5a3d',
+  // Gym specific
+  'grafito':'#3a3a3a',
+  'carbón':'#1c1c1c','carbon':'#1c1c1c',
+  'charcoal':'#2a2a2a',
+  'gunmetal':'#3c4248',
+  'verde musgo':'#3a4a30',
+  'oliva militar':'#4a5d3a','olive':'#4a5d3a',
+  'tan':'#c9a878',
+  'midnight navy':'#0e1422',
+  'sand dune':'#c4b094',
+  'negro mate':'#0d0d0d',
+  // Supplement flavors (approximate)
+  'chocolate extremo':'#3a1f12','chocolate':'#3a1f12',
+  'doble vainilla':'#e8d39c','vainilla':'#e8d39c','vanilla':'#e8d39c',
+  'fresa banan':'#d68faa','fresa':'#d76b8a','strawberry':'#d76b8a',
+  'watermelon':'#d44455',
+  'fruit punch':'#9d2a35',
+  'cherry limeade':'#6e1e2a',
+  'micronizada':'#e0dad0'
+};
+
+function colorToHex(name){
+  const k = (name || '').toLowerCase().trim();
+  return COLOR_HEX[k] || '#6a6a62';
+}
+
+function renderSwatchesHtml(productId, colors){
+  const valid = (colors || []).filter(c => c && c.trim());
+  if (!valid.length) return '';
+  const MAX = 4;
+  const shown = valid.slice(0, MAX);
+  const extra = valid.length - shown.length;
+  const swatches = shown.map(c => {
+    const hex = colorToHex(c);
+    const safeName = String(c).replace(/'/g, "\\'");
+    return `<button class="swatch"
+      style="background:${hex};"
+      title="${c}"
+      aria-label="Color: ${c}"
+      onclick="event.stopPropagation();openProductWithColor(${productId},'${safeName}')"></button>`;
+  }).join('');
+  const extraEl = extra > 0 ? `<span class="swatch-more">+${extra}</span>` : '';
+  return `<div class="prod-swatches" onclick="event.stopPropagation()">${swatches}${extraEl}</div>`;
+}
+
+function openProductWithColor(id, colorName){
+  openProduct(id);
+  // After modal renders, activate the matching color button
+  setTimeout(() => {
+    const buttons = document.querySelectorAll('#modal-colors .color-btn');
+    let matched = false;
+    buttons.forEach(b => {
+      if (b.textContent.trim().toLowerCase() === colorName.toLowerCase()) {
+        buttons.forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        matched = true;
+      }
+    });
+    if (!matched && buttons.length) buttons[0].classList.add('active');
+  }, 60);
+}
+
+function renderSkeletons(count = 8){
+  const grid = document.getElementById('products-grid');
+  if (!grid) return;
+  const cards = [];
+  for (let i = 0; i < count; i++){
+    cards.push(`
+      <div class="skel-card" aria-hidden="true">
+        <div class="skel-img"></div>
+        <div class="skel-info">
+          <div class="skel-line skel-brand"></div>
+          <div class="skel-line skel-name"></div>
+          <div class="skel-line skel-name-short"></div>
+          <div class="skel-line skel-price"></div>
+        </div>
+      </div>`);
+  }
+  grid.innerHTML = cards.join('');
+}
+
 function renderProducts(filter='all'){
   const grid = document.getElementById('products-grid');
   if(!grid) return;
+  // Show skeletons if we have no products to render at all
+  if (!products.length) {
+    renderSkeletons(8);
+    return;
+  }
   const filtered = filter==='all' ? products : products.filter(p=>p.category===filter);
   if(!filtered.length){
     grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:4rem;color:var(--muted2);font-family:var(--font-body);font-weight:600;font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;">NO HAY PRODUCTOS EN ESTA CATEGORÍA</div>';
@@ -4304,6 +4670,7 @@ function renderProducts(filter='all'){
           <span class="prod-price">₡${p.price.toLocaleString()}</span>
           ${hasDiscount?`<span class="prod-price-old">₡${p.originalPrice.toLocaleString()}</span>`:''}
         </div>
+        ${renderSwatchesHtml(p.id, p.colors)}
       </div>
     </div>`}).join('');
   grid.querySelectorAll('.reveal').forEach(el=>revealObserver.observe(el));
@@ -4312,7 +4679,14 @@ function renderProducts(filter='all'){
 function filterProducts(cat, btn){
   document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  renderProducts(cat);
+  // Skeleton flash for tactile feedback (skipped on reduced-motion)
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduceMotion) {
+    renderProducts(cat);
+    return;
+  }
+  renderSkeletons(8);
+  setTimeout(() => renderProducts(cat), 220);
 }
 
 // ════════════════════════════════════
@@ -5415,8 +5789,75 @@ function addProductToCart(){
   const colorSel = document.querySelector('#modal-colors .color-btn.active');
   const size = sizeSel ? sizeSel.textContent : '';
   const color = colorSel ? colorSel.textContent : '';
-  addToCart(currentModalProduct, size, color);
+  const product = currentModalProduct;
+
+  // Capture source image position BEFORE closing the modal
+  const sourceImg = document.getElementById('modal-main-img');
+  const sourceRect = sourceImg ? sourceImg.getBoundingClientRect() : null;
+  const sourceSrc  = sourceImg ? sourceImg.src : '';
+
   closeModal();
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (sourceRect && sourceSrc && sourceRect.width > 0 && !reduceMotion) {
+    flyToCart(sourceSrc, sourceRect, () => addToCart(product, size, color));
+  } else {
+    addToCart(product, size, color);
+  }
+}
+
+function flyToCart(imgSrc, srcRect, onComplete){
+  const cartBtn = document.getElementById('cart-btn');
+  if (!cartBtn || !imgSrc) { onComplete && onComplete(); return; }
+  const dstRect = cartBtn.getBoundingClientRect();
+
+  const clone = document.createElement('img');
+  clone.src = imgSrc;
+  clone.className = 'fly-clone';
+  clone.style.left   = srcRect.left + 'px';
+  clone.style.top    = srcRect.top + 'px';
+  clone.style.width  = srcRect.width + 'px';
+  clone.style.height = srcRect.height + 'px';
+  document.body.appendChild(clone);
+
+  const dx = (dstRect.left + dstRect.width/2)  - (srcRect.left + srcRect.width/2);
+  const dy = (dstRect.top  + dstRect.height/2) - (srcRect.top  + srcRect.height/2);
+  // Arc upward then to cart
+  const midX = dx * 0.55;
+  const midY = Math.min(dy * 0.3, -120);
+
+  const anim = clone.animate([
+    { transform: 'translate(0,0) scale(1) rotate(0deg)',                       opacity: 1,    offset: 0 },
+    { transform: `translate(${midX}px, ${midY}px) scale(0.55) rotate(-12deg)`, opacity: 0.92, offset: 0.6 },
+    { transform: `translate(${dx}px, ${dy}px) scale(0.12) rotate(22deg)`,      opacity: 0,    offset: 1 }
+  ], {
+    duration: 720,
+    easing:  'cubic-bezier(.55,0,.3,1)',
+    fill:    'forwards'
+  });
+
+  anim.onfinish = () => {
+    clone.remove();
+    punchCart();
+    onComplete && onComplete();
+  };
+}
+
+function punchCart(){
+  const btn   = document.getElementById('cart-btn');
+  const badge = document.getElementById('cart-count');
+  if (btn) {
+    btn.classList.remove('cart-punch');
+    void btn.offsetWidth;
+    btn.classList.add('cart-punch');
+    setTimeout(() => btn.classList.remove('cart-punch'), 600);
+  }
+  if (badge) {
+    badge.classList.remove('badge-punch');
+    void badge.offsetWidth;
+    badge.classList.add('badge-punch');
+    setTimeout(() => badge.classList.remove('badge-punch'), 600);
+  }
 }
 
 // ════════════════════════════════════
@@ -5838,6 +6279,165 @@ openProductForm = function(id){
   }
 };
 
+// ════════════════════════════════════════════════════════════
+// FEATURE 2 ── MAGNETIC BUTTONS
+// Damped cursor-pull on primary CTAs (skipped on touch / reduced motion).
+// Auto-attaches to .btn-primary / .modal-btn-cart / .cart-wa-btn,
+// excluding admin and form modal contexts.
+// ════════════════════════════════════════════════════════════
+(function initMagneticButtons(){
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isTouch      = window.matchMedia('(hover: none)').matches;
+  if (reduceMotion || isTouch) return;
+
+  const SELECTORS = '.btn-primary, .modal-btn-cart, .cart-wa-btn';
+  const EXCLUDE   = ['#admin-panel', '#prod-form-modal', '#drop-form-modal'];
+
+  function isExcluded(el){
+    return EXCLUDE.some(sel => el.closest(sel));
+  }
+
+  function attach(btn){
+    if (btn.dataset.magnetic) return;
+    btn.dataset.magnetic = '1';
+
+    let tx = 0, ty = 0, cx = 0, cy = 0;
+    let rafId = null;
+    let inside = false;
+    const STRENGTH_X = 0.3;
+    const STRENGTH_Y = 0.4;
+
+    function loop(){
+      cx += (tx - cx) * 0.18;
+      cy += (ty - cy) * 0.18;
+      btn.style.transform = `translate(${cx.toFixed(2)}px, ${cy.toFixed(2)}px)`;
+      if (Math.abs(tx - cx) > 0.1 || Math.abs(ty - cy) > 0.1) {
+        rafId = requestAnimationFrame(loop);
+      } else {
+        rafId = null;
+        if (!inside) btn.style.transform = '';
+      }
+    }
+
+    btn.addEventListener('mouseenter', () => { inside = true; });
+    btn.addEventListener('mousemove', (e) => {
+      const r = btn.getBoundingClientRect();
+      const x = e.clientX - r.left - r.width  / 2;
+      const y = e.clientY - r.top  - r.height / 2;
+      tx = x * STRENGTH_X;
+      ty = y * STRENGTH_Y;
+      if (!rafId) loop();
+    });
+    btn.addEventListener('mouseleave', () => {
+      inside = false;
+      tx = 0; ty = 0;
+      if (!rafId) loop();
+    });
+  }
+
+  function rescan(){
+    document.querySelectorAll(SELECTORS).forEach(btn => {
+      if (!isExcluded(btn)) attach(btn);
+    });
+  }
+
+  rescan();
+
+  // Re-scan when dynamic product/cart content renders (debounced)
+  let scanTimer = null;
+  const mo = new MutationObserver((mutations) => {
+    let added = false;
+    for (const m of mutations) {
+      if (m.addedNodes.length) { added = true; break; }
+    }
+    if (!added) return;
+    clearTimeout(scanTimer);
+    scanTimer = setTimeout(rescan, 200);
+  });
+  mo.observe(document.body, { childList: true, subtree: true });
+})();
+
+// ════════════════════════════════════════════════════════════
+// FEATURE 3 ── SCROLL REVEAL (sections + grid stagger)
+// IntersectionObserver-based reveal:
+//   • Sections (except hero) fade up as they enter the viewport.
+//   • Items inside known grids stagger in with incremental delay.
+//   • Respects prefers-reduced-motion (no marking, no animation).
+//   • Handles dynamic content via MutationObserver on grids that have
+//     already triggered (new items revealed immediately).
+// ════════════════════════════════════════════════════════════
+(function initScrollReveal(){
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  const STAGGER_GRIDS = [
+    '.trust-grid',
+    '.cat-grid',
+    '.how-grid',
+    '.test-grid',
+    '.faq-list'
+  ];
+  const STAGGER_MS = 70;
+  const STAGGER_MAX = 600;
+
+  // 1. Mark sections (except hero)
+  document.querySelectorAll('section').forEach(section => {
+    if (section.classList.contains('hero')) return;
+    section.classList.add('reveal-section');
+  });
+
+  // 2. Mark grid items (per-parent indexing)
+  function markGridItems(grid){
+    Array.from(grid.children).forEach((child, idx) => {
+      if (child.dataset.revealMarked) return;
+      child.dataset.revealMarked = '1';
+      child.classList.add('reveal-item');
+      const delay = Math.min(idx * STAGGER_MS, STAGGER_MAX);
+      child.style.setProperty('--reveal-delay', delay + 'ms');
+      // If grid is already revealed, fade in immediately
+      if (grid.dataset.revealTriggered) {
+        requestAnimationFrame(() => child.classList.add('in'));
+      }
+    });
+  }
+
+  document.querySelectorAll(STAGGER_GRIDS.join(',')).forEach(markGridItems);
+
+  // 3. IntersectionObserver
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('in');
+      // Trigger stagger children
+      entry.target.querySelectorAll('.reveal-item').forEach(item => {
+        item.classList.add('in');
+      });
+      // Mark each contained grid as triggered (for future dynamic items)
+      entry.target.querySelectorAll(STAGGER_GRIDS.join(',')).forEach(g => {
+        g.dataset.revealTriggered = '1';
+      });
+      io.unobserve(entry.target);
+    });
+  }, { rootMargin: '-60px 0px', threshold: 0.04 });
+
+  document.querySelectorAll('.reveal-section').forEach(s => io.observe(s));
+
+  // 4. Watch for dynamic items added to known grids after their section
+  // already triggered (e.g., products re-render, FAQ adds).
+  const gridMO = new MutationObserver((mutations) => {
+    for (const m of mutations) {
+      if (!m.addedNodes.length) continue;
+      // If the target itself is one of our grids, mark new children
+      const parent = m.target;
+      if (parent.matches && parent.matches(STAGGER_GRIDS.join(','))) {
+        markGridItems(parent);
+      }
+    }
+  });
+  document.querySelectorAll(STAGGER_GRIDS.join(',')).forEach(grid => {
+    gridMO.observe(grid, { childList: true });
+  });
+})();
+
 </script>
 
 
@@ -5958,5 +6558,220 @@ openProductForm = function(id){
   </div>
 </div>
 
+
+<script>
+// ════════════════════════════════════
+// HERO PARTICLES
+// ════════════════════════════════════
+(function(){
+  const canvas = document.getElementById('hero-particles');
+  if(!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [], animId;
+
+  function resize(){
+    W = canvas.width = canvas.offsetWidth;
+    H = canvas.height = canvas.offsetHeight;
+  }
+
+  function randBetween(a, b){ return a + Math.random() * (b - a); }
+
+  function createParticle(fromBottom){
+    const red = Math.random() > 0.45;
+    // 40% of particles spawn near center (bat zone), rest spread everywhere
+    let x, y;
+    if(Math.random() > 0.6){
+      // near bat center — gaussian-ish spread
+      const angle = Math.random() * Math.PI * 2;
+      const dist = randBetween(0, Math.min(W, H) * 0.45);
+      x = W * 0.5 + Math.cos(angle) * dist;
+      y = fromBottom ? H + randBetween(5, 60) : H * 0.5 + Math.sin(angle) * dist;
+    } else {
+      x = Math.random() * W;
+      y = fromBottom ? H + randBetween(5, 60) : Math.random() * H;
+    }
+    return {
+      x,
+      y,
+      r: randBetween(1.2, 4.5),
+      vx: randBetween(-0.45, 0.45),
+      vy: randBetween(-0.8, -0.15),
+      alpha: red ? randBetween(0.65, 1.0) : randBetween(0.35, 0.75),
+      life: 0,
+      maxLife: randBetween(100, 280),
+      red,
+      twinkle: Math.random() > 0.35,
+      twinkleSpeed: randBetween(0.04, 0.12),
+      twinkleOffset: Math.random() * Math.PI * 2
+    };
+  }
+
+  function initParticles(){
+    particles = [];
+    const count = Math.floor((W * H) / 2200);
+    for(let i = 0; i < count; i++){
+      const p = createParticle(false);
+      p.life = Math.random() * p.maxLife;
+      particles.push(p);
+    }
+  }
+
+  function draw(){
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach((p, i) => {
+      p.life++;
+      p.x += p.vx;
+      p.y += p.vy;
+
+      const progress = p.life / p.maxLife;
+      const fade = progress < 0.06 ? progress / 0.06 : progress > 0.78 ? (1 - progress) / 0.22 : 1;
+      let alpha = p.alpha * fade;
+
+      if(p.twinkle){
+        alpha *= 0.55 + 0.45 * Math.sin(p.life * p.twinkleSpeed + p.twinkleOffset);
+      }
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      if(p.red){
+        ctx.shadowBlur = p.r * 6;
+        ctx.shadowColor = `rgba(220,17,17,0.9)`;
+        ctx.fillStyle = `rgba(220,17,17,${alpha})`;
+      } else {
+        ctx.shadowBlur = p.r * 3;
+        ctx.shadowColor = `rgba(240,236,228,0.5)`;
+        ctx.fillStyle = `rgba(240,236,228,${alpha})`;
+      }
+      ctx.fill();
+      ctx.shadowBlur = 0;
+
+      if(p.life >= p.maxLife || p.y < -10 || p.x < -10 || p.x > W + 10){
+        particles[i] = createParticle(true);
+      }
+    });
+    animId = requestAnimationFrame(draw);
+  }
+
+  resize();
+  initParticles();
+  draw();
+
+  window.addEventListener('resize', () => {
+    cancelAnimationFrame(animId);
+    resize();
+    initParticles();
+    draw();
+  });
+})();
+</script>
+<script>
+// ════════════════════════════════════
+// BAT SCROLL ANIMATION — STICKY STAGE
+// ════════════════════════════════════
+(function(){
+  const bat     = document.querySelector('.hero-bat-svg');
+  const stage   = document.querySelector('.hero-scroll-stage');
+  const glow    = document.querySelector('.hero-glow');
+  const content = document.querySelector('.hero-content');
+  const title   = document.querySelector('.hero-title');
+  const tagline = document.querySelector('.hero-tagline');
+  const btns    = document.querySelector('.hero-btns');
+  const stats   = document.querySelector('.hero-stats');
+  const eyebrow = document.querySelector('.hero-eyebrow');
+  const sub     = document.querySelector('.hero-sub');
+  if(!bat || !stage) return;
+
+  const ease    = t => t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+  const clamp   = (v,a,b) => Math.min(Math.max(v,a),b);
+  const norm    = (v,a,b) => clamp((v-a)/(b-a),0,1);
+
+  let raf = null;
+  let paused = false;
+
+  function tick(){
+    raf = null;
+    const stageTop  = stage.getBoundingClientRect().top + window.scrollY;
+    const stageH    = stage.offsetHeight - window.innerHeight;
+    const scrolled  = window.scrollY - stageTop;
+    // progress 0→1 across the scrollable portion of the stage
+    const p = clamp(scrolled / stageH, 0, 1);
+
+    // Pause/resume CSS float
+    if(p > 0.01 && !paused){
+      bat.style.animationPlayState = 'paused';
+      paused = true;
+    } else if(p <= 0.01 && paused){
+      bat.style.animationPlayState = 'running';
+      paused = false;
+    }
+
+    if(p <= 0){
+      bat.style.transform = '';
+      bat.style.opacity   = '';
+      bat.style.filter    = '';
+      if(glow) glow.style.opacity = '';
+      [content,title,tagline,btns,stats,eyebrow,sub].forEach(el=>{ if(el){ el.style.opacity=''; el.style.transform=''; }});
+      return;
+    }
+
+    // ── PHASE 1: 0–0.2 — AWAKEN: heartbeat + glow flare ──
+    // ── PHASE 2: 0.2–0.55 — FLAP: wing beats + slow rise ──
+    // ── PHASE 3: 0.55–1.0 — FLY: accelerate up + vanish ──
+
+    let sx=1, sy=1, ty=0, tx=0, skew=0, batOpacity=1, bright=1;
+
+    if(p < 0.2){
+      const t = norm(p, 0, 0.2);
+      const pulse = Math.sin(t * Math.PI * 4) * 0.05;
+      sx = 1 + pulse;
+      sy = 1 + pulse * 0.6;
+      bright = 1 + t * 1.2;
+      if(glow) glow.style.opacity = 0.8 + t * 1.4;
+
+    } else if(p < 0.55){
+      const t = norm(p, 0.2, 0.55);
+      const flap = Math.sin(t * Math.PI * 5 * 2); // 5 full beats
+      sx   = 1.05 + Math.abs(flap) * 0.08;
+      sy   = 1.0  - Math.abs(flap) * 0.1;
+      skew = flap * 4;
+      ty   = -ease(t) * 50;
+      bright = 2 - t * 0.5;
+      batOpacity = 1;
+      if(glow) glow.style.opacity = 1.8 - t * 0.6;
+
+    } else {
+      const t = norm(p, 0.55, 1.0);
+      const et = ease(t);
+      sx   = 1.1  - et * 0.35;
+      sy   = 0.95 - et * 0.3;
+      ty   = -50  - et * 220;
+      tx   = Math.sin(et * Math.PI * 2) * 30;
+      batOpacity = 1 - et * 1.2;
+      bright = 2.5 - et * 2.2;
+      if(glow) glow.style.opacity = Math.max(0, 1.2 - et * 1.5);
+    }
+
+    bat.style.transform = `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(${sx},${sy}) skewX(${skew}deg)`;
+    bat.style.opacity   = Math.max(0, Math.min(1, batOpacity));
+    bat.style.filter    = `drop-shadow(0 0 ${8+bright*8}px rgba(255,20,20,1)) drop-shadow(0 0 ${28+bright*22}px rgba(255,0,0,${0.7+bright*0.08})) drop-shadow(0 0 ${65+bright*35}px rgba(220,17,17,${0.35+bright*0.04}))`;
+
+    // Content: stays fully visible until phase 2, then fades and rises
+    const contentFade = norm(p, 0.25, 0.7);
+    const contentEase = ease(contentFade);
+    if(content){
+      content.style.opacity  = Math.max(0, 1 - contentEase * 1.1);
+      content.style.transform = `translateY(${-contentEase * 60}px)`;
+    }
+  }
+
+  function onScroll(){
+    if(!raf) raf = requestAnimationFrame(tick);
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  // Run once on load in case page is already scrolled
+  tick();
+})();
+</script>
 </body>
 </html>
