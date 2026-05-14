@@ -5217,7 +5217,161 @@ html.loader-dismissed #page-loader { display: none !important; }
   .recent-card { flex: 0 0 160px; }
   .recent-strip { gap: 0.6rem; }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   FEATURE 27 ── MOBILE BOTTOM TAB BAR
+   Visible only ≤900px. Replaces floating cart-btn FAB on mobile.
+   4 tabs: Home / Shop / Wishlist / Cart with active indicator
+   driven by IntersectionObserver on hero/products sections.
+═══════════════════════════════════════════════════════════ */
+.bottom-tabs {
+  display: none;   /* hidden on desktop */
+}
+@media (max-width: 900px) {
+  .bottom-tabs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    position: fixed;
+    left: 0; right: 0;
+    bottom: 0;
+    background: rgba(8, 8, 8, 0.96);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-top: 1px solid rgba(220,17,17,0.32);
+    box-shadow: 0 -8px 32px rgba(0,0,0,0.75);
+    z-index: 500;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    transition: transform 0.35s cubic-bezier(.16,1,.3,1);
+    will-change: transform;
+  }
+  .bottom-tabs::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--red), transparent);
+    box-shadow: 0 0 10px var(--red);
+  }
+  /* Push body up so content doesn't hide behind the bar */
+  body {
+    padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px));
+  }
+  /* Replace floating cart FAB with the bottom-tab cart icon on mobile */
+  #cart-btn { display: none !important; }
+  /* If the keyboard pushes the viewport, hide the bar so users see input */
+  .bottom-tabs.keyboard-hidden {
+    transform: translateY(120%);
+    pointer-events: none;
+  }
+}
+.bt-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 10px 4px 8px;
+  text-decoration: none;
+  color: var(--muted2);
+  font-family: var(--font-body);
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  position: relative;
+  transition: color 0.25s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.bt-tab svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.7;
+  transition: transform 0.22s cubic-bezier(.16,1,.3,1),
+              stroke 0.25s ease,
+              fill 0.25s ease;
+}
+.bt-tab .bt-label { line-height: 1; }
+.bt-tab.active {
+  color: var(--red);
+}
+.bt-tab.active svg {
+  stroke: var(--red);
+  fill: rgba(220,17,17,0.18);
+  transform: scale(1.06);
+  filter: drop-shadow(0 0 6px rgba(220,17,17,0.6));
+}
+.bt-tab.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 30%;
+  right: 30%;
+  height: 2px;
+  background: var(--red);
+  box-shadow: 0 0 10px var(--red), 0 0 20px rgba(220,17,17,0.5);
+  animation: bt-active-in 0.3s cubic-bezier(.16,1,.3,1);
+}
+@keyframes bt-active-in {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+.bt-tab:active svg { transform: scale(0.86); }
+.bt-tab:hover { color: var(--text); }
+.bt-tab.active:hover { color: var(--red); }
+.bt-badge {
+  position: absolute;
+  top: 4px;
+  right: calc(50% - 22px);
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  background: var(--red);
+  color: white;
+  font-family: var(--font-body);
+  font-size: 0.5rem;
+  border-radius: 8px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  box-shadow: 0 2px 8px rgba(220,17,17,0.55);
+}
+.bt-badge.visible { display: flex; }
+.bt-badge.bump {
+  animation: bt-badge-bump 0.45s cubic-bezier(.16,1,.3,1);
+}
+@keyframes bt-badge-bump {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.45); background: var(--red-bright); }
+  100% { transform: scale(1); }
+}
 </style>
+
+<!-- ═══ PLAUSIBLE ANALYTICS (privacy-friendly, no cookies) ═══ -->
+<script defer data-domain="desmosmind.netlify.app" src="https://plausible.io/js/script.tagged-events.js"></script>
+<script>
+  // Queue stub: buffers events fired before Plausible script finishes loading.
+  window.plausible = window.plausible || function(){
+    (window.plausible.q = window.plausible.q || []).push(arguments);
+  };
+  // Canonical event tracker. Use track('Event Name', { props: { key: 'value' } }).
+  // Silently no-ops if Plausible script fails to load (ad-blockers, offline).
+  window.track = function(eventName, options){
+    try {
+      if (typeof window.plausible === 'function') {
+        window.plausible(eventName, options || {});
+      }
+    } catch(e) { /* fail silent */ }
+  };
+</script>
 </head>
 <body>
 
@@ -6308,6 +6462,113 @@ function renderMarquee(){
 // RENDER PRODUCTS
 // ════════════════════════════════════
 // ════════════════════════════════════════════════════════════
+// FEATURE 29 ── FOCUS TRAP (accessibility)
+// Generic factory: createFocusTrap(container) returns { activate, deactivate }.
+// On activate: focus moves to first focusable child; Tab cycles through
+// focusable descendants only. On deactivate: focus restored to the
+// previously-focused element.
+// ════════════════════════════════════════════════════════════
+function createFocusTrap(container){
+  let prevFocus = null;
+  let kbdHandler = null;
+  const FOCUSABLE = [
+    'a[href]',
+    'button:not([disabled])',
+    'input:not([disabled]):not([type="hidden"])',
+    'select:not([disabled])',
+    'textarea:not([disabled])',
+    '[tabindex]:not([tabindex="-1"])'
+  ].join(',');
+
+  function getFocusable(){
+    return Array.from(container.querySelectorAll(FOCUSABLE))
+      .filter(el => el.offsetWidth || el.offsetHeight || el.getClientRects().length);
+  }
+
+  function activate(){
+    prevFocus = document.activeElement;
+    const list = getFocusable();
+    if (list.length) {
+      // Defer focus to next tick so any opening animation has settled
+      setTimeout(() => {
+        const first = getFocusable()[0];
+        if (first && document.activeElement !== first) first.focus();
+      }, 50);
+    }
+    kbdHandler = (e) => {
+      if (e.key !== 'Tab') return;
+      const list = getFocusable();
+      if (!list.length) { e.preventDefault(); return; }
+      const first = list[0];
+      const last  = list[list.length - 1];
+      const active = document.activeElement;
+      if (e.shiftKey && (active === first || !container.contains(active))) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (active === last || !container.contains(active))) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener('keydown', kbdHandler);
+  }
+  function deactivate(){
+    if (kbdHandler) document.removeEventListener('keydown', kbdHandler);
+    kbdHandler = null;
+    if (prevFocus && typeof prevFocus.focus === 'function') {
+      try { prevFocus.focus(); } catch(e) {}
+    }
+    prevFocus = null;
+  }
+  return { activate, deactivate };
+}
+
+// Instances created lazily so containers exist at trap-creation time
+let _prodModalTrap   = null;
+let _cartDrawerTrap  = null;
+let _qvModalTrap     = null;
+let _exitIntentTrap  = null;
+function prodModalTrap(){
+  if (!_prodModalTrap) _prodModalTrap = createFocusTrap(document.getElementById('prod-modal'));
+  return _prodModalTrap;
+}
+function cartDrawerTrap(){
+  if (!_cartDrawerTrap) _cartDrawerTrap = createFocusTrap(document.getElementById('cart-panel'));
+  return _cartDrawerTrap;
+}
+function qvModalTrap(){
+  if (!_qvModalTrap) _qvModalTrap = createFocusTrap(document.getElementById('quick-view-modal'));
+  return _qvModalTrap;
+}
+function exitIntentTrap(){
+  if (!_exitIntentTrap) _exitIntentTrap = createFocusTrap(document.getElementById('exit-intent-modal'));
+  return _exitIntentTrap;
+}
+
+// ════════════════════════════════════════════════════════════
+// FEATURE 28 ── IMAGE OPTIMIZATION
+// Rewrites Unsplash URLs to webp + sized + auto-compressed.
+// Other URLs (Supabase Storage, etc.) pass through unchanged.
+// Pair with explicit width/height attrs on <img> to prevent CLS.
+// ════════════════════════════════════════════════════════════
+function optimizeImg(url, width){
+  if (!url || typeof url !== 'string') return url || '';
+  const w = Math.max(80, Math.min(2000, parseInt(width, 10) || 600));
+  try {
+    if (/^https?:\/\/images\.unsplash\.com/i.test(url)) {
+      const u = new URL(url);
+      u.searchParams.set('w', String(w));
+      u.searchParams.set('q', '78');
+      u.searchParams.set('fm', 'webp');
+      u.searchParams.set('auto', 'format,compress');
+      if (!u.searchParams.get('fit')) u.searchParams.set('fit', 'crop');
+      return u.toString();
+    }
+  } catch(e) { /* invalid URL — pass through */ }
+  return url;
+}
+
+// ════════════════════════════════════════════════════════════
 // WISHLIST (localStorage-backed Set of product IDs)
 // ════════════════════════════════════════════════════════════
 const WISHLIST_KEY = 'desmos_wishlist_v1';
@@ -6343,17 +6604,20 @@ function toggleWishlist(id, btn){
 function updateWishlistCount(){
   const btn   = document.querySelector('.nav-wishlist');
   const badge = document.getElementById('nav-wishlist-count');
-  if (!badge) return;
-  const n = wishlist.size;
-  badge.textContent = n;
-  badge.classList.toggle('visible', n > 0);
-  if (btn) btn.classList.toggle('has-items', n > 0);
-  // Bump animation only when count grows
-  badge.classList.remove('bump');
-  if (n > 0) {
-    void badge.offsetWidth;
-    badge.classList.add('bump');
+  if (badge) {
+    const n = wishlist.size;
+    badge.textContent = n;
+    badge.classList.toggle('visible', n > 0);
+    if (btn) btn.classList.toggle('has-items', n > 0);
+    // Bump animation only when count grows
+    badge.classList.remove('bump');
+    if (n > 0) {
+      void badge.offsetWidth;
+      badge.classList.add('bump');
+    }
   }
+  // Mirror to bottom-tab wishlist badge
+  if (typeof updateBottomTabBadges === 'function') updateBottomTabBadges();
 }
 
 function openWishlist(){
@@ -6516,8 +6780,9 @@ function renderRecentlyViewed(){
   section.style.display = 'block';
   strip.innerHTML = items.map(p => `
     <a class="recent-card" href="javascript:void(0)" onclick="openProduct(${p.id})" aria-label="${p.name}">
-      <img class="recent-card-img" src="${p.img}" alt="${p.name}" loading="lazy"
-        onerror="this.src='https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400'">
+      <img class="recent-card-img" src="${optimizeImg(p.img, 240)}" alt="${(p.brand||'')} ${p.name}"
+        width="240" height="240" loading="lazy" decoding="async"
+        onerror="this.src='https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=240&fm=webp&q=78'">
       <div class="recent-card-info">
         <p class="recent-card-brand">${p.brand || ''}</p>
         <p class="recent-card-name">${p.name || ''}</p>
@@ -6543,8 +6808,15 @@ function openQuickView(id){
   currentQuickProduct = p;
   trackRecentlyViewed(p.id);
 
-  document.getElementById('qv-img').src = p.img || (p.imgs && p.imgs[0]) || '';
-  document.getElementById('qv-img').alt = p.name || '';
+  const qvImgEl = document.getElementById('qv-img');
+  qvImgEl.src = optimizeImg(p.img || (p.imgs && p.imgs[0]) || '', 640);
+  qvImgEl.alt = `${p.brand || ''} ${p.name || ''}`.trim();
+  if (!qvImgEl.getAttribute('width')) {
+    qvImgEl.setAttribute('width', '640');
+    qvImgEl.setAttribute('height', '640');
+    qvImgEl.setAttribute('decoding', 'async');
+    qvImgEl.setAttribute('loading', 'lazy');
+  }
   document.getElementById('qv-brand').textContent = p.brand || '';
   document.getElementById('qv-name').textContent  = p.name || '';
   document.getElementById('qv-price').textContent = `₡${(p.price || 0).toLocaleString()}`;
@@ -6573,6 +6845,7 @@ function openQuickView(id){
   modal.classList.add('open');
   modal.setAttribute('aria-hidden', 'false');
   document.addEventListener('keydown', qvEscHandler);
+  if (typeof qvModalTrap === 'function') qvModalTrap().activate();
 }
 
 function qvEscHandler(e){
@@ -6584,6 +6857,7 @@ function closeQuickView(){
   modal.classList.remove('open');
   modal.setAttribute('aria-hidden', 'true');
   document.removeEventListener('keydown', qvEscHandler);
+  if (typeof qvModalTrap === 'function') qvModalTrap().deactivate();
   currentQuickProduct = null;
 }
 
@@ -6694,12 +6968,16 @@ function renderProducts(filter='all'){
   const sorted = (typeof sortProducts === 'function') ? sortProducts(filtered) : filtered;
   grid.innerHTML = sorted.map((p,i)=>{
     const imgs = Array.isArray(p.imgs) && p.imgs.length ? p.imgs : [p.img];
-    const mainImg = imgs[0] || 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600';
-    const hoverImg = imgs[1] || mainImg;
-    const lifestyleImg = imgs[2] || imgs[1] || mainImg;
+    const rawMain = imgs[0] || 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600';
+    const rawHover = imgs[1] || rawMain;
+    const rawLifestyle = imgs[2] || imgs[1] || rawMain;
+    const mainImg      = optimizeImg(rawMain, 600);
+    const hoverImg     = optimizeImg(rawHover, 600);
+    const lifestyleImg = optimizeImg(rawLifestyle, 600);
     const lookbookCount = Math.min(imgs.filter(Boolean).length, 3); // 1, 2, or 3
     const hasDiscount = p.originalPrice && p.originalPrice > p.price;
     const discountPct = hasDiscount ? Math.round((1-p.price/p.originalPrice)*100) : 0;
+    const altText = `${p.brand || ''} ${p.name || ''}`.trim();
 
     // Badges adicionales: el admin puede setear p.bestseller=true o p.isNew=true
     // (compatible con productos viejos que no tienen estos flags)
@@ -6711,11 +6989,13 @@ function renderProducts(filter='all'){
     return `
     <div class="prod-card reveal" data-lookbook="${lookbookCount}" style="transition-delay:${i*0.06}s">
       <div class="prod-img-wrap" onclick="openProduct(${p.id})">
-        <img class="prod-img-main" src="${mainImg}" alt="${p.name}" loading="lazy"
-          onerror="this.src='https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600'">
-        <img class="prod-img-hover" src="${hoverImg}" alt="${p.name}" loading="lazy"
+        <img class="prod-img-main" src="${mainImg}" alt="${altText}"
+          width="600" height="800" loading="lazy" decoding="async"
+          onerror="this.src='https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600&fm=webp&q=78'">
+        <img class="prod-img-hover" src="${hoverImg}" alt="${altText}"
+          width="600" height="800" loading="lazy" decoding="async"
           onerror="this.src='${mainImg}'">
-        ${lookbookCount === 3 ? `<img class="prod-img-lifestyle" src="${lifestyleImg}" alt="${p.name}" loading="lazy" onerror="this.src='${mainImg}'">` : ''}
+        ${lookbookCount === 3 ? `<img class="prod-img-lifestyle" src="${lifestyleImg}" alt="${altText}" width="600" height="800" loading="lazy" decoding="async" onerror="this.src='${mainImg}'">` : ''}
         ${lookbookCount === 3 ? '<div class="lookbook-dots" aria-hidden="true"><span></span><span></span><span></span></div>' : ''}
         <button class="wishlist-btn ${isWishlisted(p.id) ? 'active' : ''}"
           data-product-id="${p.id}"
@@ -6823,18 +7103,36 @@ function openProduct(id){
   currentModalProduct = p;
   if (typeof trackRecentlyViewed === 'function') trackRecentlyViewed(p.id);
 
+  // Plausible — product modal opened
+  if (typeof track === 'function') {
+    track('Product View', { props: {
+      product: p.name || '',
+      brand:   p.brand || '',
+      category: p.category || '',
+      price:   p.price || 0
+    }});
+  }
+
   // Gallery
   const imgs = Array.isArray(p.imgs) && p.imgs.length ? p.imgs : [p.img].filter(Boolean);
   const mainImg = imgs[0] || '';
-  document.getElementById('modal-main-img').src = mainImg;
-  document.getElementById('modal-main-img').alt = p.name;
+  const mainImgOpt = optimizeImg(mainImg, 900);
+  const modalMain = document.getElementById('modal-main-img');
+  modalMain.src = mainImgOpt;
+  modalMain.alt = `${p.brand || ''} ${p.name || ''}`.trim();
+  if (!modalMain.getAttribute('width')) {
+    modalMain.setAttribute('width', '900');
+    modalMain.setAttribute('height', '900');
+    modalMain.setAttribute('decoding', 'async');
+  }
 
   // Thumbnails
   const thumbsEl = document.getElementById('modal-thumbs');
   if(imgs.length > 1){
     thumbsEl.innerHTML = imgs.map((img,i)=>`
-      <img class="modal-thumb ${i===0?'active':''}" src="${img}" alt="${p.name} ${i+1}"
-        onclick="switchModalImg(this,'${img}')" loading="lazy">`).join('');
+      <img class="modal-thumb ${i===0?'active':''}" src="${optimizeImg(img, 120)}" alt="${p.name} ${i+1}"
+        width="60" height="60" loading="lazy" decoding="async"
+        onclick="switchModalImg(this,'${optimizeImg(img, 900)}')">`).join('');
     thumbsEl.style.display='flex';
   } else { thumbsEl.style.display='none'; }
 
@@ -6900,6 +7198,13 @@ function openProduct(id){
   document.getElementById('prod-modal').classList.add('open');
   // Prevent body scroll without breaking iOS momentum
   lockBodyScroll();
+  // Focus trap + ESC
+  if (typeof prodModalTrap === 'function') prodModalTrap().activate();
+  document.addEventListener('keydown', prodModalEscHandler);
+}
+
+function prodModalEscHandler(e){
+  if (e.key === 'Escape') closeModal();
 }
 
 function switchModalImg(thumb, src){
@@ -6918,6 +7223,8 @@ function toggleModalDesc(){
 function closeModal(){
   document.getElementById('prod-modal').classList.remove('open');
   unlockBodyScroll();
+  if (typeof prodModalTrap === 'function') prodModalTrap().deactivate();
+  document.removeEventListener('keydown', prodModalEscHandler);
 }
 function selectSize(btn,s){
   btn.closest('.size-btns').querySelectorAll('.size-btn').forEach(b=>b.classList.remove('active'));
@@ -6955,6 +7262,15 @@ function orderViaWhatsApp(){
   let msg=`Hola! Me interesa este producto de DESMOSMIND:\n\n*${p.name}*\nPrecio: ₡${p.price.toLocaleString()}`;
   if(sizeSel) msg+=`\nTalla: ${sizeSel.textContent}`;
   if(colorSel) msg+=`\nColor: ${colorSel.textContent}`;
+  // Plausible — WhatsApp inquiry from product modal
+  if (typeof track === 'function') {
+    track('WhatsApp Inquiry', { props: {
+      source:  'product-modal',
+      product: p.name || '',
+      brand:   p.brand || '',
+      price:   p.price || 0
+    }});
+  }
   window.open(`https://wa.me/50685946741?text=${encodeURIComponent(msg)}`,'_blank');
 }
 document.getElementById('prod-modal').addEventListener('click',function(e){if(e.target===this)closeModal();});
@@ -8396,7 +8712,21 @@ function toggleCart(){
   const isOpen = panel.classList.contains('open');
   panel.classList.toggle('open', !isOpen);
   overlay.classList.toggle('on', !isOpen);
-  if(!isOpen) lockBodyScroll(); else unlockBodyScroll();
+  if(!isOpen) {
+    lockBodyScroll();
+    if (typeof cartDrawerTrap === 'function') cartDrawerTrap().activate();
+    document.addEventListener('keydown', cartDrawerEscHandler);
+  } else {
+    unlockBodyScroll();
+    if (typeof cartDrawerTrap === 'function') cartDrawerTrap().deactivate();
+    document.removeEventListener('keydown', cartDrawerEscHandler);
+  }
+}
+
+function cartDrawerEscHandler(e){
+  if (e.key === 'Escape' && document.getElementById('cart-panel').classList.contains('open')) {
+    toggleCart();
+  }
 }
 
 // Branded empty-cart markup (used in both initial paint and dynamic re-render)
@@ -8434,6 +8764,8 @@ function closeCartAndBrowse(){
   if (panel) panel.classList.remove('open');
   if (overlay) overlay.classList.remove('on');
   if (typeof unlockBodyScroll === 'function') unlockBodyScroll();
+  if (typeof cartDrawerTrap === 'function') cartDrawerTrap().deactivate();
+  document.removeEventListener('keydown', cartDrawerEscHandler);
   setTimeout(() => {
     const target = document.getElementById('stock');
     if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -8449,6 +8781,17 @@ function addToCart(product, size, color){
   }
   updateCartUI();
   saveCart();
+  // Plausible — add-to-cart
+  if (typeof track === 'function') {
+    track('Add to Cart', { props: {
+      product:  product.name || '',
+      brand:    product.brand || '',
+      category: product.category || '',
+      price:    product.price || 0,
+      size:     size || '',
+      color:    color || ''
+    }});
+  }
   showToast(t('cartAdded', product.name));
   // Open cart panel
   const panel = document.getElementById('cart-panel');
@@ -8546,6 +8889,8 @@ function updateCartTotals(){
     badge.textContent = count;
     badge.classList.toggle('visible', count > 0);
   }
+  // Mirror to bottom-tab cart badge
+  if (typeof updateBottomTabBadges === 'function') updateBottomTabBadges();
   const totalEl = document.getElementById('cart-total');
   if (totalEl) {
     const prev = parseInt(totalEl.dataset.value || '0', 10);
@@ -8571,8 +8916,9 @@ function updateCartUI(){
   }
   itemsEl.innerHTML = cart.map((item, idx) => `
     <div class="cart-item" data-idx="${idx}">
-      <img class="cart-item-img" src="${item.product.img}" alt="${item.product.name}"
-        onerror="this.src='https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=200'">
+      <img class="cart-item-img" src="${optimizeImg(item.product.img, 140)}" alt="${(item.product.brand||'')} ${item.product.name}"
+        width="70" height="70" loading="lazy" decoding="async"
+        onerror="this.src='https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=140&fm=webp&q=78'">
       <div class="cart-item-info">
         <p class="cart-item-brand">${item.product.brand}</p>
         <p class="cart-item-name">${item.product.name}</p>
@@ -8592,6 +8938,7 @@ function updateCartUI(){
 function checkoutWhatsApp(){
   if(cart.length === 0) return;
   const total = cart.reduce((s,i)=>s+(i.product.price*i.qty), 0);
+  const itemCount = cart.reduce((s,i)=>s+i.qty, 0);
   let msg = `Hola! Quiero hacer un pedido en DESMOSMIND 🦇\n\n`;
   cart.forEach((item, i) => {
     msg += `*${i+1}. ${item.product.name}*\n`;
@@ -8603,6 +8950,15 @@ function checkoutWhatsApp(){
   });
   msg += `*TOTAL: ₡${total.toLocaleString()}*\n\n`;
   msg += `¿Cómo puedo proceder con el pago?`;
+  // Plausible — full cart checkout via WhatsApp
+  if (typeof track === 'function') {
+    track('WhatsApp Checkout', { props: {
+      source:    'cart-drawer',
+      itemCount: itemCount,
+      total:     total,
+      lineCount: cart.length
+    }});
+  }
   window.open(`https://wa.me/50685946741?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
@@ -9105,6 +9461,28 @@ openProductForm = function(id){
   </svg>
   <span id="cart-count">0</span>
 </button>
+
+<!-- ═══ BOTTOM TAB BAR (mobile only, replaces cart FAB) ═══ -->
+<nav id="bottom-tabs" class="bottom-tabs" aria-label="Navegación móvil">
+  <a href="#inicio" class="bt-tab" data-tab="home" onclick="setActiveTab('home')">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1V9.5z"/></svg>
+    <span class="bt-label">Inicio</span>
+  </a>
+  <a href="#catalogo" class="bt-tab" data-tab="shop" onclick="setActiveTab('shop')">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+    <span class="bt-label">Shop</span>
+  </a>
+  <button type="button" class="bt-tab" data-tab="wishlist" onclick="setActiveTab('wishlist');openWishlist()" aria-label="Lista de deseos">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+    <span class="bt-label">Lista</span>
+    <span class="bt-badge" id="bt-wishlist-count" aria-live="polite"></span>
+  </button>
+  <button type="button" class="bt-tab" data-tab="cart" onclick="setActiveTab('cart');toggleCart()" aria-label="Carrito">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg>
+    <span class="bt-label">Carrito</span>
+    <span class="bt-badge" id="bt-cart-count" aria-live="polite"></span>
+  </button>
+</nav>
 
 <!-- ═══ CART OVERLAY ═══ -->
 <div id="cart-overlay" onclick="toggleCart()"></div>
@@ -9648,6 +10026,7 @@ function showExitIntent(){
     if (input) input.focus();
   }, 450);
   document.addEventListener('keydown', exitIntentEscHandler);
+  if (typeof exitIntentTrap === 'function') exitIntentTrap().activate();
 }
 
 function dismissExitIntent(){
@@ -9657,6 +10036,7 @@ function dismissExitIntent(){
     modal.setAttribute('aria-hidden', 'true');
   }
   document.removeEventListener('keydown', exitIntentEscHandler);
+  if (typeof exitIntentTrap === 'function') exitIntentTrap().deactivate();
 }
 
 function exitIntentEscHandler(e){
@@ -10001,6 +10381,96 @@ function navigateModal(dir, innerEl){
   const grid = document.getElementById('products-grid');
   if (grid) {
     new MutationObserver(scan).observe(grid, { childList: true });
+  }
+})();
+
+// ════════════════════════════════════════════════════════════
+// FEATURE 27 ── MOBILE BOTTOM TAB BAR
+// Active state driven by either user click or scroll position.
+// Badges mirror cart-count + wishlist-count.
+// Hides when virtual keyboard opens.
+// ════════════════════════════════════════════════════════════
+function setActiveTab(tab){
+  document.querySelectorAll('#bottom-tabs .bt-tab').forEach(el => {
+    el.classList.toggle('active', el.dataset.tab === tab);
+  });
+}
+
+function updateBottomTabBadges(){
+  const cartBadge = document.getElementById('bt-cart-count');
+  const wlBadge   = document.getElementById('bt-wishlist-count');
+  const cartCount = cart.reduce((s, i) => s + (i.qty || 0), 0);
+  const wlCount   = (typeof wishlist !== 'undefined' && wishlist.size) ? wishlist.size : 0;
+  if (cartBadge) {
+    const prev = parseInt(cartBadge.textContent, 10) || 0;
+    cartBadge.textContent = cartCount;
+    cartBadge.classList.toggle('visible', cartCount > 0);
+    if (cartCount > prev) {
+      cartBadge.classList.remove('bump');
+      void cartBadge.offsetWidth;
+      cartBadge.classList.add('bump');
+    }
+  }
+  if (wlBadge) {
+    const prev = parseInt(wlBadge.textContent, 10) || 0;
+    wlBadge.textContent = wlCount;
+    wlBadge.classList.toggle('visible', wlCount > 0);
+    if (wlCount > prev) {
+      wlBadge.classList.remove('bump');
+      void wlBadge.offsetWidth;
+      wlBadge.classList.add('bump');
+    }
+  }
+}
+
+(function initBottomTabs(){
+  const bar = document.getElementById('bottom-tabs');
+  if (!bar) return;
+
+  // Initial badges + initial active tab guess
+  if (typeof document !== 'undefined') {
+    if (document.readyState !== 'loading') setTimeout(updateBottomTabBadges, 0);
+    else document.addEventListener('DOMContentLoaded', updateBottomTabBadges);
+  }
+
+  // Drive active tab from scroll position via IntersectionObserver
+  const heroEl  = document.getElementById('inicio');
+  const shopEl  = document.getElementById('catalogo');
+  if (heroEl && shopEl && 'IntersectionObserver' in window) {
+    const observed = new Map();
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => observed.set(e.target, e.intersectionRatio));
+      // Decide which is more in view; default to home if neither dominant
+      const heroR = observed.get(heroEl) || 0;
+      const shopR = observed.get(shopEl) || 0;
+      // Active tab only swaps based on home/shop scroll. Wishlist/cart only set on click.
+      const currentActive = bar.querySelector('.bt-tab.active');
+      const currentTab = currentActive ? currentActive.dataset.tab : '';
+      if (currentTab === 'wishlist' || currentTab === 'cart') return; // don't override transient
+      if (shopR > 0.25 && shopR >= heroR) setActiveTab('shop');
+      else setActiveTab('home');
+    }, { threshold: [0, 0.25, 0.5, 0.75, 1] });
+    io.observe(heroEl);
+    io.observe(shopEl);
+  }
+
+  // Hide on virtual keyboard (text input focus). Visual Viewport API is most reliable.
+  if (window.visualViewport) {
+    const baseHeight = window.visualViewport.height;
+    window.visualViewport.addEventListener('resize', () => {
+      const shrunk = baseHeight - window.visualViewport.height > 120;
+      bar.classList.toggle('keyboard-hidden', shrunk);
+    });
+  } else {
+    document.addEventListener('focusin', (e) => {
+      const tag = (e.target.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || e.target.isContentEditable) {
+        bar.classList.add('keyboard-hidden');
+      }
+    });
+    document.addEventListener('focusout', () => {
+      bar.classList.remove('keyboard-hidden');
+    });
   }
 })();
 
