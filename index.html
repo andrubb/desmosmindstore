@@ -98,6 +98,29 @@
   --fs-label: 0.72rem;
   --fs-body:  1rem;
   --fs-small: 0.875rem;
+
+  /* ── TRANSITION SCALE ──
+     Canonical durations + easings for all motion. Prefer these over
+     hard-coded values in new CSS. Existing legacy rules use literal
+     durations — migrate opportunistically when touching them.
+        --t-instant: micro-feedback (press, focus)
+        --t-fast:    icon swaps, color shifts
+        --t-base:    standard hover transitions
+        --t-slow:    panel/drawer slides, scroll-reveal
+        --t-cinematic: hero parallax, brand-feel reveals
+  */
+  --t-instant:   0.12s;
+  --t-fast:      0.22s;
+  --t-base:      0.32s;
+  --t-slow:      0.55s;
+  --t-cinematic: 0.8s;
+  --ease-out:    cubic-bezier(.16, 1,  .3, 1);   /* spring-like out, used for reveals */
+  --ease-in-out: cubic-bezier(.4,  0,  .2, 1);   /* material standard, used for state change */
+  --ease-emph:   cubic-bezier(.22, .62, .36, 1); /* emphasized easeOut for big moves */
+
+  /* ── RGB SPLITS ── (for rgba() composition with alpha vars) */
+  --red-rgb: 220, 17, 17;
+  --bg-rgb:  5, 5, 5;
 }
 
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -1580,60 +1603,14 @@ footer{background:#030303;border-top:1px solid rgba(220,17,17,0.1);padding:5rem 
   .wa-tooltip{display:none;}
 }
 
-/* ══════════════════════════════════
-   PRODUCT CARD — HOVER IMAGE SWAP
-══════════════════════════════════ */
-.prod-img-wrap {
-  position: relative;
-  aspect-ratio: 1;
-  overflow: hidden;
-  background: var(--bg3);
-}
-.prod-img-main,
-.prod-img-hover {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: opacity 0.55s cubic-bezier(.4,0,.2,1),
-              transform 0.65s cubic-bezier(.4,0,.2,1);
-}
-.prod-img-hover {
-  opacity: 0;
-  transform: scale(1.04);
-}
-.prod-card:hover .prod-img-main {
-  opacity: 0;
-  transform: scale(1.04);
-}
-.prod-card:hover .prod-img-hover {
-  opacity: 1;
-  transform: scale(1);
-}
-/* fallback: single image still works */
-.prod-img-wrap img.prod-img {
-  position: absolute; inset:0;
-  width:100%; height:100%; object-fit:cover;
-  transition: transform 0.65s cubic-bezier(.4,0,.2,1);
-}
-.prod-card:hover .prod-img-wrap img.prod-img { transform: scale(1.05); }
-
-/* Quick-add button on hover */
-.prod-quick-add {
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  background: rgba(220,17,17,0.95);
-  color: white;
-  font-family: var(--font-body); font-weight: 600;
-  font-size: 0.65rem; letter-spacing: 0.18em;
-  padding: 0.75rem;
-  text-align: center;
-  transform: translateY(100%);
-  transition: transform 0.3s cubic-bezier(.4,0,.2,1);
-  cursor: pointer; border: none; width: 100%;
-}
-.prod-card:hover .prod-quick-add { transform: translateY(0); }
+/* NOTE — intermediate prod-card "HOVER IMAGE SWAP" block removed.
+   Its rules (.prod-img-wrap with aspect-ratio:1, the .prod-img-main/hover
+   transitions, the .prod-img fallback, and .prod-quick-add) were fully
+   superseded by:
+     - FINAL POLISH block (~line 2180+, aspect-ratio:3/4)
+     - FEATURE 6 lookbook (lookbook-{1,2,3} animations + dots)
+     - FEATURE blocks for cards (badges, swatches, social proof, etc.)
+   The dead `.prod-img` class fallback is no longer used by the template. */
 
 /* ══════════════════════════════════
    PRODUCT MODAL — REDESIGNED
@@ -5353,6 +5330,191 @@ html.loader-dismissed #page-loader { display: none !important; }
   40%  { transform: scale(1.45); background: var(--red-bright); }
   100% { transform: scale(1); }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   FEATURE 32 ── REAL STOCK INDICATORS
+═══════════════════════════════════════════════════════════ */
+/* Low-stock prod-badge (replaces "EN STOCK" when stock <= 5) */
+.prod-badge.badge-low {
+  background: rgba(220,17,17,0.95);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.18);
+  box-shadow: 0 2px 12px rgba(220,17,17,0.55);
+  animation: badge-low-pulse 1.8s ease-in-out infinite;
+}
+@keyframes badge-low-pulse {
+  0%,100% { box-shadow: 0 2px 12px rgba(220,17,17,0.55); }
+  50%     { box-shadow: 0 4px 22px rgba(220,17,17,0.85); }
+}
+.prod-badge.badge-soldout {
+  background: rgba(0,0,0,0.85);
+  color: var(--muted2);
+  border: 1px solid rgba(255,255,255,0.12);
+  text-decoration: line-through;
+}
+
+/* Full-card sold-out overlay */
+.prod-soldout-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.62);
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(1.5px);
+  -webkit-backdrop-filter: blur(1.5px);
+  pointer-events: none;
+}
+.prod-soldout-overlay span {
+  background: rgba(0,0,0,0.88);
+  border: 1px solid var(--red);
+  color: var(--red);
+  padding: 0.7rem 1.5rem;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  box-shadow: 0 0 24px rgba(220,17,17,0.4);
+  transform: rotate(-4deg);
+  text-shadow: 0 0 12px rgba(220,17,17,0.5);
+}
+
+/* Modal stock label */
+.modal-stock {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 1.2em;
+}
+.modal-stock:empty { display: none; }
+.modal-stock.low {
+  color: rgba(255,255,255,0.7);
+}
+.modal-stock.urgent {
+  color: var(--red-bright);
+  animation: stock-urgent-pulse 1.8s ease-in-out infinite;
+}
+.modal-stock.urgent strong { color: white; font-weight: 800; }
+.modal-stock.out {
+  color: var(--red);
+  font-weight: 700;
+}
+.modal-stock .ms-dot {
+  width: 8px; height: 8px;
+  background: var(--red);
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(220,17,17,0.7);
+  flex-shrink: 0;
+  animation: ms-dot-pulse 1.4s ease-in-out infinite;
+}
+.modal-stock .ms-icon {
+  color: var(--red);
+  font-weight: 700;
+}
+@keyframes ms-dot-pulse {
+  0%,100% { transform: scale(1); opacity: 1; }
+  50%     { transform: scale(1.35); opacity: 0.7; }
+}
+@keyframes stock-urgent-pulse {
+  0%,100% { opacity: 1; }
+  50%     { opacity: 0.78; }
+}
+
+/* Disabled add-to-cart when out of stock */
+.modal-btn-cart:disabled,
+.msb-add:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+  filter: grayscale(0.5);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FEATURE 33 ── STICKY FILTER BAR (mobile)
+   Filters + sort pin below the navbar (and ticker, if visible)
+   so users can refilter without scrolling back up.
+═══════════════════════════════════════════════════════════ */
+:root {
+  --header-stack-mobile: 86px;  /* ticker 26px + navbar ~60px */
+}
+html.ticker-dismissed {
+  --header-stack-mobile: 60px;  /* just navbar when ticker is hidden */
+}
+
+/* Desktop default — controls flow inline */
+.products-toolbar-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 700px) {
+  .products-toolbar-controls {
+    position: sticky;
+    top: var(--header-stack-mobile);
+    background: rgba(5, 5, 5, 0.94);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    z-index: 50;
+    padding: 0.7rem 1.25rem;
+    margin: 0 -1.25rem;
+    border-top: 1px solid rgba(220,17,17,0.14);
+    border-bottom: 1px solid rgba(220,17,17,0.22);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+    transition: top 0.4s cubic-bezier(.16,1,.3,1);
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+  }
+  /* Filters scroll horizontally on mobile so many chips fit cleanly */
+  .products-toolbar-controls .products-filters {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    flex: 1 1 auto;
+    min-width: 0;
+    padding-right: 0.4rem;
+  }
+  .products-toolbar-controls .products-filters::-webkit-scrollbar {
+    display: none;
+  }
+  .products-toolbar-controls .filter-btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  /* Right-edge fade hint: there are more chips off-screen */
+  .products-toolbar-controls::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: calc(64px + 0.5rem); /* park before the sort dropdown */
+    width: 30px;
+    background: linear-gradient(90deg, transparent, rgba(5,5,5,0.94));
+    pointer-events: none;
+    z-index: 1;
+  }
+  .products-toolbar-controls .products-sort {
+    flex-shrink: 0;
+    z-index: 2;
+    background: rgba(5,5,5,0.94);
+    padding-left: 0.4rem;
+  }
+  /* Active filter chip gets a stronger highlight on mobile sticky */
+  .products-toolbar-controls .filter-btn.active {
+    box-shadow: inset 0 0 24px rgba(220,17,17,0.12), 0 0 18px rgba(220,17,17,0.25);
+  }
+}
 </style>
 
 <!-- ═══ PLAUSIBLE ANALYTICS (privacy-friendly, no cookies) ═══ -->
@@ -5730,6 +5892,8 @@ html.loader-dismissed #page-loader { display: none !important; }
         <span class="modal-discount" id="modal-discount" style="display:none"></span>
       </div>
 
+      <p class="modal-stock" id="modal-stock" aria-live="polite"></p>
+
       <div id="modal-sizes-wrap">
         <p class="modal-label" data-i18n="modalSize">TALLA</p>
         <div class="size-btns" id="modal-sizes"></div>
@@ -5831,20 +5995,22 @@ html.loader-dismissed #page-loader { display: none !important; }
         </div>
         <a href="#catalogo" class="btn-primary coming-soon-cta">Ver Catálogo →</a>
       </div>
-      <div class="products-filters">
-        <button class="filter-btn active" onclick="filterProducts('all',this)" data-i18n="filterAll">Todos</button>
-        <button class="filter-btn" onclick="filterProducts('ropa',this)" data-i18n="filterApparel">Ropa</button>
-        <button class="filter-btn" onclick="filterProducts('suplementos',this)" data-i18n="filterSupps">Suplementos</button>
-        <button class="filter-btn" onclick="filterProducts('accesorios',this)" data-i18n="filterAccessories">Accesorios</button>
-      </div>
-      <div class="products-sort">
-        <span class="products-sort-label" data-i18n="sortLabel">Ordenar:</span>
-        <select id="product-sort" onchange="setSort(this.value)" aria-label="Ordenar productos">
-          <option value="trending" data-i18n="sortTrending">Trending</option>
-          <option value="newest" data-i18n="sortNewest">Más nuevo</option>
-          <option value="price-asc" data-i18n="sortPriceAsc">Precio ↑</option>
-          <option value="price-desc" data-i18n="sortPriceDesc">Precio ↓</option>
-        </select>
+      <div class="products-toolbar-controls">
+        <div class="products-filters">
+          <button class="filter-btn active" onclick="filterProducts('all',this)" data-i18n="filterAll">Todos</button>
+          <button class="filter-btn" onclick="filterProducts('ropa',this)" data-i18n="filterApparel">Ropa</button>
+          <button class="filter-btn" onclick="filterProducts('suplementos',this)" data-i18n="filterSupps">Suplementos</button>
+          <button class="filter-btn" onclick="filterProducts('accesorios',this)" data-i18n="filterAccessories">Accesorios</button>
+        </div>
+        <div class="products-sort">
+          <span class="products-sort-label" data-i18n="sortLabel">Ordenar:</span>
+          <select id="product-sort" onchange="setSort(this.value)" aria-label="Ordenar productos">
+            <option value="trending" data-i18n="sortTrending">Trending</option>
+            <option value="newest" data-i18n="sortNewest">Más nuevo</option>
+            <option value="price-asc" data-i18n="sortPriceAsc">Precio ↑</option>
+            <option value="price-desc" data-i18n="sortPriceDesc">Precio ↓</option>
+          </select>
+        </div>
       </div>
     </div>
 
@@ -6411,13 +6577,20 @@ async function loadAllData(){
         sizes: p.sizes ? p.sizes.split(',').map(s=>s.trim()).filter(Boolean) : [],
         colors: p.colors ? p.colors.split(',').map(s=>s.trim()).filter(Boolean) : [],
         img: p.img||'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600',
-        imgs: [p.img, p.img2].filter(Boolean)
+        imgs: [p.img, p.img2].filter(Boolean),
+        // Real stock from Supabase: nullable (null = not tracked).
+        // Add a `stock integer` column to the products table to enable.
+        stock: (typeof p.stock === 'number') ? p.stock : null,
+        bestseller: !!p.bestseller,
+        isNew:      !!p.is_new
       }));
       renderProducts();
       // Re-resolve cart items against the fresh Supabase products
       if (typeof refreshCartFromProducts === 'function') refreshCartFromProducts();
       // Re-resolve recently viewed strip against fresh products
       if (typeof renderRecentlyViewed === 'function') renderRecentlyViewed();
+      // Inject Product JSON-LD for Google rich results
+      if (typeof injectProductSchemas === 'function') injectProductSchemas();
     }
     const content = await sbFetch('site_content','GET',null,'?order=key.asc');
     if(content && content.length){
@@ -6461,6 +6634,144 @@ function renderMarquee(){
 // ════════════════════════════════════
 // RENDER PRODUCTS
 // ════════════════════════════════════
+// ════════════════════════════════════════════════════════════
+// FEATURE 31 ── ORDER PERSISTENCE + ORDER CODE
+// On WhatsApp checkout: generate a human-readable order code,
+// persist the order to Supabase (fire-and-forget — order still
+// goes to WhatsApp even if Supabase is offline), and include the
+// code in the WhatsApp message so the merchant can look it up.
+//
+// REQUIRED SUPABASE TABLE (run once in Supabase SQL editor):
+//   create table orders (
+//     id         uuid primary key default gen_random_uuid(),
+//     order_code text unique not null,
+//     items      jsonb not null,
+//     total      numeric not null,
+//     status     text default 'pending',
+//     source     text default 'whatsapp',
+//     created_at timestamptz default now()
+//   );
+//   alter table orders enable row level security;
+//   create policy "anon insert orders" on orders for insert to anon with check (true);
+//   create policy "anon read own orders" on orders for select to anon using (true);
+// ════════════════════════════════════════════════════════════
+function generateOrderCode(){
+  const now = new Date();
+  const yy = String(now.getFullYear()).slice(-2);
+  const mm = String(now.getMonth() + 1).padStart(2, '0');
+  const dd = String(now.getDate()).padStart(2, '0');
+  const rand = Math.floor(Math.random() * 9000) + 1000;
+  return `DM-${yy}${mm}${dd}-${rand}`;
+}
+
+async function persistOrder(orderCode, items, total, source){
+  if (typeof sbFetch !== 'function') return null;
+  const payload = {
+    order_code: orderCode,
+    items: items,
+    total: total,
+    status: 'pending',
+    source: source || 'whatsapp'
+  };
+  try {
+    const result = await sbFetch('orders', 'POST', payload, '');
+    return result;
+  } catch (e) {
+    console.warn('Order persistence failed (continuing to WhatsApp):', e.message || e);
+    // Cache failed order locally so we can retry later
+    try {
+      const queue = JSON.parse(localStorage.getItem('desmos_failed_orders') || '[]');
+      queue.push({ ...payload, failed_at: Date.now() });
+      localStorage.setItem('desmos_failed_orders', JSON.stringify(queue.slice(-20)));
+    } catch(_) {}
+    return null;
+  }
+}
+
+function buildOrderItems(){
+  return cart.map(item => ({
+    product_id: item.product.id,
+    name:  item.product.name,
+    brand: item.product.brand,
+    size:  item.size || '',
+    color: item.color || '',
+    qty:   item.qty,
+    unit_price: item.product.price,
+    line_total: item.product.price * item.qty
+  }));
+}
+
+// ════════════════════════════════════════════════════════════
+// FEATURE 30 ── PER-PRODUCT SCHEMA.ORG (JSON-LD)
+// Generates one ItemList of Product objects for Google rich results,
+// regenerated whenever products load/reload from Supabase.
+// Lives in <head> so crawlers find it without rendering JS — though
+// modern Googlebot will pick it up either way.
+// ════════════════════════════════════════════════════════════
+const SITE_ORIGIN = 'https://desmosmind.netlify.app';
+
+function buildProductSchema(p){
+  if (!p || !p.id) return null;
+  const stockNum = (typeof p.stock === 'number') ? p.stock : null;
+  let availability;
+  if (stockNum === 0) availability = 'https://schema.org/OutOfStock';
+  else if (p.type === 'stock' || stockNum > 0) availability = 'https://schema.org/InStock';
+  else availability = 'https://schema.org/PreOrder';
+
+  const schema = {
+    '@type': 'Product',
+    'name': p.name || '',
+    'brand': { '@type': 'Brand', 'name': p.brand || 'Desmos Mind' },
+    'sku': `DM-${p.id}`,
+    'image': [optimizeImg(p.img || (p.imgs && p.imgs[0]) || '', 1200)],
+    'description': p.desc || `${p.brand || ''} ${p.name || ''} — importado de USA a Costa Rica vía Desmos Mind.`.trim(),
+    'category': p.category || 'apparel',
+    'offers': {
+      '@type': 'Offer',
+      'price': String(p.price || 0),
+      'priceCurrency': 'CRC',
+      'availability': availability,
+      'itemCondition': 'https://schema.org/NewCondition',
+      'url': `${SITE_ORIGIN}/#product-${p.id}`,
+      'seller': { '@type': 'Organization', 'name': 'Desmos Mind' }
+    }
+  };
+  if (Array.isArray(p.imgs) && p.imgs.length > 1) {
+    schema.image = p.imgs.filter(Boolean).map(u => optimizeImg(u, 1200));
+  }
+  if (stockNum !== null && stockNum > 0) {
+    // Use AggregateRating-friendly shape: add inventoryLevel as a property (Google may use it)
+    schema.offers.inventoryLevel = { '@type': 'QuantitativeValue', 'value': stockNum };
+  }
+  return schema;
+}
+
+function injectProductSchemas(){
+  if (!Array.isArray(products) || !products.length) return;
+  const itemList = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    'name': 'Desmos Mind — Catálogo',
+    'itemListElement': products.map((p, i) => {
+      const product = buildProductSchema(p);
+      if (!product) return null;
+      return {
+        '@type': 'ListItem',
+        'position': i + 1,
+        'item': product
+      };
+    }).filter(Boolean)
+  };
+  let el = document.getElementById('products-jsonld');
+  if (!el) {
+    el = document.createElement('script');
+    el.type = 'application/ld+json';
+    el.id = 'products-jsonld';
+    document.head.appendChild(el);
+  }
+  el.textContent = JSON.stringify(itemList);
+}
+
 // ════════════════════════════════════════════════════════════
 // FEATURE 29 ── FOCUS TRAP (accessibility)
 // Generic factory: createFocusTrap(container) returns { activate, deactivate }.
@@ -6979,6 +7290,22 @@ function renderProducts(filter='all'){
     const discountPct = hasDiscount ? Math.round((1-p.price/p.originalPrice)*100) : 0;
     const altText = `${p.brand || ''} ${p.name || ''}`.trim();
 
+    // Stock-aware primary badge (top-left)
+    let stockBadgeText, stockBadgeClass;
+    if (typeof p.stock === 'number') {
+      if (p.stock === 0) {
+        stockBadgeText = 'AGOTADO';
+        stockBadgeClass = 'badge-soldout';
+      } else if (p.stock <= 5) {
+        stockBadgeText = `QUEDAN ${p.stock}`;
+        stockBadgeClass = 'badge-low';
+      }
+    }
+    if (!stockBadgeText) {
+      stockBadgeText  = p.type === 'stock' ? 'EN STOCK' : 'POR ENCARGO';
+      stockBadgeClass = p.type === 'stock' ? 'badge-stock' : 'badge-encargo';
+    }
+
     // Badges adicionales: el admin puede setear p.bestseller=true o p.isNew=true
     // (compatible con productos viejos que no tienen estos flags)
     const badges = [];
@@ -7010,9 +7337,9 @@ function renderProducts(filter='all'){
             <circle cx="12" cy="12" r="3"/>
           </svg>
         </button>
-        <span class="prod-badge ${p.type==='stock'?'badge-stock':'badge-encargo'}">${p.type==='stock'?'EN STOCK':'POR ENCARGO'}</span>
+        <span class="prod-badge ${stockBadgeClass}">${stockBadgeText}</span>
         ${badges.length ? `<div class="prod-flags">${badges.join('')}</div>` : ''}
-        ${renderSocialProofHtml(p)}
+        ${(typeof p.stock === 'number' && p.stock === 0) ? '<div class="prod-soldout-overlay" aria-hidden="true"><span>AGOTADO</span></div>' : renderSocialProofHtml(p)}
         <button class="prod-quick-add" onclick="event.stopPropagation();openProduct(${p.id})" data-i18n="productCardCTA">VER PRODUCTO</button>
       </div>
       <div class="prod-info" onclick="openProduct(${p.id})" style="cursor:pointer;">
@@ -7159,6 +7486,34 @@ function openProduct(id){
   const msbPrice = document.getElementById('msb-price');
   if (msbPrice) msbPrice.textContent = `₡${p.price.toLocaleString()}`;
 
+  // Stock indicator (modal)
+  const stockEl = document.getElementById('modal-stock');
+  const addBtn   = document.querySelector('.modal-btn-cart');
+  const msbAdd   = document.querySelector('.msb-add');
+  if (stockEl) {
+    if (typeof p.stock === 'number') {
+      if (p.stock === 0) {
+        stockEl.innerHTML = '<span class="ms-icon">✕</span> AGOTADO — pronto volverá';
+        stockEl.className = 'modal-stock out';
+      } else if (p.stock <= 5) {
+        stockEl.innerHTML = `<span class="ms-dot"></span> Solo quedan <strong>${p.stock}</strong> ${p.stock === 1 ? 'unidad' : 'unidades'}`;
+        stockEl.className = 'modal-stock urgent';
+      } else if (p.stock <= 15) {
+        stockEl.innerHTML = `<span class="ms-dot"></span> Quedan ${p.stock} unidades`;
+        stockEl.className = 'modal-stock low';
+      } else {
+        stockEl.textContent = '';
+        stockEl.className = 'modal-stock';
+      }
+    } else {
+      stockEl.textContent = '';
+      stockEl.className = 'modal-stock';
+    }
+  }
+  const outOfStock = (typeof p.stock === 'number' && p.stock === 0);
+  if (addBtn) addBtn.disabled = outOfStock;
+  if (msbAdd) msbAdd.disabled = outOfStock;
+
   // Sizes
   const sizesWrap = document.getElementById('modal-sizes-wrap');
   const sizesEl = document.getElementById('modal-sizes');
@@ -7259,16 +7614,33 @@ function orderViaWhatsApp(){
   const p=currentModalProduct;
   const sizeSel=document.querySelector('#modal-sizes .size-btn.active');
   const colorSel=document.querySelector('#modal-colors .color-btn.active');
-  let msg=`Hola! Me interesa este producto de DESMOSMIND:\n\n*${p.name}*\nPrecio: ₡${p.price.toLocaleString()}`;
-  if(sizeSel) msg+=`\nTalla: ${sizeSel.textContent}`;
-  if(colorSel) msg+=`\nColor: ${colorSel.textContent}`;
+  const size  = sizeSel  ? sizeSel.textContent  : '';
+  const color = colorSel ? colorSel.textContent : '';
+  const orderCode = generateOrderCode();
+
+  // Persist single-product inquiry (fire-and-forget)
+  persistOrder(orderCode, [{
+    product_id: p.id,
+    name:  p.name,
+    brand: p.brand,
+    size:  size,
+    color: color,
+    qty:   1,
+    unit_price: p.price,
+    line_total: p.price
+  }], p.price, 'product-modal');
+
+  let msg=`Hola! Me interesa este producto de DESMOSMIND:\n\n*Consulta:* ${orderCode}\n\n*${p.name}*\nPrecio: ₡${p.price.toLocaleString()}`;
+  if(size)  msg+=`\nTalla: ${size}`;
+  if(color) msg+=`\nColor: ${color}`;
   // Plausible — WhatsApp inquiry from product modal
   if (typeof track === 'function') {
     track('WhatsApp Inquiry', { props: {
-      source:  'product-modal',
-      product: p.name || '',
-      brand:   p.brand || '',
-      price:   p.price || 0
+      source:    'product-modal',
+      orderCode: orderCode,
+      product:   p.name || '',
+      brand:     p.brand || '',
+      price:     p.price || 0
     }});
   }
   window.open(`https://wa.me/50685946741?text=${encodeURIComponent(msg)}`,'_blank');
@@ -8486,6 +8858,7 @@ renderReviews();  // show reviews
 renderCategories(); // show categories
 initDrops(); // load drops from Supabase (with localStorage cache fallback)
 loadCart();       // restore persisted cart (uses default products initially)
+if (typeof injectProductSchemas === 'function') injectProductSchemas(); // SEO: Product JSON-LD
 loadAllData();    // then load from Supabase (will refresh cart prices via refreshCartFromProducts)
 function addProductToCart(){
   if(!currentModalProduct) return;
@@ -8939,7 +9312,15 @@ function checkoutWhatsApp(){
   if(cart.length === 0) return;
   const total = cart.reduce((s,i)=>s+(i.product.price*i.qty), 0);
   const itemCount = cart.reduce((s,i)=>s+i.qty, 0);
+  const orderCode = generateOrderCode();
+  const items = buildOrderItems();
+
+  // Persist to Supabase BEFORE opening WhatsApp (fire-and-forget;
+  // doesn't block the user if it fails)
+  persistOrder(orderCode, items, total, 'cart-drawer');
+
   let msg = `Hola! Quiero hacer un pedido en DESMOSMIND 🦇\n\n`;
+  msg += `*Pedido:* ${orderCode}\n\n`;
   cart.forEach((item, i) => {
     msg += `*${i+1}. ${item.product.name}*\n`;
     msg += `   Marca: ${item.product.brand}\n`;
@@ -8954,6 +9335,7 @@ function checkoutWhatsApp(){
   if (typeof track === 'function') {
     track('WhatsApp Checkout', { props: {
       source:    'cart-drawer',
+      orderCode: orderCode,
       itemCount: itemCount,
       total:     total,
       lineCount: cart.length
