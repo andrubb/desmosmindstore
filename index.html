@@ -5687,6 +5687,8 @@ async function loadAllData(){
         imgs: [p.img, p.img2].filter(Boolean)
       }));
       renderProducts();
+      // Re-resolve cart items against the fresh Supabase products
+      if (typeof refreshCartFromProducts === 'function') refreshCartFromProducts();
     }
     const content = await sbFetch('site_content','GET',null,'?order=key.asc');
     if(content && content.length){
@@ -7431,7 +7433,8 @@ renderProducts(); // show default while loading
 renderReviews();  // show reviews
 renderCategories(); // show categories
 initDrops(); // load drops from Supabase (with localStorage cache fallback)
-loadAllData();    // then load from Supabase
+loadCart();       // restore persisted cart (uses default products initially)
+loadAllData();    // then load from Supabase (will refresh cart prices via refreshCartFromProducts)
 function addProductToCart(){
   if(!currentModalProduct) return;
   const sizeSel = document.querySelector('#modal-sizes .size-btn.active');
@@ -7573,6 +7576,68 @@ function fireCartConfetti(){
 // ════════════════════════════════════
 let cart = []; // [{product, size, color, qty}]
 
+// ─── Cart persistence (localStorage) ───
+// Stores a "lite" version of each item: productId + size/color/qty + a
+// product snapshot used as fallback when the live product list is missing
+// the item (offline, deleted from Supabase, etc.). This means: fresh price
+// when the product exists in the current `products` array, stale snapshot
+// when it doesn't — cart is never lost.
+const CART_STORAGE_KEY = 'desmos_cart_v1';
+function saveCart(){
+  try {
+    const lite = cart.map(i => ({
+      productId: i.product && i.product.id,
+      productSnapshot: i.product,
+      size: i.size || '',
+      color: i.color || '',
+      qty: Math.max(1, Math.min(99, parseInt(i.qty, 10) || 1))
+    })).filter(i => i.productId != null);
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(lite));
+  } catch(e) { /* storage disabled/full — fail silent */ }
+}
+function loadCart(){
+  try {
+    const raw = localStorage.getItem(CART_STORAGE_KEY);
+    if (!raw) return false;
+    const lite = JSON.parse(raw);
+    if (!Array.isArray(lite) || !lite.length) return false;
+    cart = lite.map(i => {
+      // Prefer fresh product (live prices); fall back to snapshot
+      const fresh = products.find(p => p.id === i.productId);
+      const product = fresh || i.productSnapshot;
+      if (!product) return null;
+      return {
+        product,
+        size:  i.size  || '',
+        color: i.color || '',
+        qty:   Math.max(1, Math.min(99, parseInt(i.qty, 10) || 1))
+      };
+    }).filter(Boolean);
+    if (typeof updateCartUI === 'function') updateCartUI();
+    return cart.length > 0;
+  } catch(e) {
+    console.warn('Cart restore failed:', e);
+    return false;
+  }
+}
+// After Supabase products load, refresh price/img on existing cart items
+// without losing the user's selections.
+function refreshCartFromProducts(){
+  let changed = false;
+  cart.forEach(item => {
+    if (!item.product) return;
+    const fresh = products.find(p => p.id === item.product.id);
+    if (fresh && fresh !== item.product) {
+      item.product = fresh;
+      changed = true;
+    }
+  });
+  if (changed) {
+    if (typeof updateCartUI === 'function') updateCartUI();
+    saveCart();
+  }
+}
+
 function lockBodyScroll(){
   document.body.dataset.scrollY = window.scrollY;
   document.body.style.overflow='hidden';
@@ -7647,6 +7712,7 @@ function addToCart(product, size, color){
     cart.push({product, size, color, qty:1});
   }
   updateCartUI();
+  saveCart();
   showToast(t('cartAdded', product.name));
   // Open cart panel
   const panel = document.getElementById('cart-panel');
@@ -7677,10 +7743,12 @@ function removeFromCart(idx){
   const commit = () => {
     cart.splice(idx, 1);
     updateCartUI();
+    saveCart();
     cartSyncRemote('remove', { idx }).catch(err => {
       console.warn('Cart sync failed (remove), restoring:', err);
       cart = prevSnapshot;
       updateCartUI();
+      saveCart();
       if (typeof showToast === 'function') showToast(t('cartRemoveFail'));
     });
   };
@@ -7703,11 +7771,13 @@ function changeQty(idx, delta){
   cart[idx].qty = newQty;
   surgicallyUpdateCartItem(idx);
   updateCartTotals();
+  saveCart();
 
   cartSyncRemote('changeQty', { idx, newQty }).catch(err => {
     console.warn('Cart sync failed (qty), restoring:', err);
     cart = prevSnapshot;
     updateCartUI();
+    saveCart();
     if (typeof showToast === 'function') showToast(t('cartUpdateFail'));
   });
 }
