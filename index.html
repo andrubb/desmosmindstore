@@ -4328,9 +4328,409 @@ img { transition: opacity 0.4s ease; }
   100% { text-shadow: 0 0 22px rgba(220,17,17,0.18); }
 }
 .cart-qty-btn:active { transform: scale(0.88); transition: transform 0.1s ease; }
+
+/* ═══════════════════════════════════════════════════════════
+   FEATURE 19 ── EXIT-INTENT EMAIL MODAL
+═══════════════════════════════════════════════════════════ */
+.ei-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 950;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+.ei-modal.open {
+  display: flex;
+  animation: ei-fade-in 0.35s ease;
+}
+@keyframes ei-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.ei-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.84);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  cursor: pointer;
+}
+.ei-card {
+  position: relative;
+  max-width: 460px;
+  width: 100%;
+  background: linear-gradient(180deg, var(--bg2) 0%, var(--bg) 100%);
+  border: 1px solid rgba(220,17,17,0.42);
+  padding: 2.6rem 2rem 2rem;
+  text-align: center;
+  box-shadow:
+    0 30px 80px rgba(0,0,0,0.7),
+    0 0 60px rgba(220,17,17,0.18),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+  animation: ei-rise 0.5s cubic-bezier(.16,1,.3,1);
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px),
+                     calc(100% - 12px) 100%, 0 100%, 0 12px);
+}
+@keyframes ei-rise {
+  from { opacity: 0; transform: translateY(24px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.ei-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--red), var(--red-bright), var(--red), transparent);
+  box-shadow: 0 0 14px var(--red);
+  animation: ei-stitch-pulse 3s ease-in-out infinite;
+}
+@keyframes ei-stitch-pulse {
+  0%,100% { opacity: 0.6; }
+  50%     { opacity: 1; }
+}
+.ei-close {
+  position: absolute;
+  top: 12px; right: 12px;
+  background: rgba(0,0,0,0.55);
+  border: 1px solid rgba(255,255,255,0.06);
+  color: var(--muted2);
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s, transform 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  z-index: 2;
+}
+.ei-close:hover {
+  color: var(--red);
+  border-color: var(--red);
+  transform: scale(1.08);
+}
+.ei-art {
+  margin: 0 auto 1.2rem;
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--red);
+  filter: drop-shadow(0 0 18px rgba(220,17,17,0.55));
+  animation: ei-art-float 3.6s ease-in-out infinite;
+}
+@keyframes ei-art-float {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-6px); }
+}
+.ei-eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin: 0 0 0.85rem;
+}
+.ei-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 4.5vw, 2.2rem);
+  color: var(--white);
+  letter-spacing: 0.04em;
+  line-height: 1.05;
+  margin: 0 0 1rem;
+  text-shadow: 0 0 22px rgba(220,17,17,0.3);
+}
+.ei-text {
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  color: var(--text);
+  font-weight: 300;
+  line-height: 1.55;
+  margin: 0 0 1.6rem;
+}
+.ei-text strong { color: var(--red-bright); font-weight: 700; }
+.ei-form {
+  display: flex;
+  margin-bottom: 1rem;
+}
+.ei-form input {
+  flex: 1;
+  background: rgba(0,0,0,0.45);
+  border: 1px solid rgba(220,17,17,0.25);
+  border-right: none;
+  color: var(--white);
+  padding: 0.9rem 1rem;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.25s ease, background 0.25s ease, box-shadow 0.3s ease;
+}
+.ei-form input::placeholder { color: var(--muted2); }
+.ei-form input:focus {
+  border-color: var(--red);
+  background: rgba(220,17,17,0.04);
+  box-shadow: inset 0 0 14px rgba(220,17,17,0.06);
+}
+.ei-form button {
+  background: var(--red);
+  color: white;
+  border: none;
+  padding: 0 1.6rem;
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.25s, box-shadow 0.3s, transform 0.18s;
+  white-space: nowrap;
+}
+.ei-form button:hover {
+  background: var(--red-bright);
+  box-shadow: 0 0 28px rgba(220,17,17,0.45);
+}
+.ei-form button:active { transform: scale(0.97); }
+.ei-decline {
+  background: none;
+  border: none;
+  color: var(--muted2);
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(106,106,98,0.4);
+  transition: color 0.25s;
+  padding: 0.25rem 0.5rem;
+}
+.ei-decline:hover { color: var(--text); }
+
+@media (max-width: 480px) {
+  .ei-card { padding: 2rem 1.3rem 1.6rem; }
+  .ei-form { flex-direction: column; gap: 0.45rem; }
+  .ei-form input { border-right: 1px solid rgba(220,17,17,0.25); }
+  .ei-form button { padding: 0.9rem; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FEATURE 20 ── TICKER BAR (above navbar)
+═══════════════════════════════════════════════════════════ */
+.ticker-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background: linear-gradient(90deg,
+    rgba(165,13,13,0.95),
+    rgba(220,17,17,0.98),
+    rgba(255,34,34,1),
+    rgba(220,17,17,0.98),
+    rgba(165,13,13,0.95));
+  background-size: 200% 100%;
+  animation: ticker-shimmer 6s linear infinite;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 600;
+  overflow: hidden;
+  font-family: var(--font-body);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  box-shadow: 0 2px 14px rgba(220,17,17,0.4);
+  transition: transform 0.5s cubic-bezier(.16,1,.3,1),
+              box-shadow 0.4s ease;
+  will-change: transform;
+}
+@keyframes ticker-shimmer {
+  0%   { background-position: 0% 0; }
+  100% { background-position: 200% 0; }
+}
+.ticker-bar::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: rgba(0,0,0,0.45);
+}
+.ticker-track {
+  position: relative;
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.ticker-msg {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) translateY(14px);
+  opacity: 0;
+  white-space: nowrap;
+  padding: 0 1rem;
+  transition: opacity 0.5s cubic-bezier(.16,1,.3,1),
+              transform 0.5s cubic-bezier(.16,1,.3,1);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+}
+.ticker-msg.active {
+  opacity: 1;
+  transform: translate(-50%, -50%) translateY(0);
+}
+.ticker-msg.exit {
+  opacity: 0;
+  transform: translate(-50%, -50%) translateY(-14px);
+}
+.ticker-close {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.75);
+  cursor: pointer;
+  font-size: 0.85rem;
+  padding: 4px 8px;
+  transition: color 0.2s, transform 0.2s;
+  line-height: 1;
+}
+.ticker-close:hover {
+  color: white;
+  transform: translateY(-50%) scale(1.2);
+}
+
+/* Push navbar below the ticker */
+#navbar { top: 30px; }
+html.ticker-dismissed .ticker-bar {
+  transform: translateY(-100%);
+  pointer-events: none;
+}
+html.ticker-dismissed #navbar { top: 0; }
+
+@media (max-width: 700px) {
+  .ticker-bar {
+    height: 26px;
+    font-size: 0.55rem;
+    letter-spacing: 0.2em;
+  }
+  #navbar { top: 26px; }
+  .ticker-close { right: 4px; padding: 4px 6px; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FEATURE 21 ── EN/ES LANGUAGE TOGGLE
+═══════════════════════════════════════════════════════════ */
+.lang-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-right: 0.75rem;
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+.lang-btn {
+  background: none;
+  border: none;
+  color: var(--muted2);
+  cursor: pointer;
+  padding: 4px 2px;
+  transition: color 0.25s ease, text-shadow 0.25s ease;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+}
+.lang-btn:hover { color: var(--text); }
+.lang-btn.active {
+  color: var(--red);
+  text-shadow: 0 0 10px rgba(220,17,17,0.5);
+}
+.lang-sep {
+  color: rgba(255,255,255,0.18);
+  font-size: 0.7em;
+  pointer-events: none;
+}
+@media (max-width: 900px) {
+  .lang-toggle { margin-right: 0.55rem; font-size: 0.58rem; }
+}
+@media (max-width: 380px) {
+  .lang-toggle { display: none; } /* hide on very narrow screens; surface via drawer */
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FEATURE 22 ── ADD-TO-CART CONFETTI (first add per session)
+═══════════════════════════════════════════════════════════ */
+.confetti-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9997;
+  overflow: hidden;
+}
+.confetti-piece {
+  position: absolute;
+  left: var(--cx, 50%);
+  top:  var(--cy, 50%);
+  width:  var(--size, 6px);
+  height: var(--size, 6px);
+  transform: translate(-50%, -50%);
+  animation: confetti-burst forwards cubic-bezier(.22,.62,.36,1);
+  will-change: transform, opacity;
+  box-shadow: 0 0 6px currentColor;
+}
+.confetti-piece.square { border-radius: 1px; }
+.confetti-piece.circle { border-radius: 50%; }
+.confetti-piece.streak {
+  width: var(--size, 6px);
+  height: calc(var(--size, 6px) * 2.2);
+  border-radius: 1px;
+}
+@keyframes confetti-burst {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  15% { opacity: 1; }
+  100% {
+    transform:
+      translate(calc(-50% + var(--dx)), calc(-50% + var(--dy) + 220px))
+      rotate(var(--rot, 360deg))
+      scale(0.6);
+    opacity: 0;
+  }
+}
 </style>
 </head>
 <body>
+
+<script>
+  // Pre-paint: if user already dismissed the ticker this session, hide it before first paint
+  try {
+    if (sessionStorage.getItem('desmos_ticker_dismissed')) {
+      document.documentElement.classList.add('ticker-dismissed');
+    }
+  } catch(e) {}
+</script>
+
+<!-- ═══ TICKER BAR ═══ -->
+<div id="ticker-bar" class="ticker-bar" role="region" aria-label="Anuncios">
+  <div class="ticker-track" id="ticker-track">
+    <!-- Messages injected by JS -->
+  </div>
+  <button class="ticker-close" type="button" aria-label="Cerrar anuncios" onclick="dismissTicker()">✕</button>
+</div>
 
 <!-- ═══ NAVBAR ═══ -->
 <nav id="navbar">
@@ -4346,12 +4746,17 @@ img { transition: opacity 0.4s ease; }
     </a>
 
     <ul class="nav-links">
-      <li><a href="#stock">Stock</a></li>
-      <li><a href="#catalogo">Catálogo</a></li>
-      <li><a href="#testimonios">Reseñas</a></li>
-      <li><a href="#faq">FAQ</a></li>
-      <li><a href="#contacto">Contacto</a></li>
+      <li><a href="#stock" data-i18n="navStock">Stock</a></li>
+      <li><a href="#catalogo" data-i18n="navCatalog">Catálogo</a></li>
+      <li><a href="#testimonios" data-i18n="navReviews">Reseñas</a></li>
+      <li><a href="#faq" data-i18n="navFAQ">FAQ</a></li>
+      <li><a href="#contacto" data-i18n="navContact">Contacto</a></li>
     </ul>
+    <div class="lang-toggle" role="group" aria-label="Language">
+      <button type="button" class="lang-btn" data-lang="es" onclick="setLang('es')">ES</button>
+      <span class="lang-sep">/</span>
+      <button type="button" class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+    </div>
     <button class="nav-wishlist" onclick="openWishlist()" aria-label="Mi lista de deseos" type="button">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
         <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
@@ -4631,18 +5036,18 @@ img { transition: opacity 0.4s ease; }
       </div>
 
       <div id="modal-sizes-wrap">
-        <p class="modal-label">TALLA</p>
+        <p class="modal-label" data-i18n="modalSize">TALLA</p>
         <div class="size-btns" id="modal-sizes"></div>
       </div>
 
       <div id="modal-colors-wrap">
-        <p class="modal-label">COLOR</p>
+        <p class="modal-label" data-i18n="modalColor">COLOR</p>
         <div class="color-btns" id="modal-colors"></div>
       </div>
 
       <!-- Description accordion -->
       <div class="modal-desc-toggle" id="modal-desc-toggle" onclick="toggleModalDesc()">
-        <span>DESCRIPCIÓN DEL PRODUCTO</span>
+        <span data-i18n="modalDescToggle">DESCRIPCIÓN DEL PRODUCTO</span>
         <span class="modal-desc-toggle-arrow">▼</span>
       </div>
       <div class="modal-desc-text" id="modal-desc"></div>
@@ -4650,11 +5055,11 @@ img { transition: opacity 0.4s ease; }
       <div class="modal-actions">
         <button class="modal-btn-cart" onclick="addProductToCart()">
           <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-          AGREGAR AL CARRITO
+          <span data-i18n="modalAddCart">AGREGAR AL CARRITO</span>
         </button>
         <button class="modal-btn-wa" onclick="orderViaWhatsApp()">
           <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-          CONSULTAR POR WHATSAPP
+          <span data-i18n="modalWhatsapp">CONSULTAR POR WHATSAPP</span>
         </button>
       </div>
     </div>
@@ -4663,12 +5068,12 @@ img { transition: opacity 0.4s ease; }
     <div class="modal-sticky-bar" id="modal-sticky-bar" aria-hidden="false">
       <div class="msb-price" id="msb-price">—</div>
       <button class="msb-size-chip" id="msb-size-chip" type="button" onclick="scrollToModalSizes()">
-        <span id="msb-size-label">Elegí talla</span>
+        <span id="msb-size-label" data-i18n="msbSizePrompt">Elegí talla</span>
         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
       <button class="msb-add" type="button" onclick="addProductToCart()">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
-        Agregar
+        <span data-i18n="msbAdd">Agregar</span>
       </button>
     </div>
   </div>
@@ -4700,18 +5105,18 @@ img { transition: opacity 0.4s ease; }
         <a href="#catalogo" class="btn-primary coming-soon-cta">Ver Catálogo →</a>
       </div>
       <div class="products-filters">
-        <button class="filter-btn active" onclick="filterProducts('all',this)">Todos</button>
-        <button class="filter-btn" onclick="filterProducts('ropa',this)">Ropa</button>
-        <button class="filter-btn" onclick="filterProducts('suplementos',this)">Suplementos</button>
-        <button class="filter-btn" onclick="filterProducts('accesorios',this)">Accesorios</button>
+        <button class="filter-btn active" onclick="filterProducts('all',this)" data-i18n="filterAll">Todos</button>
+        <button class="filter-btn" onclick="filterProducts('ropa',this)" data-i18n="filterApparel">Ropa</button>
+        <button class="filter-btn" onclick="filterProducts('suplementos',this)" data-i18n="filterSupps">Suplementos</button>
+        <button class="filter-btn" onclick="filterProducts('accesorios',this)" data-i18n="filterAccessories">Accesorios</button>
       </div>
       <div class="products-sort">
-        <span class="products-sort-label">Ordenar:</span>
+        <span class="products-sort-label" data-i18n="sortLabel">Ordenar:</span>
         <select id="product-sort" onchange="setSort(this.value)" aria-label="Ordenar productos">
-          <option value="trending">Trending</option>
-          <option value="newest">Más nuevo</option>
-          <option value="price-asc">Precio ↑</option>
-          <option value="price-desc">Precio ↓</option>
+          <option value="trending" data-i18n="sortTrending">Trending</option>
+          <option value="newest" data-i18n="sortNewest">Más nuevo</option>
+          <option value="price-asc" data-i18n="sortPriceAsc">Precio ↑</option>
+          <option value="price-desc" data-i18n="sortPriceDesc">Precio ↓</option>
         </select>
       </div>
     </div>
@@ -5343,11 +5748,11 @@ function toggleWishlist(id, btn){
   if (wishlist.has(id)) {
     wishlist.delete(id);
     btn.classList.remove('active');
-    if (typeof showToast === 'function') showToast('Removido de favoritos');
+    if (typeof showToast === 'function') showToast(t('wishlistRemoved'));
   } else {
     wishlist.add(id);
     btn.classList.add('active');
-    if (typeof showToast === 'function') showToast('Agregado a favoritos');
+    if (typeof showToast === 'function') showToast(t('wishlistAdded'));
   }
   // Pop animation on card heart
   btn.classList.remove('popping');
@@ -5376,7 +5781,7 @@ function updateWishlistCount(){
 
 function openWishlist(){
   if (wishlist.size === 0) {
-    if (typeof showToast === 'function') showToast('Tu lista está vacía. Agregá favoritos con el ♥');
+    if (typeof showToast === 'function') showToast(t('wishlistEmpty'));
     return;
   }
   const target = document.getElementById('stock');
@@ -5555,9 +5960,9 @@ function renderProducts(filter='all'){
     filtered = products.filter(p => p.category === filter);
   }
   if(!filtered.length){
-    const emptyMsg = filter === '__wishlist__'
-      ? 'TU LISTA DE DESEOS ESTÁ VACÍA'
-      : 'NO HAY PRODUCTOS EN ESTA CATEGORÍA';
+    const emptyMsg = (typeof t === 'function')
+      ? (filter === '__wishlist__' ? t('emptyWishlist') : t('emptyCategory'))
+      : (filter === '__wishlist__' ? 'TU LISTA ESTÁ EN BLANCO.' : 'NADA POR AQUÍ.');
     grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:4rem;color:var(--muted2);font-family:var(--font-body);font-weight:600;font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;">'+emptyMsg+'</div>';
     return;
   }
@@ -5597,7 +6002,7 @@ function renderProducts(filter='all'){
         <span class="prod-badge ${p.type==='stock'?'badge-stock':'badge-encargo'}">${p.type==='stock'?'EN STOCK':'POR ENCARGO'}</span>
         ${badges.length ? `<div class="prod-flags">${badges.join('')}</div>` : ''}
         ${renderSocialProofHtml(p)}
-        <button class="prod-quick-add" onclick="event.stopPropagation();openProduct(${p.id})">VER PRODUCTO</button>
+        <button class="prod-quick-add" onclick="event.stopPropagation();openProduct(${p.id})" data-i18n="productCardCTA">VER PRODUCTO</button>
       </div>
       <div class="prod-info" onclick="openProduct(${p.id})" style="cursor:pointer;">
         <p class="prod-brand">${p.brand}</p>
@@ -5736,7 +6141,8 @@ function openProduct(id){
     if (msbChip && msbLabel) {
       msbChip.classList.remove('missing');
       msbChip.classList.add('has-value');
-      msbLabel.textContent = `Talla: ${p.sizes[0]}`;
+      msbLabel.textContent = t('msbSizeLabel', p.sizes[0]);
+      msbLabel.removeAttribute('data-i18n'); // dynamic value, don't override via applyLang
     }
   } else {
     sizesWrap.style.display='none';
@@ -5789,7 +6195,8 @@ function selectSize(btn,s){
   const msbLabel = document.getElementById('msb-size-label');
   if (msbChip && msbLabel) {
     msbChip.classList.add('has-value');
-    msbLabel.textContent = `Talla: ${s}`;
+    msbLabel.textContent = t('msbSizeLabel', s);
+    msbLabel.removeAttribute('data-i18n');
   }
 }
 
@@ -5871,13 +6278,234 @@ function showToast(msg){
   setTimeout(()=>t.classList.remove('show'),3000);
 }
 
+// ════════════════════════════════════════════════════════════
+// FEATURE 18 ── BRAND-VOICE MICROCOPY + I18N REGISTRY
+// All user-facing strings live here. Feature #21 (EN/ES toggle)
+// will read from I18N[currentLang]. Default = ES with gothic voice.
+// Use t('key') in code; t('key', arg) for function-valued strings.
+// ════════════════════════════════════════════════════════════
+const I18N = {
+  es: {
+    // — Wishlist —
+    wishlistAdded:    'Sumado a tu lista. ♥',
+    wishlistRemoved:  'Fuera de tu lista.',
+    wishlistEmpty:    'Tu lista está vacía. Marcá favoritos con el ♥',
+    // — Cart —
+    cartAdded:        (name) => `Locked in. ${name} en tu drop.`,
+    cartRemoveFail:   'Falla. La pieza sigue ahí.',
+    cartUpdateFail:   'Falla. Cantidad restaurada.',
+    cartEmptyTitle:   'Vacío. Por ahora.',
+    cartEmptyText:    'Tu drop te espera. Encontrá la pieza que te define.',
+    cartEmptyCTA:     'Explorar Colección',
+    // — Newsletter —
+    newsletterOK:     'Sumado a la tribu. Te avisamos del próximo drop.',
+    newsletterBad:    'Email inválido. Probá de nuevo.',
+    // — Filter results —
+    emptyCategory:    'NADA POR AQUÍ. PROBÁ OTRA CATEGORÍA.',
+    emptyWishlist:    'TU LISTA ESTÁ EN BLANCO.',
+    // — Supabase / connection —
+    connOK:           'Conexión activa.',
+    connFail:         (m) => `Conexión perdida: ${m}`,
+    emptyResp:        'Respuesta vacía. Intentá de nuevo.',
+    // — Admin: confirms —
+    confirmDelProduct:  '¿Eliminar esta pieza? No hay vuelta atrás.',
+    confirmDelCategory: (name) => `¿Eliminar "${name}"? Acción definitiva.`,
+    confirmDelSlide:    '¿Eliminar este slide?',
+    confirmDelReview:   '¿Eliminar esta reseña?',
+    confirmDelBrand:    '¿Quitar esta marca del marquee?',
+    // — Admin: results —
+    productSaved:    'Pieza guardada.',
+    productCreated:  'Pieza forjada.',
+    productUpdated:  'Pieza actualizada.',
+    productDeleted:  'Pieza eliminada.',
+    productNameReq:  'El nombre de la pieza es obligatorio.',
+    categoryAdded:   'Categoría agregada.',
+    categoryUpdated: 'Categoría actualizada.',
+    categoryDeleted: 'Categoría eliminada.',
+    brandAdded:      'Marca agregada.',
+    brandUpdated:    'Marca actualizada.',
+    brandDeleted:    'Marca eliminada.',
+    brandNameReq:    'Escribí el nombre de la marca.',
+    slideAdded:      'Slide agregado.',
+    slideUpdated:    'Slide actualizado.',
+    slideDeleted:    'Slide eliminado.',
+    slideTitleReq:   'El título es obligatorio.',
+    slideLocalOnly:  'Guardado local (Supabase no disponible).',
+    reviewAdded:     'Reseña agregada.',
+    reviewUpdated:   'Reseña actualizada.',
+    reviewDeleted:   'Reseña eliminada.',
+    contentSaved:    'Textos actualizados.',
+    imageUploaded:   'Imagen lista.',
+    imageLoaded:     'Imagen cargada.',
+    importedRevise:  'Datos importados. Revisá los campos.',
+    deleteFail:      (m) => `Falla al eliminar: ${m}`,
+    err:             (m) => `Falla: ${m}`,
+    // — Exit-intent —
+    eiEyebrow:       'DROP EXCLUSIVO',
+    eiTitle:         'No te vayas sin tu pieza.',
+    eiText:          '10% OFF en tu primer drop. Solo por unirte a la tribu.',
+    eiCTA:           'Reclamar',
+    eiDecline:       'No me interesa',
+    eiPlaceholder:   'tu@email.com',
+    // — Ticker bar —
+    tickerMessages: [
+      'ENVÍO GRATIS · COMPRAS +₡40.000',
+      'NUEVO DROP · COLECCIÓN RAVEN',
+      'PAGÁ CON SINPE · 100% SEGURO',
+      'IMPORTADO DESDE USA · STOCK EN CR',
+      '+1.500 ATLETAS YA USAN DESMOS · SUMATE'
+    ],
+    // — Static UI strings (tagged via data-i18n) —
+    navStock:        'Stock',
+    navCatalog:      'Catálogo',
+    navReviews:      'Reseñas',
+    navFAQ:          'FAQ',
+    navContact:      'Contacto',
+    filterAll:       'Todos',
+    filterApparel:   'Ropa',
+    filterSupps:     'Suplementos',
+    filterAccessories: 'Accesorios',
+    sortLabel:       'Ordenar:',
+    sortTrending:    'Trending',
+    sortNewest:      'Más nuevo',
+    sortPriceAsc:    'Precio ↑',
+    sortPriceDesc:   'Precio ↓',
+    productCardCTA:  'VER PRODUCTO',
+    modalSize:       'TALLA',
+    modalColor:      'COLOR',
+    modalDescToggle: 'DESCRIPCIÓN DEL PRODUCTO',
+    modalAddCart:    'AGREGAR AL CARRITO',
+    modalWhatsapp:   'CONSULTAR POR WHATSAPP',
+    msbSizePrompt:   'Elegí talla',
+    msbSizeLabel:    (s) => `Talla: ${s}`,
+    msbAdd:          'Agregar',
+    cartTitle:       'TU CARRITO',
+    cartTotalLabel:  'TOTAL',
+    cartCheckoutCTA: 'COMPRAR POR WHATSAPP',
+    langToggleLabel: 'Idioma'
+  },
+  en: {
+    // — Wishlist —
+    wishlistAdded:    'Added to your list. ♥',
+    wishlistRemoved:  'Removed from your list.',
+    wishlistEmpty:    'Your list is empty. Hit the ♥ to add favorites.',
+    // — Cart —
+    cartAdded:        (name) => `Locked in. ${name} added to your drop.`,
+    cartRemoveFail:   'Failed. Item still there.',
+    cartUpdateFail:   'Failed. Quantity restored.',
+    cartEmptyTitle:   'Empty. For now.',
+    cartEmptyText:    'Your drop awaits. Find the piece that defines you.',
+    cartEmptyCTA:     'Explore Collection',
+    // — Newsletter —
+    newsletterOK:     'Welcome to the tribe. We\'ll alert you on the next drop.',
+    newsletterBad:    'Invalid email. Try again.',
+    // — Filter results —
+    emptyCategory:    'NOTHING HERE. TRY ANOTHER CATEGORY.',
+    emptyWishlist:    'YOUR LIST IS EMPTY.',
+    // — Supabase / connection —
+    connOK:           'Connection live.',
+    connFail:         (m) => `Connection lost: ${m}`,
+    emptyResp:        'Empty response. Try again.',
+    // — Admin: confirms —
+    confirmDelProduct:  'Delete this piece? No going back.',
+    confirmDelCategory: (name) => `Delete "${name}"? Final action.`,
+    confirmDelSlide:    'Delete this slide?',
+    confirmDelReview:   'Delete this review?',
+    confirmDelBrand:    'Remove this brand from the marquee?',
+    // — Admin: results —
+    productSaved:    'Piece saved.',
+    productCreated:  'Piece forged.',
+    productUpdated:  'Piece updated.',
+    productDeleted:  'Piece deleted.',
+    productNameReq:  'Piece name is required.',
+    categoryAdded:   'Category added.',
+    categoryUpdated: 'Category updated.',
+    categoryDeleted: 'Category deleted.',
+    brandAdded:      'Brand added.',
+    brandUpdated:    'Brand updated.',
+    brandDeleted:    'Brand removed.',
+    brandNameReq:    'Brand name required.',
+    slideAdded:      'Slide added.',
+    slideUpdated:    'Slide updated.',
+    slideDeleted:    'Slide deleted.',
+    slideTitleReq:   'Title is required.',
+    slideLocalOnly:  'Saved locally (Supabase offline).',
+    reviewAdded:     'Review added.',
+    reviewUpdated:   'Review updated.',
+    reviewDeleted:   'Review deleted.',
+    contentSaved:    'Texts updated.',
+    imageUploaded:   'Image ready.',
+    imageLoaded:     'Image loaded.',
+    importedRevise:  'Data imported. Review the fields.',
+    deleteFail:      (m) => `Delete failed: ${m}`,
+    err:             (m) => `Error: ${m}`,
+    // — Exit-intent —
+    eiEyebrow:       'EXCLUSIVE DROP',
+    eiTitle:         'Don\'t leave without your piece.',
+    eiText:          '10% OFF on your first drop. Just for joining the tribe.',
+    eiCTA:           'Claim',
+    eiDecline:       'Not interested',
+    eiPlaceholder:   'your@email.com',
+    // — Ticker bar —
+    tickerMessages: [
+      'FREE SHIPPING · ORDERS OVER ₡40,000',
+      'NEW DROP · RAVEN COLLECTION',
+      'PAY WITH SINPE · 100% SECURE',
+      'IMPORTED FROM USA · IN STOCK IN CR',
+      '+1,500 ATHLETES WEAR DESMOS · JOIN THEM'
+    ],
+    // — Static UI —
+    navStock:        'Stock',
+    navCatalog:      'Catalog',
+    navReviews:      'Reviews',
+    navFAQ:          'FAQ',
+    navContact:      'Contact',
+    filterAll:       'All',
+    filterApparel:   'Apparel',
+    filterSupps:     'Supplements',
+    filterAccessories: 'Accessories',
+    sortLabel:       'Sort:',
+    sortTrending:    'Trending',
+    sortNewest:      'Newest',
+    sortPriceAsc:    'Price ↑',
+    sortPriceDesc:   'Price ↓',
+    productCardCTA:  'VIEW PRODUCT',
+    modalSize:       'SIZE',
+    modalColor:      'COLOR',
+    modalDescToggle: 'PRODUCT DESCRIPTION',
+    modalAddCart:    'ADD TO CART',
+    modalWhatsapp:   'ASK ON WHATSAPP',
+    msbSizePrompt:   'Pick size',
+    msbSizeLabel:    (s) => `Size: ${s}`,
+    msbAdd:          'Add',
+    cartTitle:       'YOUR CART',
+    cartTotalLabel:  'TOTAL',
+    cartCheckoutCTA: 'CHECKOUT ON WHATSAPP',
+    langToggleLabel: 'Language'
+  }
+};
+
+let currentLang = (function(){
+  try { return localStorage.getItem('desmos_lang') || 'es'; }
+  catch(e){ return 'es'; }
+})();
+
+function t(key, ...args){
+  const dict = I18N[currentLang] || I18N.es;
+  let val = dict[key];
+  if (val === undefined) val = I18N.es[key];
+  if (val === undefined) return key;
+  if (typeof val === 'function') return val(...args);
+  return val;
+}
+
 // ════════════════════════════════════
 // NEWSLETTER
 // ════════════════════════════════════
 function subscribeNL(){
   const v=document.getElementById('nl-input').value;
-  if(v&&v.includes('@')){showToast('¡Gracias por suscribirte! 🦇');document.getElementById('nl-input').value='';}
-  else showToast('Por favor ingresa un email válido');
+  if(v&&v.includes('@')){showToast(t('newsletterOK'));document.getElementById('nl-input').value='';}
+  else showToast(t('newsletterBad'));
 }
 
 // ════════════════════════════════════
@@ -5982,7 +6610,7 @@ function editReview(i){
   showToast('Reseña actualizada ✓');
 }
 function deleteReview(i){
-  if(!confirm('¿Eliminar esta reseña?')) return;
+  if(!confirm(t('confirmDelReview'))) return;
   reviews.splice(i,1);
   saveReviews(); renderReviews(); renderAdminReviews();
   showToast('Reseña eliminada');
@@ -6441,7 +7069,7 @@ function addDrop(){ openDropForm(null); }
 function editDrop(i){ openDropForm(i); }
 
 async function deleteDrop(i){
-  if(!confirm('¿Eliminar este slide?')) return;
+  if(!confirm(t('confirmDelSlide'))) return;
   const d = drops[i];
   if(_dropsSupabaseOk){
     try { await sbFetch('drops','DELETE',null,`?id=eq.${d.id}`); } catch(e){}
@@ -6546,7 +7174,7 @@ function editCategory(i){
   showToast('Categoría actualizada ✓');
 }
 function deleteCategory(i){
-  if(!confirm(`¿Eliminar la categoría "${categories[i].name}"?`)) return;
+  if(!confirm(t('confirmDelCategory', categories[i].name))) return;
   categories.splice(i,1);
   saveCategories(); renderCategories(); renderAdminCategories();
   showToast('Categoría eliminada');
@@ -6573,7 +7201,7 @@ function renderAdminGrid(){
 }
 
 async function deleteProduct(id){
-  if(!confirm('¿Eliminar este producto?')) return;
+  if(!confirm(t('confirmDelProduct'))) return;
   try {
     await sbFetch('products','DELETE',null,`?id=eq.${id}`);
     products = products.filter(p=>p.id!==id);
@@ -6744,7 +7372,7 @@ async function addBrand(){
 }
 
 async function deleteBrand(id){
-  if(!confirm('¿Eliminar esta marca del marquee?')) return;
+  if(!confirm(t('confirmDelBrand'))) return;
   try {
     await sbFetch('brands','DELETE',null,`?id=eq.${id}`);
     siteBrands=siteBrands.filter(b=>b.id!==id);
@@ -6879,6 +7507,65 @@ function punchCart(){
     badge.classList.add('badge-punch');
     setTimeout(() => badge.classList.remove('badge-punch'), 600);
   }
+  // Confetti only on first add-to-cart per session (function self-guards)
+  fireCartConfetti();
+}
+
+// ════════════════════════════════════════════════════════════
+// FEATURE 22 ── ADD-TO-CART CONFETTI
+// Fires a one-time burst from the cart button when the user makes
+// their first add-to-cart of the session. Skips on reduced motion.
+// ════════════════════════════════════════════════════════════
+const CONFETTI_SESSION_KEY = 'desmos_confetti_fired';
+function fireCartConfetti(){
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  try {
+    if (sessionStorage.getItem(CONFETTI_SESSION_KEY)) return;
+    sessionStorage.setItem(CONFETTI_SESSION_KEY, '1');
+  } catch(e) { /* if storage blocked, fire every time — minor */ }
+
+  const btn = document.getElementById('cart-btn');
+  if (!btn) return;
+  const rect = btn.getBoundingClientRect();
+  const cx = rect.left + rect.width  / 2;
+  const cy = rect.top  + rect.height / 2;
+
+  const container = document.createElement('div');
+  container.className = 'confetti-container';
+  document.body.appendChild(container);
+
+  const COLORS = ['#DC1111', '#ff2222', '#a50d0d', '#f0ece4', '#ff5555'];
+  const SHAPES = ['square', 'circle', 'streak'];
+  const COUNT  = 32;
+
+  for (let i = 0; i < COUNT; i++) {
+    const piece = document.createElement('span');
+    piece.className = 'confetti-piece ' + SHAPES[i % SHAPES.length];
+    // Mostly-upward burst with wide arc
+    const angle = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 1.25;
+    const power = 220 + Math.random() * 280;
+    const dx = Math.cos(angle) * power;
+    const dy = Math.sin(angle) * power;
+    const rot  = (Math.random() - 0.5) * 900;
+    const size = 5 + Math.random() * 5;
+    const color = COLORS[Math.floor(Math.random() * COLORS.length)];
+    const dur   = 950 + Math.random() * 700;
+
+    piece.style.setProperty('--cx', cx + 'px');
+    piece.style.setProperty('--cy', cy + 'px');
+    piece.style.setProperty('--dx', dx.toFixed(1) + 'px');
+    piece.style.setProperty('--dy', dy.toFixed(1) + 'px');
+    piece.style.setProperty('--rot', rot.toFixed(0) + 'deg');
+    piece.style.setProperty('--size', size.toFixed(1) + 'px');
+    piece.style.background = color;
+    piece.style.color = color; // box-shadow uses currentColor
+    piece.style.animationDuration = dur + 'ms';
+    piece.style.animationDelay = (Math.random() * 80) + 'ms';
+    container.appendChild(piece);
+  }
+
+  // Cleanup once the longest particle finishes
+  setTimeout(() => container.remove(), 2200);
 }
 
 // ════════════════════════════════════
@@ -6913,6 +7600,9 @@ function toggleCart(){
 
 // Branded empty-cart markup (used in both initial paint and dynamic re-render)
 function getEmptyCartHTML(){
+  const title = (typeof t === 'function') ? t('cartEmptyTitle') : 'Vacío. Por ahora.';
+  const text  = (typeof t === 'function') ? t('cartEmptyText')  : 'Tu drop te espera. Encontrá la pieza que te define.';
+  const cta   = (typeof t === 'function') ? t('cartEmptyCTA')   : 'Explorar Colección';
   return `
     <div class="cart-empty">
       <div class="cart-empty-art">
@@ -6924,11 +7614,11 @@ function getEmptyCartHTML(){
           <line x1="48" y1="44" x2="32" y2="58" stroke-linecap="round"/>
         </svg>
       </div>
-      <h3 class="cart-empty-title">Vacío. Por ahora.</h3>
+      <h3 class="cart-empty-title">${title}</h3>
       <div class="cart-empty-divider"></div>
-      <p class="cart-empty-text">Tu drop te espera.<br>Encontrá la pieza que te define.</p>
+      <p class="cart-empty-text">${text.replace(/\.(\s|$)/, '.<br>')}</p>
       <button class="cart-empty-cta" type="button" onclick="closeCartAndBrowse()">
-        Explorar Colección
+        ${cta}
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
           <line x1="5" y1="12" x2="19" y2="12"/>
           <polyline points="12 5 19 12 12 19"/>
@@ -6957,7 +7647,7 @@ function addToCart(product, size, color){
     cart.push({product, size, color, qty:1});
   }
   updateCartUI();
-  showToast(`${product.name} agregado al carrito 🛍`);
+  showToast(t('cartAdded', product.name));
   // Open cart panel
   const panel = document.getElementById('cart-panel');
   const overlay = document.getElementById('cart-overlay');
@@ -6991,7 +7681,7 @@ function removeFromCart(idx){
       console.warn('Cart sync failed (remove), restoring:', err);
       cart = prevSnapshot;
       updateCartUI();
-      if (typeof showToast === 'function') showToast('No se pudo eliminar. Restaurado.');
+      if (typeof showToast === 'function') showToast(t('cartRemoveFail'));
     });
   };
 
@@ -7018,7 +7708,7 @@ function changeQty(idx, delta){
     console.warn('Cart sync failed (qty), restoring:', err);
     cart = prevSnapshot;
     updateCartUI();
-    if (typeof showToast === 'function') showToast('No se pudo actualizar. Restaurado.');
+    if (typeof showToast === 'function') showToast(t('cartUpdateFail'));
   });
 }
 
@@ -7578,6 +8268,29 @@ openProductForm = function(id){
 </script>
 
 
+<!-- ═══ EXIT-INTENT MODAL ═══ -->
+<div id="exit-intent-modal" class="ei-modal" role="dialog" aria-modal="true" aria-labelledby="ei-title" aria-hidden="true">
+  <div class="ei-overlay" onclick="dismissExitIntent()"></div>
+  <div class="ei-card">
+    <button class="ei-close" type="button" onclick="dismissExitIntent()" aria-label="Cerrar">✕</button>
+    <div class="ei-art" aria-hidden="true">
+      <svg width="72" height="44" viewBox="0 0 64 40" fill="currentColor">
+        <path d="M32 36 C28 36 24 32 20 30 L14 34 L8 26 L4 30 L0 20 L2 16 L6 20 L10 12 L16 16 L22 8 L28 12 C30 6 32 4 32 4 C32 4 34 6 36 12 L42 8 L48 16 L54 12 L58 20 L62 16 L64 20 L60 30 L56 26 L50 34 L44 30 C40 32 36 36 32 36Z"/>
+        <circle cx="26" cy="16" r="2.5" fill="#fff"/>
+        <circle cx="38" cy="16" r="2.5" fill="#fff"/>
+      </svg>
+    </div>
+    <p class="ei-eyebrow" id="ei-eyebrow-text">DROP EXCLUSIVO</p>
+    <h2 class="ei-title" id="ei-title">No te vayas sin tu pieza.</h2>
+    <p class="ei-text" id="ei-text"><strong>10% OFF</strong> en tu primer drop. Solo por unirte a la tribu.</p>
+    <form class="ei-form" onsubmit="submitExitIntent(event)">
+      <input type="email" id="ei-email" placeholder="tu@email.com" required autocomplete="email">
+      <button type="submit" id="ei-cta-btn">Reclamar</button>
+    </form>
+    <button class="ei-decline" type="button" onclick="dismissExitIntent()" id="ei-decline-btn">No me interesa</button>
+  </div>
+</div>
+
 <!-- ═══ CART BUTTON ═══ -->
 <button id="cart-btn" onclick="toggleCart()" aria-label="Carrito">
   <svg width="22" height="22" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24">
@@ -7593,7 +8306,7 @@ openProductForm = function(id){
 <!-- ═══ CART PANEL ═══ -->
 <div id="cart-panel">
   <div class="cart-header">
-    <h2 class="cart-title">🛍 TU CARRITO</h2>
+    <h2 class="cart-title"><span aria-hidden="true">🛍</span> <span data-i18n="cartTitle">TU CARRITO</span></h2>
     <button class="cart-close" onclick="toggleCart()">✕</button>
   </div>
   <div class="cart-items" id="cart-items">
@@ -7622,12 +8335,12 @@ openProductForm = function(id){
   </div>
   <div class="cart-footer">
     <div class="cart-subtotal">
-      <span class="cart-subtotal-label">TOTAL</span>
+      <span class="cart-subtotal-label" data-i18n="cartTotalLabel">TOTAL</span>
       <span class="cart-subtotal-price" id="cart-total">₡0</span>
     </div>
     <button class="cart-wa-btn" id="cart-checkout-btn" onclick="checkoutWhatsApp()" disabled>
       <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-      PEDIR POR WHATSAPP
+      <span data-i18n="cartCheckoutCTA">PEDIR POR WHATSAPP</span>
     </button>
     <p class="cart-note">Te contactaremos para confirmar tu pedido y método de pago.</p>
   </div>
@@ -7930,6 +8643,238 @@ openProductForm = function(id){
   // Run once on load in case page is already scrolled
   tick();
 })();
+
+// ════════════════════════════════════════════════════════════
+// FEATURE 21 ── EN/ES LANGUAGE TOGGLE
+// Re-applies all [data-i18n] elements + cart UI + ticker + exit-intent
+// text whenever the user switches languages. Persists via localStorage.
+// ════════════════════════════════════════════════════════════
+function setLang(lang){
+  if (lang !== 'es' && lang !== 'en') return;
+  if (lang === currentLang) {
+    syncLangToggleUI();
+    return;
+  }
+  currentLang = lang;
+  try { localStorage.setItem('desmos_lang', lang); } catch(e) {}
+  document.documentElement.setAttribute('lang', lang);
+  applyLang();
+  syncLangToggleUI();
+}
+
+function syncLangToggleUI(){
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === currentLang);
+  });
+}
+
+function applyLang(){
+  // 1. Walk all [data-i18n] static elements
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const val = t(key);
+    if (typeof val === 'string') el.textContent = val;
+  });
+
+  // 2. Refresh ticker messages (array-valued)
+  if (typeof refreshTicker === 'function') refreshTicker();
+
+  // 3. Refresh exit-intent modal text (in case it's about to show)
+  try {
+    const eyebrowEl = document.getElementById('ei-eyebrow-text');
+    const titleEl   = document.getElementById('ei-title');
+    const textEl    = document.getElementById('ei-text');
+    const ctaEl     = document.getElementById('ei-cta-btn');
+    const declineEl = document.getElementById('ei-decline-btn');
+    const emailEl   = document.getElementById('ei-email');
+    if (eyebrowEl) eyebrowEl.textContent = t('eiEyebrow');
+    if (titleEl)   titleEl.textContent   = t('eiTitle');
+    if (textEl) {
+      const raw = t('eiText');
+      textEl.innerHTML = raw.replace(/^(\S+\s+\S+)/, '<strong>$1</strong>');
+    }
+    if (ctaEl)     ctaEl.textContent     = t('eiCTA');
+    if (declineEl) declineEl.textContent = t('eiDecline');
+    if (emailEl)   emailEl.placeholder   = t('eiPlaceholder');
+  } catch(e) {}
+
+  // 4. Refresh cart UI (empty state copy + checkout button)
+  if (typeof updateCartUI === 'function') updateCartUI();
+}
+
+// On initial load: set html[lang], sync toggle, apply translations if EN is persisted
+(function initLang(){
+  document.documentElement.setAttribute('lang', currentLang);
+  const run = () => {
+    syncLangToggleUI();
+    if (currentLang !== 'es') applyLang(); // ES is the default in markup; only re-render if EN
+  };
+  if (document.readyState !== 'loading') setTimeout(run, 0);
+  else document.addEventListener('DOMContentLoaded', run);
+})();
+
+// ════════════════════════════════════════════════════════════
+// FEATURE 20 ── TICKER BAR
+// Rotating announcement messages above the navbar.
+// Messages live in I18N.tickerMessages (translated by lang).
+// Dismissable per session via the ✕ button.
+// ════════════════════════════════════════════════════════════
+function dismissTicker(){
+  try { sessionStorage.setItem('desmos_ticker_dismissed', '1'); } catch(e) {}
+  document.documentElement.classList.add('ticker-dismissed');
+}
+
+function refreshTicker(){
+  const track = document.getElementById('ticker-track');
+  if (!track) return;
+  const msgs = (typeof t === 'function' ? t('tickerMessages') : null) || [];
+  if (!Array.isArray(msgs) || !msgs.length) return;
+  track.innerHTML = msgs.map((m, i) =>
+    `<span class="ticker-msg${i === 0 ? ' active' : ''}">${m}</span>`
+  ).join('');
+}
+
+(function initTicker(){
+  if (document.documentElement.classList.contains('ticker-dismissed')) return;
+  refreshTicker();
+  const track = document.getElementById('ticker-track');
+  if (!track) return;
+
+  let idx = 0;
+  setInterval(() => {
+    const msgs = track.querySelectorAll('.ticker-msg');
+    if (msgs.length < 2) return;
+    const current = msgs[idx];
+    current.classList.remove('active');
+    current.classList.add('exit');
+    setTimeout(() => current.classList.remove('exit'), 500);
+    idx = (idx + 1) % msgs.length;
+    msgs[idx].classList.add('active');
+  }, 4000);
+})();
+
+// ════════════════════════════════════════════════════════════
+// FEATURE 19 ── EXIT-INTENT EMAIL MODAL
+// Desktop: triggers when cursor moves above viewport (clientY <= 0)
+//   after 10s of dwell, once per session.
+// Touch: triggers after 45s OR when user scrolls 80% then back up,
+//   whichever comes first.
+// Persists subscription in localStorage so subscribed users never see it.
+// ════════════════════════════════════════════════════════════
+const EI_SESSION_KEY = 'desmos_exit_intent_shown';
+const EI_SUBSCRIBED_KEY = 'desmos_exit_intent_subscribed';
+
+(function initExitIntent(){
+  try {
+    if (sessionStorage.getItem(EI_SESSION_KEY)) return;
+    if (localStorage.getItem(EI_SUBSCRIBED_KEY)) return;
+  } catch(e) { /* storage disabled */ }
+
+  // Sync modal text from i18n registry (if available)
+  try {
+    if (typeof t === 'function') {
+      const eyebrowEl = document.getElementById('ei-eyebrow-text');
+      const titleEl   = document.getElementById('ei-title');
+      const textEl    = document.getElementById('ei-text');
+      const ctaEl     = document.getElementById('ei-cta-btn');
+      const declineEl = document.getElementById('ei-decline-btn');
+      const emailEl   = document.getElementById('ei-email');
+      if (eyebrowEl) eyebrowEl.textContent = t('eiEyebrow');
+      if (titleEl)   titleEl.textContent   = t('eiTitle');
+      if (textEl) {
+        const raw = t('eiText');
+        textEl.innerHTML = raw.replace(/^(\S+\s+\S+)/, '<strong>$1</strong>');
+      }
+      if (ctaEl)     ctaEl.textContent     = t('eiCTA');
+      if (declineEl) declineEl.textContent = t('eiDecline');
+      if (emailEl)   emailEl.placeholder   = t('eiPlaceholder');
+    }
+  } catch(e) {}
+
+  const isTouch = window.matchMedia('(hover: none)').matches;
+
+  if (isTouch) {
+    // Touch heuristic: trigger after 45s, or after scrolling 80% then back to top half
+    let triggered = false;
+    let scrolledDeep = false;
+
+    setTimeout(() => {
+      if (!triggered) { triggered = true; showExitIntent(); }
+    }, 45000);
+
+    window.addEventListener('scroll', () => {
+      if (triggered) return;
+      const sy = window.scrollY;
+      const total = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = sy / Math.max(1, total);
+      if (pct > 0.75) scrolledDeep = true;
+      if (scrolledDeep && pct < 0.35) {
+        triggered = true;
+        showExitIntent();
+      }
+    }, { passive: true });
+    return;
+  }
+
+  // Desktop: arm after 10s, listen for mouseleave through top
+  let armed = false;
+  setTimeout(() => { armed = true; }, 10000);
+
+  function onMouseLeave(e){
+    if (!armed) return;
+    // Only fire when leaving through the top
+    if (e.clientY > 0) return;
+    showExitIntent();
+    document.removeEventListener('mouseleave', onMouseLeave);
+  }
+  document.addEventListener('mouseleave', onMouseLeave);
+})();
+
+function showExitIntent(){
+  try { sessionStorage.setItem(EI_SESSION_KEY, '1'); } catch(e) {}
+  const modal = document.getElementById('exit-intent-modal');
+  if (!modal) return;
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+  // Focus the email input after the entrance animation lands
+  setTimeout(() => {
+    const input = document.getElementById('ei-email');
+    if (input) input.focus();
+  }, 450);
+  document.addEventListener('keydown', exitIntentEscHandler);
+}
+
+function dismissExitIntent(){
+  const modal = document.getElementById('exit-intent-modal');
+  if (modal) {
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+  }
+  document.removeEventListener('keydown', exitIntentEscHandler);
+}
+
+function exitIntentEscHandler(e){
+  if (e.key === 'Escape') dismissExitIntent();
+}
+
+function submitExitIntent(e){
+  e.preventDefault();
+  const input = document.getElementById('ei-email');
+  const email = (input && input.value || '').trim();
+  if (!email || !email.includes('@') || email.length < 5) {
+    showToast(t('newsletterBad'));
+    if (input) {
+      input.style.borderColor = 'var(--red)';
+      input.focus();
+      setTimeout(() => { input.style.borderColor = ''; }, 1500);
+    }
+    return;
+  }
+  try { localStorage.setItem(EI_SUBSCRIBED_KEY, email); } catch(e) {}
+  // TODO: POST to Supabase newsletter_subs table
+  showToast(t('newsletterOK'));
+  dismissExitIntent();
+}
 
 // ════════════════════════════════════════════════════════════
 // FEATURE 15 ── STATS COUNT-UP ANIMATION
