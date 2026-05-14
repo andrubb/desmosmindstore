@@ -776,51 +776,10 @@ section{padding:6rem 2.5rem;}
 @media(max-width:1100px){.products-grid{grid-template-columns:repeat(3,1fr);}}
 @media(max-width:700px){.products-grid{grid-template-columns:repeat(2,1fr);}}
 
-.prod-card{
-  background:var(--bg3);border:1px solid var(--border-white);
-  cursor:pointer;transition:all 0.4s cubic-bezier(.16,1,.3,1);
-  text-decoration:none;color:inherit;display:block;
-}
-.prod-card:hover{border-color:rgba(220,17,17,0.35);transform:translateY(-5px);box-shadow:0 20px 40px rgba(0,0,0,0.5);}
-.prod-img-wrap{position:relative;aspect-ratio:1;overflow:hidden;}
-.prod-img{
-  width:100%;height:100%;object-fit:cover;
-  filter:grayscale(0.5);
-  transition:all 0.8s cubic-bezier(.25,.46,.45,.94);
-}
-.prod-card:hover .prod-img{filter:grayscale(0);transform:scale(1.05);}
-
-.prod-badge{
-  position:absolute;top:0.8rem;left:0.8rem;
-  font-family:var(--font-body);font-size:0.6rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;
-  padding:0.3rem 0.75rem;
-}
-.badge-stock{background:rgba(22,163,74,0.12);color:#4ade80;border:1px solid rgba(22,163,74,0.25);}
-.badge-encargo{background:rgba(220,17,17,0.12);color:#f87171;border:1px solid rgba(220,17,17,0.25);}
-.prod-sale{
-  position:absolute;top:0.8rem;right:0.8rem;
-  background:var(--red);color:white;
-  font-family:var(--font-body);font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;
-  padding:0.3rem 0.6rem;
-}
-
-.prod-info{padding:1.4rem 1.6rem;}
-.prod-brand{
-  font-family:var(--font-body);font-size:0.62rem;font-weight:700;letter-spacing:0.22em;text-transform:uppercase;
-  color:var(--red);margin-bottom:0.4rem;
-}
-.prod-name{
-  font-family:var(--font-body);font-size:0.95rem;font-weight:500;
-  margin-bottom:0.8rem;line-height:1.4;color:var(--text);
-}
-.prod-price{
-  font-family:var(--font-display);
-  font-size:1.3rem;font-weight:400;color:var(--white);letter-spacing:0.04em;
-}
-.prod-price-old{
-  font-family:var(--font-body);font-size:0.85rem;
-  color:var(--muted);text-decoration:line-through;margin-left:0.5rem;
-}
+/* NOTE — original .prod-card rules removed.
+   They were fully superseded by the FINAL POLISH block (~line 2187)
+   and the GOTHIC DEPTH PASS + FEATURE blocks that follow.
+   .prod-img and .prod-sale are dead classes (no markup references). */
 
 /* Product Modal */
 #prod-modal{
@@ -841,7 +800,7 @@ section{padding:6rem 2.5rem;}
   to{opacity:1;transform:none;}
 }
 @media(max-width:700px){.modal-inner{grid-template-columns:1fr;}}
-.modal-img{width:100%;aspect-ratio:1;object-fit:cover;}
+/* .modal-img removed — superseded by .modal-main-img */
 .modal-body{padding:2.5rem 2rem;display:flex;flex-direction:column;gap:1rem;}
 .modal-brand{font-family:var(--font-body);font-size:0.6rem;letter-spacing:0.25em;color:var(--red);}
 .modal-name{font-family:var(--font-display);font-size:1.3rem;font-weight:400;line-height:1.2;}
@@ -1403,10 +1362,7 @@ footer{background:#030303;border-top:1px solid rgba(220,17,17,0.1);padding:5rem 
 .cart-items{
   flex:1;overflow-y:auto;padding:1rem 1.5rem;
 }
-.cart-empty{
-  text-align:center;padding:4rem 1rem;
-  color:var(--muted2);font-style:italic;
-}
+/* Original .cart-empty removed — superseded by FEATURE 16 branded empty cart block */
 .cart-item{
   display:flex;gap:1rem;align-items:flex-start;
   padding:1rem 0;border-bottom:1px solid var(--border-white);
@@ -4711,18 +4667,588 @@ html.ticker-dismissed #navbar { top: 0; }
     opacity: 0;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   FEATURE 23 ── CUSTOM BAT CURSOR (desktop only)
+═══════════════════════════════════════════════════════════ */
+#cursor-dot, #cursor-bat {
+  position: fixed;
+  top: 0; left: 0;
+  pointer-events: none;
+  z-index: 99999;
+  will-change: transform;
+  display: none;
+}
+html.has-custom-cursor #cursor-dot,
+html.has-custom-cursor #cursor-bat { display: block; }
+html.has-custom-cursor body,
+html.has-custom-cursor body * { cursor: none !important; }
+html.has-custom-cursor input,
+html.has-custom-cursor textarea,
+html.has-custom-cursor select,
+html.has-custom-cursor [contenteditable] { cursor: text !important; }
+
+#cursor-dot {
+  width: 5px; height: 5px;
+  background: var(--red-bright, #ff2222);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(220,17,17,0.9), 0 0 4px rgba(255,30,30,0.7);
+  transition: opacity 0.2s ease, transform 0.1s ease;
+}
+#cursor-bat {
+  width: 32px; height: 32px;
+  transition: width 0.25s cubic-bezier(.16,1,.3,1),
+              height 0.25s cubic-bezier(.16,1,.3,1),
+              opacity 0.2s ease,
+              filter 0.3s ease;
+  filter: drop-shadow(0 0 6px rgba(220,17,17,0.55));
+}
+#cursor-bat svg {
+  width: 100%; height: 100%;
+  fill: var(--red);
+  display: block;
+  transform: translate(-50%, -50%);
+  transform-origin: 50% 50%;
+}
+#cursor-bat.hover-link {
+  width: 50px; height: 50px;
+  filter: drop-shadow(0 0 14px rgba(255,30,30,0.85));
+}
+#cursor-bat.hover-link svg { animation: cursor-flap 0.6s ease-in-out infinite; }
+@keyframes cursor-flap {
+  0%, 100% { transform: translate(-50%, -50%) scaleX(1); }
+  50%      { transform: translate(-50%, -50%) scaleX(0.7); }
+}
+#cursor-bat.hidden, #cursor-dot.hidden { opacity: 0; }
+#cursor-bat.clicking {
+  width: 22px; height: 22px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FEATURE 24 ── PAGE LOADING SCREEN
+═══════════════════════════════════════════════════════════ */
+#page-loader {
+  position: fixed;
+  inset: 0;
+  background: #050505;
+  z-index: 999999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.4rem;
+  transition: opacity 0.7s cubic-bezier(.4,0,.2,1), visibility 0.7s;
+  will-change: opacity;
+}
+#page-loader::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 50% 35% at 50% 50%, rgba(220,17,17,0.12), transparent 70%);
+  pointer-events: none;
+}
+#page-loader.fade {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+html.loader-dismissed #page-loader { display: none !important; }
+.page-loader-bat {
+  width: 72px;
+  height: 45px;
+  fill: var(--red);
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 0 16px rgba(220,17,17,0.7))
+          drop-shadow(0 0 30px rgba(220,17,17,0.4));
+  animation: loader-bat-pulse 1.5s ease-in-out infinite;
+}
+@keyframes loader-bat-pulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 12px rgba(220,17,17,0.65))
+            drop-shadow(0 0 24px rgba(220,17,17,0.3));
+  }
+  50% {
+    transform: scale(1.16);
+    filter: drop-shadow(0 0 22px rgba(255,30,30,0.95))
+            drop-shadow(0 0 44px rgba(220,17,17,0.55))
+            drop-shadow(0 0 70px rgba(220,17,17,0.3));
+  }
+}
+.page-loader-text {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  letter-spacing: 0.4em;
+  color: rgba(255,255,255,0.55);
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+.page-loader-text em {
+  color: var(--red);
+  font-style: normal;
+  text-shadow: 0 0 14px rgba(220,17,17,0.7);
+}
+.page-loader-bar {
+  width: 140px;
+  height: 1px;
+  background: rgba(255,255,255,0.08);
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+.page-loader-fill {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, var(--red), rgba(255,30,30,0.9), var(--red), transparent);
+  animation: loader-fill 1.5s ease-in-out infinite;
+}
+@keyframes loader-fill {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-loader-bat { animation: none; }
+  .page-loader-fill { animation-duration: 2.5s; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FEATURE 25 ── PRODUCT QUICK-VIEW PANEL
+   Lightweight peek (image + name + price + sizes + add).
+   Sidesteps the full modal for fast browsing.
+═══════════════════════════════════════════════════════════ */
+.prod-qv-btn {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-12px);
+  z-index: 5;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(220,17,17,0.3);
+  background: rgba(0,0,0,0.62);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  opacity: 0;
+  border-radius: 50%;
+  transition: opacity 0.3s ease,
+              transform 0.3s cubic-bezier(.16,1,.3,1),
+              border-color 0.25s ease,
+              background 0.25s ease,
+              box-shadow 0.3s ease;
+}
+.prod-card:hover .prod-qv-btn {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.prod-qv-btn:hover {
+  border-color: var(--red);
+  background: rgba(220,17,17,0.18);
+  box-shadow: 0 0 16px rgba(220,17,17,0.4);
+}
+.prod-qv-btn svg {
+  width: 16px;
+  height: 16px;
+  stroke: white;
+  fill: none;
+}
+
+#quick-view-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 800;
+  background: rgba(0,0,0,0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 1.5rem;
+  align-items: center;
+  justify-content: center;
+  animation: qv-fade-in 0.25s cubic-bezier(.4,0,.2,1);
+}
+#quick-view-modal.open { display: flex; }
+@keyframes qv-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.qv-card {
+  background: linear-gradient(180deg, var(--bg2), var(--bg3));
+  border: 1px solid rgba(220,17,17,0.32);
+  box-shadow: 0 30px 80px rgba(0,0,0,0.7),
+              0 0 60px rgba(220,17,17,0.12);
+  width: 100%;
+  max-width: 720px;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  position: relative;
+  animation: qv-rise 0.4s cubic-bezier(.16,1,.3,1);
+  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px),
+                     calc(100% - 14px) 100%, 0 100%, 0 14px);
+}
+@keyframes qv-rise {
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to   { opacity: 1; transform: none; }
+}
+.qv-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 3;
+  width: 32px;
+  height: 32px;
+  background: rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: var(--muted2);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.qv-close:hover {
+  border-color: var(--red);
+  color: var(--red);
+  background: rgba(220,17,17,0.12);
+}
+.qv-image {
+  position: relative;
+  overflow: hidden;
+  background: #060606;
+  aspect-ratio: 1;
+}
+.qv-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.6s cubic-bezier(.16,1,.3,1);
+}
+.qv-card:hover .qv-image img { transform: scale(1.05); }
+.qv-image::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--red), transparent);
+  box-shadow: 0 0 10px var(--red);
+  z-index: 2;
+}
+.qv-info {
+  padding: 1.8rem 1.6rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.qv-brand {
+  font-family: var(--font-body);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin: 0;
+}
+.qv-name {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  letter-spacing: 0.04em;
+  color: var(--white);
+  line-height: 1.1;
+  margin: 0;
+}
+.qv-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+.qv-price {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--white);
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 16px rgba(220,17,17,0.3);
+}
+.qv-price-old {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--muted);
+  text-decoration: line-through;
+}
+.qv-price-old:empty { display: none; }
+.qv-label {
+  font-family: var(--font-body);
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted2);
+  margin: 0.3rem 0 0.25rem;
+}
+.qv-sizes {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+.qv-size-btn {
+  min-width: 38px;
+  height: 38px;
+  padding: 0 0.5rem;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.12);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.qv-size-btn:hover { border-color: var(--red); color: var(--red); }
+.qv-size-btn.active {
+  border-color: var(--red);
+  background: rgba(220,17,17,0.12);
+  color: var(--red);
+}
+.qv-actions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.qv-add {
+  background: var(--red);
+  color: white;
+  border: none;
+  padding: 0.95rem;
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.25s, box-shadow 0.3s, transform 0.15s;
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+.qv-add:hover {
+  background: var(--red-bright);
+  box-shadow: 0 0 30px rgba(220,17,17,0.55);
+}
+.qv-add:active { transform: scale(0.97); }
+.qv-more {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.12);
+  color: var(--muted2);
+  padding: 0.7rem;
+  font-family: var(--font-body);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.qv-more:hover { border-color: var(--red); color: var(--red); }
+
+@media (max-width: 700px) {
+  .qv-card {
+    grid-template-columns: 1fr;
+    max-width: 100%;
+  }
+  .qv-image { aspect-ratio: 4/3; }
+  .qv-info { padding: 1.4rem 1.2rem 1.2rem; }
+  .qv-name { font-size: 1.2rem; }
+  .qv-price { font-size: 1.3rem; }
+  .prod-qv-btn { display: none; } /* On mobile, just tap the card */
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FEATURE 26 ── RECENTLY VIEWED STRIP
+═══════════════════════════════════════════════════════════ */
+.recent-section {
+  background: var(--bg2);
+  padding: 4rem 2.5rem;
+  border-top: 1px solid rgba(220,17,17,0.14);
+  position: relative;
+  display: none;     /* shown by JS only when >= 2 items */
+}
+.recent-section::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  height: 1px;
+  background: var(--red);
+  box-shadow: 0 0 12px var(--red);
+}
+.recent-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.recent-eyebrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.1rem;
+  margin-bottom: 0.9rem;
+  font-family: var(--font-body);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--red);
+}
+.recent-eyebrow-line {
+  width: 26px;
+  height: 1px;
+  background: rgba(220,17,17,0.5);
+}
+.recent-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  letter-spacing: 0.06em;
+  color: var(--white);
+  margin: 0;
+}
+.recent-strip {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.5rem 0 1rem;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: var(--red) transparent;
+}
+.recent-strip::-webkit-scrollbar { height: 4px; }
+.recent-strip::-webkit-scrollbar-track { background: transparent; }
+.recent-strip::-webkit-scrollbar-thumb {
+  background: var(--red);
+  box-shadow: inset 0 0 3px rgba(255,40,40,0.6);
+}
+.recent-card {
+  flex: 0 0 200px;
+  background: var(--bg3);
+  border: 1px solid rgba(220,17,17,0.1);
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  transition: border-color 0.3s ease,
+              transform 0.3s cubic-bezier(.16,1,.3,1),
+              box-shadow 0.3s ease;
+  scroll-snap-align: start;
+  position: relative;
+  overflow: hidden;
+}
+.recent-card:hover {
+  border-color: rgba(220,17,17,0.45);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px rgba(0,0,0,0.6), 0 0 22px rgba(220,17,17,0.1);
+}
+.recent-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: var(--red);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s cubic-bezier(.16,1,.3,1);
+}
+.recent-card:hover::after { transform: scaleX(1); }
+.recent-card-img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(0.4);
+  transition: filter 0.5s ease, transform 0.7s ease;
+}
+.recent-card:hover .recent-card-img {
+  filter: grayscale(0);
+  transform: scale(1.05);
+}
+.recent-card-info { padding: 0.8rem 1rem 1rem; }
+.recent-card-brand {
+  font-family: var(--font-body);
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin: 0 0 0.25rem;
+}
+.recent-card-name {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text);
+  margin: 0 0 0.5rem;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 2.1em;
+}
+.recent-card-price {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+  color: var(--white);
+  margin: 0;
+}
+@media (max-width: 700px) {
+  .recent-section { padding: 3rem 1.25rem; }
+  .recent-card { flex: 0 0 160px; }
+  .recent-strip { gap: 0.6rem; }
+}
 </style>
 </head>
 <body>
 
 <script>
-  // Pre-paint: if user already dismissed the ticker this session, hide it before first paint
+  // Pre-paint: hide loader & ticker if user already saw/dismissed them this session
   try {
+    if (sessionStorage.getItem('desmos_loader_shown')) {
+      document.documentElement.classList.add('loader-dismissed');
+    }
     if (sessionStorage.getItem('desmos_ticker_dismissed')) {
       document.documentElement.classList.add('ticker-dismissed');
     }
   } catch(e) {}
 </script>
+
+<!-- ═══ PAGE LOADER ═══ -->
+<div id="page-loader" aria-hidden="true">
+  <svg class="page-loader-bat" viewBox="0 0 32 20" xmlns="http://www.w3.org/2000/svg">
+    <path d="M16 18 C14 18 12 16 10 15 L7 17 L4 13 L2 15 L0 10 L1 8 L3 10 L5 6 L8 8 L11 4 L14 6 C15 3 16 2 16 2 C16 2 17 3 18 6 L21 4 L24 8 L27 6 L29 10 L31 8 L32 10 L30 15 L28 13 L25 17 L22 15 C20 16 18 18 16 18Z"/>
+  </svg>
+  <p class="page-loader-text">DESMOS<em>MIND</em></p>
+  <div class="page-loader-bar"><div class="page-loader-fill"></div></div>
+</div>
+
+<!-- ═══ CUSTOM CURSOR (desktop) ═══ -->
+<div id="cursor-dot" aria-hidden="true"></div>
+<div id="cursor-bat" aria-hidden="true">
+  <svg viewBox="0 0 32 20" xmlns="http://www.w3.org/2000/svg">
+    <path d="M16 18 C14 18 12 16 10 15 L7 17 L4 13 L2 15 L0 10 L1 8 L3 10 L5 6 L8 8 L11 4 L14 6 C15 3 16 2 16 2 C16 2 17 3 18 6 L21 4 L24 8 L27 6 L29 10 L31 8 L32 10 L30 15 L28 13 L25 17 L22 15 C20 16 18 18 16 18Z"/>
+  </svg>
+</div>
 
 <!-- ═══ TICKER BAR ═══ -->
 <div id="ticker-bar" class="ticker-bar" role="region" aria-label="Anuncios">
@@ -5010,6 +5536,21 @@ html.ticker-dismissed #navbar { top: 0; }
   </div>
 </section>
 
+<!-- ═══ RECENTLY VIEWED ═══ -->
+<section class="recent-section" id="recent-viewed-section" aria-label="Vistos recientemente">
+  <div class="container">
+    <div class="recent-header">
+      <div class="recent-eyebrow">
+        <span class="recent-eyebrow-line"></span>
+        <span data-i18n="recentEyebrow">Vistos recientemente</span>
+        <span class="recent-eyebrow-line"></span>
+      </div>
+      <h2 class="recent-title" data-i18n="recentTitle">Continuá donde quedaste</h2>
+    </div>
+    <div class="recent-strip" id="recent-strip"></div>
+  </div>
+</section>
+
 <!-- Product Modal -->
 <div id="prod-modal">
   <div class="modal-inner" id="modal-inner">
@@ -5075,6 +5616,38 @@ html.ticker-dismissed #navbar { top: 0; }
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
         <span data-i18n="msbAdd">Agregar</span>
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ QUICK VIEW MODAL ═══ -->
+<div id="quick-view-modal" aria-hidden="true" onclick="if(event.target===this)closeQuickView()">
+  <div class="qv-card">
+    <button class="qv-close" onclick="closeQuickView()" aria-label="Cerrar">✕</button>
+    <div class="qv-image">
+      <img id="qv-img" src="" alt="">
+    </div>
+    <div class="qv-info">
+      <p class="qv-brand" id="qv-brand"></p>
+      <h3 class="qv-name" id="qv-name"></h3>
+      <div class="qv-price-row">
+        <span class="qv-price" id="qv-price"></span>
+        <span class="qv-price-old" id="qv-price-old"></span>
+      </div>
+      <div id="qv-sizes-wrap" class="qv-sizes-wrap">
+        <p class="qv-label" data-i18n="modalSize">TALLA</p>
+        <div class="qv-sizes" id="qv-sizes"></div>
+      </div>
+      <div class="qv-actions">
+        <button class="qv-add" id="qv-add" onclick="qvAddToCart()" type="button">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24">
+            <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+            <line x1="3" y1="6" x2="21" y2="6"/>
+          </svg>
+          <span data-i18n="modalAddCart">AGREGAR AL CARRITO</span>
+        </button>
+        <button class="qv-more" onclick="qvOpenFull()" type="button">Ver detalles completos →</button>
+      </div>
     </div>
   </div>
 </div>
@@ -5689,6 +6262,8 @@ async function loadAllData(){
       renderProducts();
       // Re-resolve cart items against the fresh Supabase products
       if (typeof refreshCartFromProducts === 'function') refreshCartFromProducts();
+      // Re-resolve recently viewed strip against fresh products
+      if (typeof renderRecentlyViewed === 'function') renderRecentlyViewed();
     }
     const content = await sbFetch('site_content','GET',null,'?order=key.asc');
     if(content && content.length){
@@ -5897,6 +6472,154 @@ function renderSwatchesHtml(productId, colors){
   return `<div class="prod-swatches" onclick="event.stopPropagation()">${swatches}${extraEl}</div>`;
 }
 
+// ════════════════════════════════════════════════════════════
+// FEATURE 26 ── RECENTLY VIEWED STRIP
+// Tracks last N viewed product IDs in localStorage. Renders a
+// horizontal scroller below the catalog when >= 2 items resolved.
+// ════════════════════════════════════════════════════════════
+const RECENT_KEY = 'desmos_recently_viewed_v1';
+const RECENT_MAX = 8;
+const RECENT_MIN_TO_SHOW = 2;
+
+function getRecentlyViewed(){
+  try {
+    const raw = localStorage.getItem(RECENT_KEY);
+    if (!raw) return [];
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr.filter(x => typeof x === 'number') : [];
+  } catch(e) { return []; }
+}
+function saveRecentlyViewed(arr){
+  try {
+    localStorage.setItem(RECENT_KEY, JSON.stringify(arr.slice(0, RECENT_MAX)));
+  } catch(e) {}
+}
+function trackRecentlyViewed(id){
+  if (typeof id !== 'number') return;
+  const arr = getRecentlyViewed().filter(x => x !== id);
+  arr.unshift(id);
+  saveRecentlyViewed(arr);
+  renderRecentlyViewed();
+}
+function renderRecentlyViewed(){
+  const section = document.getElementById('recent-viewed-section');
+  const strip   = document.getElementById('recent-strip');
+  if (!section || !strip) return;
+  const ids = getRecentlyViewed();
+  const items = ids
+    .map(id => products.find(p => p.id === id))
+    .filter(Boolean);
+  if (items.length < RECENT_MIN_TO_SHOW) {
+    section.style.display = 'none';
+    return;
+  }
+  section.style.display = 'block';
+  strip.innerHTML = items.map(p => `
+    <a class="recent-card" href="javascript:void(0)" onclick="openProduct(${p.id})" aria-label="${p.name}">
+      <img class="recent-card-img" src="${p.img}" alt="${p.name}" loading="lazy"
+        onerror="this.src='https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400'">
+      <div class="recent-card-info">
+        <p class="recent-card-brand">${p.brand || ''}</p>
+        <p class="recent-card-name">${p.name || ''}</p>
+        <p class="recent-card-price">₡${(p.price || 0).toLocaleString()}</p>
+      </div>
+    </a>
+  `).join('');
+}
+
+// Initial render + refresh after Supabase products load
+if (document.readyState !== 'loading') setTimeout(renderRecentlyViewed, 0);
+else document.addEventListener('DOMContentLoaded', renderRecentlyViewed);
+
+// ════════════════════════════════════════════════════════════
+// FEATURE 25 ── QUICK VIEW
+// Lightweight peek panel: image + name + price + sizes + add.
+// No description, no thumbnails — open the full modal for that.
+// ════════════════════════════════════════════════════════════
+let currentQuickProduct = null;
+function openQuickView(id){
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  currentQuickProduct = p;
+  trackRecentlyViewed(p.id);
+
+  document.getElementById('qv-img').src = p.img || (p.imgs && p.imgs[0]) || '';
+  document.getElementById('qv-img').alt = p.name || '';
+  document.getElementById('qv-brand').textContent = p.brand || '';
+  document.getElementById('qv-name').textContent  = p.name || '';
+  document.getElementById('qv-price').textContent = `₡${(p.price || 0).toLocaleString()}`;
+  const oldEl = document.getElementById('qv-price-old');
+  if (p.originalPrice && p.originalPrice > p.price) {
+    oldEl.textContent = `₡${p.originalPrice.toLocaleString()}`;
+    oldEl.style.display = 'inline';
+  } else {
+    oldEl.textContent = '';
+    oldEl.style.display = 'none';
+  }
+  // Sizes
+  const wrap = document.getElementById('qv-sizes-wrap');
+  const sizes = document.getElementById('qv-sizes');
+  if (p.sizes && p.sizes.length) {
+    wrap.style.display = 'block';
+    sizes.innerHTML = p.sizes.map(s =>
+      `<button class="qv-size-btn" onclick="qvSelectSize(this,'${s.replace(/'/g,"\\'")}')">${s}</button>`
+    ).join('');
+    sizes.querySelector('.qv-size-btn').classList.add('active');
+  } else {
+    wrap.style.display = 'none';
+  }
+  // Show modal
+  const modal = document.getElementById('quick-view-modal');
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+  document.addEventListener('keydown', qvEscHandler);
+}
+
+function qvEscHandler(e){
+  if (e.key === 'Escape') closeQuickView();
+}
+
+function closeQuickView(){
+  const modal = document.getElementById('quick-view-modal');
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+  document.removeEventListener('keydown', qvEscHandler);
+  currentQuickProduct = null;
+}
+
+function qvSelectSize(btn, s){
+  btn.closest('.qv-sizes').querySelectorAll('.qv-size-btn')
+    .forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function qvAddToCart(){
+  if (!currentQuickProduct) return;
+  const sizeSel = document.querySelector('#qv-sizes .qv-size-btn.active');
+  const size = sizeSel ? sizeSel.textContent : '';
+  const product = currentQuickProduct;
+
+  // Capture source image position for the fly animation, then close
+  const sourceImg = document.getElementById('qv-img');
+  const sourceRect = sourceImg ? sourceImg.getBoundingClientRect() : null;
+  const sourceSrc  = sourceImg ? sourceImg.src : '';
+  closeQuickView();
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (sourceRect && sourceSrc && sourceRect.width > 0 && !reduceMotion && typeof flyToCart === 'function') {
+    flyToCart(sourceSrc, sourceRect, () => addToCart(product, size, ''));
+  } else {
+    addToCart(product, size, '');
+  }
+}
+
+function qvOpenFull(){
+  if (!currentQuickProduct) return;
+  const id = currentQuickProduct.id;
+  closeQuickView();
+  setTimeout(() => openProduct(id), 180);
+}
+
 function openProductWithColor(id, colorName){
   openProduct(id);
   // After modal renders, activate the matching color button
@@ -6001,6 +6724,12 @@ function renderProducts(filter='all'){
           type="button">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
         </button>
+        <button class="prod-qv-btn" onclick="event.stopPropagation();openQuickView(${p.id})" aria-label="Vista rápida" type="button">
+          <svg viewBox="0 0 24 24" stroke-width="2" aria-hidden="true">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
         <span class="prod-badge ${p.type==='stock'?'badge-stock':'badge-encargo'}">${p.type==='stock'?'EN STOCK':'POR ENCARGO'}</span>
         ${badges.length ? `<div class="prod-flags">${badges.join('')}</div>` : ''}
         ${renderSocialProofHtml(p)}
@@ -6092,6 +6821,7 @@ function openProduct(id){
   const p = products.find(x=>x.id===id);
   if(!p) return;
   currentModalProduct = p;
+  if (typeof trackRecentlyViewed === 'function') trackRecentlyViewed(p.id);
 
   // Gallery
   const imgs = Array.isArray(p.imgs) && p.imgs.length ? p.imgs : [p.img].filter(Boolean);
@@ -6384,7 +7114,10 @@ const I18N = {
     cartTitle:       'TU CARRITO',
     cartTotalLabel:  'TOTAL',
     cartCheckoutCTA: 'COMPRAR POR WHATSAPP',
-    langToggleLabel: 'Idioma'
+    langToggleLabel: 'Idioma',
+    recentEyebrow:   'Vistos recientemente',
+    recentTitle:     'Continuá donde quedaste',
+    qvFullDetails:   'Ver detalles completos →'
   },
   en: {
     // — Wishlist —
@@ -6483,7 +7216,10 @@ const I18N = {
     cartTitle:       'YOUR CART',
     cartTotalLabel:  'TOTAL',
     cartCheckoutCTA: 'CHECKOUT ON WHATSAPP',
-    langToggleLabel: 'Language'
+    langToggleLabel: 'Language',
+    recentEyebrow:   'Recently viewed',
+    recentTitle:     'Pick up where you left',
+    qvFullDetails:   'View full details →'
   }
 };
 
@@ -9266,6 +10002,106 @@ function navigateModal(dir, innerEl){
   if (grid) {
     new MutationObserver(scan).observe(grid, { childList: true });
   }
+})();
+
+// ════════════════════════════════════════════════════════════
+// FEATURE 24 ── PAGE LOADING SCREEN
+// Visible on first visit per session. Dismisses on window.load (or 500ms
+// minimum to avoid flash), capped at 3000ms failsafe so a slow asset
+// never traps the user.
+// ════════════════════════════════════════════════════════════
+(function initPageLoader(){
+  const loader = document.getElementById('page-loader');
+  if (!loader) return;
+  if (document.documentElement.classList.contains('loader-dismissed')) {
+    loader.remove();
+    return;
+  }
+  let dismissed = false;
+  const startTime = Date.now();
+  const MIN_MS = 500;
+  const MAX_MS = 3000;
+
+  function dismiss(){
+    if (dismissed) return;
+    dismissed = true;
+    try { sessionStorage.setItem('desmos_loader_shown', '1'); } catch(e) {}
+    document.documentElement.classList.add('loader-dismissed');
+    loader.classList.add('fade');
+    setTimeout(() => loader.remove(), 750);
+  }
+
+  function ready(){
+    const elapsed = Date.now() - startTime;
+    setTimeout(dismiss, Math.max(0, MIN_MS - elapsed));
+  }
+
+  if (document.readyState === 'complete') {
+    setTimeout(ready, 0);
+  } else {
+    window.addEventListener('load', ready, { once: true });
+  }
+  // Failsafe — never trap longer than MAX_MS
+  setTimeout(dismiss, MAX_MS);
+})();
+
+// ════════════════════════════════════════════════════════════
+// FEATURE 23 ── CUSTOM BAT CURSOR (desktop only)
+// Tiny red dot follows exactly + damped bat SVG trails behind.
+// Skipped on touch / reduced-motion / small viewports.
+// ════════════════════════════════════════════════════════════
+(function initCustomCursor(){
+  const isTouch      = window.matchMedia('(hover: none)').matches;
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isSmall      = window.innerWidth < 900;
+  if (isTouch || reduceMotion || isSmall) return;
+
+  const dot = document.getElementById('cursor-dot');
+  const bat = document.getElementById('cursor-bat');
+  if (!dot || !bat) return;
+  document.documentElement.classList.add('has-custom-cursor');
+
+  let mx = window.innerWidth / 2;
+  let my = window.innerHeight / 2;
+  let bx = mx, by = my;
+  let raf = null;
+
+  function loop(){
+    bx += (mx - bx) * 0.22;
+    by += (my - by) * 0.22;
+    bat.style.transform = `translate(${bx}px, ${by}px) translate(-50%, -50%)`;
+    if (Math.abs(mx - bx) > 0.3 || Math.abs(my - by) > 0.3) {
+      raf = requestAnimationFrame(loop);
+    } else {
+      raf = null;
+    }
+  }
+
+  document.addEventListener('mousemove', (e) => {
+    mx = e.clientX; my = e.clientY;
+    dot.style.transform = `translate(${mx}px, ${my}px) translate(-50%, -50%)`;
+    if (!raf) raf = requestAnimationFrame(loop);
+  });
+
+  document.addEventListener('mouseleave', () => {
+    dot.classList.add('hidden');
+    bat.classList.add('hidden');
+  });
+  document.addEventListener('mouseenter', () => {
+    dot.classList.remove('hidden');
+    bat.classList.remove('hidden');
+  });
+
+  document.addEventListener('mousedown', () => bat.classList.add('clicking'));
+  document.addEventListener('mouseup',   () => bat.classList.remove('clicking'));
+
+  const INTERACTIVE_SEL = 'a, button, [onclick], .clickable, .swatch, .prod-card, .filter-btn, .lang-btn, .nav-wishlist, .ticker-close, .modal-close, .ei-close, .cart-close, .cart-item-remove, .cart-qty-btn, .size-btn, .color-btn, select';
+  document.addEventListener('mouseover', (e) => {
+    if (e.target.closest && e.target.closest(INTERACTIVE_SEL)) bat.classList.add('hover-link');
+  });
+  document.addEventListener('mouseout', (e) => {
+    if (e.target.closest && e.target.closest(INTERACTIVE_SEL)) bat.classList.remove('hover-link');
+  });
 })();
 </script>
 </body>
