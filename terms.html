@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="es-CR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Términos de Servicio — Desmos Mind</title>
+<meta name="description" content="Términos y condiciones de uso de Desmos Mind, tienda de streetwear y ropa de gym importada de USA a Costa Rica.">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://desmosmind.netlify.app/terms.html">
+<link rel="icon" href="/assets/Desmos.svg" type="image/svg+xml">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #050505;
+  --bg2: #0a0a0a;
+  --bg3: #0e0e0e;
+  --red: #DC1111;
+  --red-bright: #ff2222;
+  --white: #f0ece4;
+  --text: #d4d0c8;
+  --muted: #8a8a82;
+  --muted2: #6a6a62;
+  --font-display: 'Bebas Neue', sans-serif;
+  --font-body: 'Inter', sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+}
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 999;
+  mix-blend-mode: overlay;
+}
+.page-nav {
+  position: sticky;
+  top: 0;
+  background: rgba(5,5,5,0.96);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(220,17,17,0.18);
+  z-index: 100;
+  padding: 1.2rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.page-nav a.brand {
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  letter-spacing: 0.12em;
+  color: var(--white);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.page-nav a.brand em { color: var(--red); font-style: normal; }
+.page-nav a.back {
+  text-decoration: none;
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--red);
+  border: 1px solid rgba(220,17,17,0.32);
+  padding: 0.55rem 1.1rem;
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+  transition: all 0.25s;
+}
+.page-nav a.back:hover { background: var(--red); color: white; }
+
+main {
+  max-width: 820px;
+  margin: 0 auto;
+  padding: 4rem 1.5rem 5rem;
+  position: relative;
+  z-index: 1;
+}
+.eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 1.2rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+.eyebrow::before, .eyebrow::after {
+  content: '';
+  width: 30px; height: 1px;
+  background: rgba(220,17,17,0.5);
+}
+h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  letter-spacing: 0.04em;
+  color: var(--white);
+  line-height: 0.95;
+  margin-bottom: 1.5rem;
+}
+.last-updated {
+  font-size: 0.75rem;
+  color: var(--muted2);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 3rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(220,17,17,0.18);
+}
+h2 {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  letter-spacing: 0.06em;
+  color: var(--white);
+  margin-top: 2.8rem;
+  margin-bottom: 0.9rem;
+  padding-left: 1rem;
+  border-left: 3px solid var(--red);
+}
+h3 {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-top: 1.6rem;
+  margin-bottom: 0.5rem;
+}
+p { margin-bottom: 1rem; color: var(--text); }
+ul, ol { padding-left: 1.4rem; margin-bottom: 1rem; }
+li { margin-bottom: 0.5rem; color: var(--text); }
+a { color: var(--red); text-decoration: underline; text-underline-offset: 3px; }
+a:hover { color: var(--red-bright); }
+strong { color: var(--white); font-weight: 700; }
+.callout {
+  background: linear-gradient(135deg, rgba(220,17,17,0.06), rgba(220,17,17,0.01));
+  border: 1px solid rgba(220,17,17,0.22);
+  border-left: 3px solid var(--red);
+  padding: 1.4rem 1.6rem;
+  margin: 2rem 0;
+  font-size: 0.92rem;
+}
+.callout strong { color: var(--red); }
+.toc {
+  background: var(--bg2);
+  border: 1px solid rgba(220,17,17,0.12);
+  padding: 1.6rem 1.8rem;
+  margin: 2rem 0 3rem;
+}
+.toc h3 { margin-top: 0; color: var(--white); letter-spacing: 0.18em; }
+.toc ol { margin-bottom: 0; }
+.toc a { color: var(--text); text-decoration: none; }
+.toc a:hover { color: var(--red); }
+footer {
+  border-top: 1px solid rgba(220,17,17,0.18);
+  padding: 3rem 2rem;
+  text-align: center;
+  font-size: 0.72rem;
+  color: var(--muted2);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+footer a { color: var(--red); }
+@media (max-width: 600px) {
+  .page-nav { padding: 1rem 1.2rem; }
+  main { padding: 2.5rem 1.2rem 4rem; }
+  h2 { font-size: 1.2rem; padding-left: 0.8rem; }
+}
+</style>
+</head>
+<body>
+
+<nav class="page-nav">
+  <a href="/" class="brand"><span>DESMOS</span><em>MIND</em></a>
+  <a href="/" class="back">← Volver</a>
+</nav>
+
+<main>
+  <div class="eyebrow">Legal · CR</div>
+  <h1>Términos de Servicio</h1>
+  <p class="last-updated">Última actualización: 14 de mayo de 2026</p>
+
+  <div class="callout">
+    <p><strong>En corto:</strong> Importamos ropa de marcas premium de USA a Costa Rica. Hacés tu pedido por WhatsApp, coordinamos pago vía Sinpe o transferencia, y despachamos por Correos de Costa Rica. Productos son auténticos. Tiempos de entrega para producto por encargo: 7–14 días hábiles. Cambios de talla disponibles si no usaste la prenda.</p>
+  </div>
+
+  <div class="toc">
+    <h3>Contenido</h3>
+    <ol>
+      <li><a href="#aceptacion">Aceptación de los términos</a></li>
+      <li><a href="#descripcion">Descripción del servicio</a></li>
+      <li><a href="#productos">Productos importados y autenticidad</a></li>
+      <li><a href="#pedido">Proceso de pedido vía WhatsApp</a></li>
+      <li><a href="#precios">Precios e impuestos</a></li>
+      <li><a href="#pagos">Métodos de pago</a></li>
+      <li><a href="#envio">Envíos y plazos</a></li>
+      <li><a href="#cambios-devoluciones">Cambios y devoluciones</a></li>
+      <li><a href="#responsabilidad">Limitación de responsabilidad</a></li>
+      <li><a href="#propiedad">Propiedad intelectual</a></li>
+      <li><a href="#cuenta">Uso del sitio</a></li>
+      <li><a href="#modificaciones">Modificaciones</a></li>
+      <li><a href="#ley">Ley aplicable y jurisdicción</a></li>
+      <li><a href="#contacto">Contacto</a></li>
+    </ol>
+  </div>
+
+  <h2 id="aceptacion">1. Aceptación de los términos</h2>
+  <p>Al acceder y utilizar este sitio web (<a href="https://desmosmind.netlify.app">desmosmind.netlify.app</a>) o realizar un pedido a través de WhatsApp con Desmos Mind, aceptás quedar legalmente vinculado a estos Términos de Servicio y a nuestra <a href="/privacy.html">Política de Privacidad</a>.</p>
+  <p>Si no estás de acuerdo con alguna parte de estos términos, te pedimos que no utilices el servicio.</p>
+
+  <h2 id="descripcion">2. Descripción del servicio</h2>
+  <p>Desmos Mind es una marca costarricense de streetwear y ropa de gym que opera bajo modalidad de <strong>importación por encargo</strong> y, en algunos casos, venta de <strong>stock disponible en Costa Rica</strong>. Importamos prendas y suplementos de marcas premium estadounidenses (Gymshark, YoungLA, Darc Sport, Alphalete, Ryderwear, Optimum Nutrition, entre otras) para clientes en territorio costarricense.</p>
+  <p>El sitio funciona como catálogo y herramienta de cotización. El cierre del pedido, la confirmación de tallas/colores y la coordinación de pago se efectúan a través de <strong>WhatsApp Business</strong>.</p>
+
+  <h2 id="productos">3. Productos importados y autenticidad</h2>
+  <p><strong>Garantizamos la autenticidad de cada producto.</strong> Importamos directamente desde tiendas oficiales de las marcas o de sus distribuidores autorizados en Estados Unidos. Nunca trabajamos con réplicas o productos falsificados.</p>
+  <p>Las descripciones, colores y tallas presentadas en el sitio son referenciales. Pequeñas variaciones en color o textura pueden existir entre la imagen del catálogo y el producto físico debido a calibraciones de pantalla, lotes de fabricación o iluminación de la fotografía.</p>
+  <p>Las medidas de cada talla siguen los estándares de la marca original, no medidas costarricenses. Te recomendamos consultar la guía de tallas de cada marca antes de confirmar tu pedido.</p>
+
+  <h2 id="pedido">4. Proceso de pedido vía WhatsApp</h2>
+  <ol>
+    <li>Seleccionás los productos, talla y color desde el catálogo del sitio.</li>
+    <li>Al presionar "Comprar por WhatsApp", se abre una conversación con un mensaje pre-llenado que incluye un <strong>código de pedido único</strong> (ej. <code>DM-260514-3287</code>).</li>
+    <li>Confirmamos disponibilidad, total final incluyendo envío y forma de pago.</li>
+    <li>Una vez recibido el pago, procesamos la importación o despachamos del stock local según corresponda.</li>
+    <li>Te enviamos número de guía y seguimiento del envío.</li>
+  </ol>
+  <p>El pedido no se considera confirmado hasta que recibamos el pago en su totalidad. Reservamos el derecho de rechazar o cancelar pedidos en casos de stock agotado, errores de precio o sospecha de fraude.</p>
+
+  <h2 id="precios">5. Precios e impuestos</h2>
+  <p>Todos los precios están expresados en <strong>colones costarricenses (CRC)</strong> e incluyen los impuestos correspondientes vigentes en Costa Rica (IVA y demás cargas tributarias).</p>
+  <p>Los precios pueden cambiar sin previo aviso debido a fluctuaciones del tipo de cambio USD/CRC o ajustes de proveedor. El precio vigente al momento de confirmación del pago en WhatsApp es el precio final aplicable.</p>
+  <p>Productos marcados como "POR ENCARGO" implican que el producto se importa específicamente para tu pedido — el precio incluye la compra en USA, envío internacional, gestiones aduaneras y entrega local.</p>
+
+  <h2 id="pagos">6. Métodos de pago</h2>
+  <p>Aceptamos los siguientes métodos de pago, coordinados por WhatsApp:</p>
+  <ul>
+    <li><strong>Sinpe Móvil</strong> al número de la cuenta que te indicaremos.</li>
+    <li><strong>Transferencia bancaria</strong> (BCR, BAC, BN u otros bancos costarricenses).</li>
+    <li><strong>Efectivo</strong> contra entrega en zonas seleccionadas del Gran Área Metropolitana.</li>
+  </ul>
+  <p>No procesamos pagos con tarjeta directamente en el sitio. Para pedidos grandes podemos generar enlace de pago alternativo previa coordinación.</p>
+
+  <h2 id="envio">7. Envíos y plazos</h2>
+  <h3>7.1. Cobertura</h3>
+  <p>Enviamos a todo el territorio costarricense vía Correos de Costa Rica o courier privado, según ubicación y peso.</p>
+
+  <h3>7.2. Plazos estimados</h3>
+  <ul>
+    <li><strong>Productos en STOCK CR</strong>: 1–3 días hábiles tras confirmación de pago.</li>
+    <li><strong>Productos POR ENCARGO</strong>: 7–14 días hábiles, dependiendo de disponibilidad del proveedor y tiempos aduaneros.</li>
+  </ul>
+
+  <h3>7.3. Costo de envío</h3>
+  <p>El costo del envío local se confirma en la conversación de WhatsApp y depende del peso, destino y método elegido. Pedidos superiores a ₡40,000 califican para envío gratis en el Gran Área Metropolitana.</p>
+
+  <h3>7.4. Demoras</h3>
+  <p>No nos hacemos responsables por demoras causadas por: huelgas, condiciones aduaneras imprevistas, climatología extrema o fallas del servicio de correo. En estos casos te mantendremos informado y haremos lo posible por agilizar la entrega.</p>
+
+  <h2 id="cambios-devoluciones">8. Cambios y devoluciones</h2>
+  <h3>8.1. Cambio de talla</h3>
+  <p>Aceptamos cambios de talla dentro de los <strong>14 días naturales</strong> posteriores a la entrega, siempre que:</p>
+  <ul>
+    <li>La prenda no haya sido usada (ni lavada, ni manchada, ni con olores).</li>
+    <li>Conserve sus etiquetas originales.</li>
+    <li>El comprador asuma el costo de envío del cambio.</li>
+    <li>La talla solicitada esté disponible (sujeto a stock).</li>
+  </ul>
+
+  <h3>8.2. Devolución por defecto de fábrica</h3>
+  <p>Si el producto presenta un defecto de fábrica al momento de la entrega, contás con 7 días naturales para reportarlo vía WhatsApp con foto. Procederemos al reemplazo sin costo adicional o reembolso íntegro, a elección del comprador, conforme al artículo 43 de la Ley 7472 de Promoción de la Competencia y Defensa Efectiva del Consumidor.</p>
+
+  <h3>8.3. No-aplicables</h3>
+  <p>No aceptamos devoluciones por:</p>
+  <ul>
+    <li>Cambio de opinión después de 14 días.</li>
+    <li>Productos usados, lavados o con olores corporales/perfume/humo.</li>
+    <li>Productos sin etiquetas originales.</li>
+    <li>Suplementos abiertos.</li>
+    <li>Productos personalizados o de edición limitada vendidos como "venta final".</li>
+  </ul>
+
+  <h2 id="responsabilidad">9. Limitación de responsabilidad</h2>
+  <p>Desmos Mind se compromete a operar con buena fe y diligencia razonable. Sin embargo:</p>
+  <ul>
+    <li>El sitio se ofrece "tal cual" sin garantías de disponibilidad ininterrumpida.</li>
+    <li>No nos responsabilizamos por daños indirectos, lucro cesante o pérdidas consecuenciales derivadas del uso del sitio.</li>
+    <li>Nuestra responsabilidad total queda limitada al monto efectivamente pagado por el comprador en el pedido específico en disputa.</li>
+  </ul>
+  <p>Estas limitaciones no aplican en casos de dolo, negligencia grave, ni en los derechos irrenunciables del consumidor establecidos por la Ley 7472.</p>
+
+  <h2 id="propiedad">10. Propiedad intelectual</h2>
+  <p>Todos los contenidos del sitio (marca "Desmos Mind", logotipo del murciélago, diseños, fotografías propias, textos y código) son propiedad de Desmos Mind o de sus licenciantes, y están protegidos por la Ley 6683 de Derechos de Autor y Derechos Conexos.</p>
+  <p>Las marcas comerciales de los productos importados (Gymshark, YoungLA, Darc Sport, etc.) son propiedad de sus respectivos titulares; las usamos únicamente con fines de identificación del producto.</p>
+  <p>Queda prohibido copiar, reproducir o reutilizar contenido del sitio sin autorización escrita previa.</p>
+
+  <h2 id="cuenta">11. Uso del sitio</h2>
+  <p>Te comprometés a usar el sitio solo para fines lícitos y conforme a estos términos. Queda prohibido:</p>
+  <ul>
+    <li>Intentar acceder a partes restringidas (panel de administración).</li>
+    <li>Realizar ingeniería inversa, scraping masivo o ataques DDoS.</li>
+    <li>Suplantar identidad de otra persona al realizar un pedido.</li>
+    <li>Usar el sitio para fines de competencia desleal o publicidad no autorizada.</li>
+  </ul>
+  <p>Nos reservamos el derecho de suspender el servicio a usuarios que violen estos términos.</p>
+
+  <h2 id="modificaciones">12. Modificaciones</h2>
+  <p>Podemos modificar estos términos en cualquier momento. La versión vigente es la publicada en este sitio con su fecha de "Última actualización". Cambios sustanciales serán notificados con al menos 7 días de anticipación por los canales disponibles (email a suscriptores, banner en el sitio).</p>
+  <p>El uso continuado del sitio o la realización de un nuevo pedido tras la modificación constituye aceptación de los nuevos términos.</p>
+
+  <h2 id="ley">13. Ley aplicable y jurisdicción</h2>
+  <p>Estos términos se rigen por las leyes de la <strong>República de Costa Rica</strong>, en particular:</p>
+  <ul>
+    <li>Ley 7472 de Promoción de la Competencia y Defensa Efectiva del Consumidor.</li>
+    <li>Ley 8968 de Protección de la Persona frente al Tratamiento de sus Datos Personales.</li>
+    <li>Código de Comercio y Código Civil de Costa Rica.</li>
+  </ul>
+  <p>Cualquier controversia derivada de estos términos será sometida a los tribunales competentes de San José, Costa Rica, renunciando a cualquier otro fuero que pudiera corresponder.</p>
+  <p>En materia de protección al consumidor, los compradores pueden acudir a la <strong>Comisión Nacional del Consumidor</strong> del Ministerio de Economía, Industria y Comercio (MEIC): <a href="https://www.meic.go.cr" target="_blank" rel="noopener">www.meic.go.cr</a>.</p>
+
+  <h2 id="contacto">14. Contacto</h2>
+  <p>Para cualquier consulta sobre estos términos:</p>
+  <ul>
+    <li>Email: <a href="mailto:hola@desmosmind.com">hola@desmosmind.com</a></li>
+    <li>WhatsApp: <a href="https://wa.me/50685946741">+506 8594 6741</a></li>
+  </ul>
+</main>
+
+<footer>
+  © 2026 Desmos Mind · <a href="/">Inicio</a> · <a href="/privacy.html">Privacidad</a>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,49 @@
+{
+  "name": "Desmos Mind",
+  "short_name": "Desmos",
+  "description": "Streetwear gótico & ropa de gym premium importada de USA a Costa Rica.",
+  "lang": "es-CR",
+  "dir": "ltr",
+  "start_url": "/?utm_source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#050505",
+  "theme_color": "#DC1111",
+  "categories": ["shopping", "lifestyle", "fitness"],
+  "icons": [
+    {
+      "src": "/assets/Desmos.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/Desmos.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Catálogo",
+      "short_name": "Catálogo",
+      "description": "Explorar productos disponibles",
+      "url": "/#catalogo"
+    },
+    {
+      "name": "Stock CR",
+      "short_name": "Stock",
+      "description": "Productos en stock para entrega inmediata",
+      "url": "/#stock"
+    },
+    {
+      "name": "Mi lista",
+      "short_name": "Lista",
+      "description": "Lista de deseos",
+      "url": "/#catalogo"
+    }
+  ],
+  "prefer_related_applications": false
+}
