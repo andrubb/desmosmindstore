@@ -48,7 +48,7 @@
 <!-- ═══ FUENTES ═══ -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <!-- ═══ DATOS ESTRUCTURADOS (Schema.org) — para Google ═══ -->
 <script type="application/ld+json">
@@ -91,13 +91,13 @@
   --border: rgba(220,17,17,0.18);
   --border-white: rgba(255,255,255,0.06);
   --text: #d4d0c8;
-  --muted: #4a4a44;
-  --muted2: #6a6a62;
+  --muted: #626258;
+  --muted2: #82827a;
   --white: #f0ece4;
 
   /* ── TIPOGRAFÍA ── */
   --font-display: 'Bebas Neue', sans-serif;   /* H1, H2, logos, títulos grandes */
-  --font-body:    'Inter', sans-serif;         /* Todo lo demás */
+  --font-body:    'Barlow', sans-serif;        /* Todo lo demás */
 
   /* ── JERARQUÍA ── */
   --fs-h1:    clamp(4rem, 11vw, 9rem);
@@ -259,6 +259,7 @@ p      { font-family:var(--font-body);    font-size:var(--fs-body); line-height:
   font-family:var(--font-body);font-size:0.7rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;
   cursor:pointer;transition:all 0.3s;text-decoration:none;
   display:inline-block;
+  clip-path:polygon(0 0,calc(100% - 7px) 0,100% 7px,100% 100%,7px 100%,0 calc(100% - 7px));
 }
 .nav-btn:hover{background:var(--red);color:white;}
 
@@ -2167,7 +2168,7 @@ footer{background:#030303;border-top:1px solid rgba(220,17,17,0.1);padding:5rem 
   background: var(--red);
   color: white;
   font-family: var(--font-body);
-  font-size: 0.62rem; font-weight: 700;
+  font-size: 0.68rem; font-weight: 700;
   letter-spacing: 0.18em; text-transform: uppercase;
   padding: 0.85rem;
   text-align: center;
@@ -2181,7 +2182,7 @@ footer{background:#030303;border-top:1px solid rgba(220,17,17,0.1);padding:5rem 
 .prod-info { padding: 1.2rem 1.4rem 1.4rem; }
 .prod-brand {
   font-family: var(--font-body);
-  font-size: 0.58rem; font-weight: 700;
+  font-size: 0.65rem; font-weight: 700;
   letter-spacing: 0.22em; text-transform: uppercase;
   color: var(--red); margin-bottom: 0.35rem;
 }
@@ -2205,7 +2206,7 @@ footer{background:#030303;border-top:1px solid rgba(220,17,17,0.1);padding:5rem 
 .prod-badge {
   position: absolute; top: 0.75rem; left: 0.75rem;
   font-family: var(--font-body);
-  font-size: 0.55rem; font-weight: 700;
+  font-size: 0.65rem; font-weight: 700;
   letter-spacing: 0.14em; text-transform: uppercase;
   padding: 0.25rem 0.7rem;
 }
@@ -2230,7 +2231,7 @@ footer{background:#030303;border-top:1px solid rgba(220,17,17,0.1);padding:5rem 
 }
 .prod-flag{
   font-family:var(--font-body);
-  font-size:0.56rem;
+  font-size:0.65rem;
   font-weight:700;
   letter-spacing:0.12em;
   text-transform:uppercase;
@@ -3717,6 +3718,71 @@ img { transition: opacity 0.4s ease; }
 .msb-add:hover { background: var(--red-bright); }
 .msb-add:active { transform: scale(0.97); }
 
+/* ── FEATURE 43 ── Quantity stepper inside the mobile sticky bar ── */
+.msb-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.18rem;
+  flex: 1;
+  min-width: 0;
+}
+.msb-left .msb-price { font-size: 1.15rem; }
+.msb-left .msb-size-chip {
+  padding: 0.32rem 0.55rem;
+  font-size: 0.55rem;
+  flex: 0 1 auto;
+  width: fit-content;
+  max-width: 100%;
+}
+.msb-qty {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  flex-shrink: 0;
+  border: 1px solid rgba(220,17,17,0.32);
+  background: rgba(0,0,0,0.4);
+  height: 38px;
+  clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
+}
+.msb-qty-btn {
+  background: transparent;
+  border: none;
+  color: var(--white);
+  cursor: pointer;
+  font-size: 1.05rem;
+  font-weight: 700;
+  width: 30px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.msb-qty-btn:hover { background: rgba(220,17,17,0.15); color: var(--red); }
+.msb-qty-btn:active { transform: scale(0.92); }
+.msb-qty-num {
+  min-width: 22px;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--white);
+  letter-spacing: 0.02em;
+}
+.msb-add.shake {
+  animation: msb-shake 0.45s cubic-bezier(.36,.07,.19,.97);
+}
+@keyframes msb-shake {
+  10%, 90% { transform: translateX(-2px); }
+  20%, 80% { transform: translateX(3px); }
+  30%, 50%, 70% { transform: translateX(-5px); }
+  40%, 60% { transform: translateX(5px); }
+}
+@media (max-width: 380px) {
+  /* Very small screens: hide qty stepper, keep price + size + add */
+  .msb-qty { display: none; }
+}
+
 #modal-sizes-wrap.size-pulse {
   animation: size-pulse-glow 1.2s ease-out;
 }
@@ -4070,6 +4136,289 @@ img { transition: opacity 0.4s ease; }
 /* On mobile, slightly tighter spacing */
 @media (max-width: 900px) {
   .nav-wishlist { margin-right: 0.5rem; width: 36px; height: 36px; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FEATURE 42 ── NAV AUTH BUTTON + MAGIC LINK
+═══════════════════════════════════════════════════════════ */
+.nav-auth {
+  position: relative;
+  background: transparent;
+  border: 1px solid rgba(220,17,17,0.22);
+  color: var(--text);
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-right: 0.55rem;
+  padding: 0;
+  transition: border-color 0.25s, color 0.25s, background 0.25s,
+              box-shadow 0.3s, transform 0.18s;
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px),
+                     calc(100% - 6px) 100%, 0 100%, 0 6px);
+}
+.nav-auth:hover {
+  border-color: var(--red);
+  color: var(--red);
+  background: rgba(220,17,17,0.06);
+  box-shadow: 0 0 18px rgba(220,17,17,0.18);
+}
+.nav-auth:active { transform: scale(0.94); }
+html.is-authenticated .nav-auth {
+  border-color: var(--red);
+  color: var(--red);
+  background: rgba(220,17,17,0.08);
+}
+html.is-authenticated .nav-auth svg { fill: var(--red); }
+.nav-auth-dot {
+  display: none;
+  position: absolute;
+  top: -3px; right: -3px;
+  width: 9px; height: 9px;
+  background: var(--red-bright, #ff2222);
+  border: 2px solid var(--bg, #050505);
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(220,17,17,0.7);
+}
+html.is-authenticated .nav-auth-dot { display: block; }
+@media (max-width: 900px) {
+  .nav-auth { margin-right: 0.5rem; width: 36px; height: 36px; }
+}
+@media (max-width: 380px) {
+  .nav-auth { display: none; } /* surface via drawer */
+}
+
+#mob-auth-link { color: var(--text); }
+html.is-authenticated #mob-auth-link::before {
+  content: '●'; color: var(--red); margin-right: 6px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FEATURE 45 ── PRODUCT SEARCH + KEYBOARD SHORTCUT
+═══════════════════════════════════════════════════════════ */
+.nav-search {
+  position: relative;
+  background: transparent;
+  border: 1px solid rgba(220,17,17,0.22);
+  color: var(--text);
+  height: 38px;
+  padding: 0 0.7rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  margin-right: 0.55rem;
+  transition: border-color 0.25s, color 0.25s, background 0.25s,
+              box-shadow 0.3s, transform 0.18s;
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px),
+                     calc(100% - 6px) 100%, 0 100%, 0 6px);
+}
+.nav-search:hover {
+  border-color: var(--red);
+  color: var(--red);
+  background: rgba(220,17,17,0.06);
+  box-shadow: 0 0 18px rgba(220,17,17,0.18);
+}
+.nav-search:active { transform: scale(0.96); }
+.nav-search-kbd {
+  font-family: var(--font-body);
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--muted2);
+  padding: 0.18rem 0.4rem;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.4);
+}
+@media (max-width: 900px) {
+  .nav-search-kbd { display: none; }
+  .nav-search { padding: 0; width: 36px; justify-content: center; }
+}
+
+#search-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 850;
+  display: none;
+}
+#search-overlay.open { display: block; }
+.search-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  animation: search-fade-in 0.22s ease-out;
+}
+@keyframes search-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.search-panel {
+  position: absolute;
+  top: 12vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(640px, calc(100% - 2rem));
+  background: linear-gradient(180deg, var(--bg2), var(--bg3));
+  border: 1px solid rgba(220,17,17,0.32);
+  box-shadow:
+    0 30px 80px rgba(0,0,0,0.75),
+    0 0 60px rgba(220,17,17,0.12);
+  max-height: 72vh;
+  display: flex;
+  flex-direction: column;
+  animation: search-rise 0.32s cubic-bezier(.16,1,.3,1);
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px),
+                     calc(100% - 10px) 100%, 0 100%, 0 10px);
+}
+@keyframes search-rise {
+  from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+@media (max-width: 700px) {
+  .search-panel {
+    top: 0; left: 0;
+    transform: none;
+    width: 100%;
+    max-height: 100vh;
+    height: 100dvh;
+    clip-path: none;
+    animation: search-mobile-slide 0.3s cubic-bezier(.16,1,.3,1);
+  }
+  @keyframes search-mobile-slide {
+    from { transform: translateY(-100%); }
+    to   { transform: translateY(0); }
+  }
+}
+.search-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 1rem 1.2rem;
+  border-bottom: 1px solid rgba(220,17,17,0.18);
+}
+.search-header > svg {
+  width: 20px; height: 20px;
+  stroke: var(--red);
+  filter: drop-shadow(0 0 4px rgba(220,17,17,0.4));
+  flex-shrink: 0;
+}
+.search-header input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0.4rem 0;
+  outline: none;
+}
+.search-header input::placeholder { color: var(--muted2); }
+.search-esc {
+  font-family: var(--font-body);
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: var(--muted2);
+  padding: 0.3rem 0.55rem;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(0,0,0,0.45);
+}
+@media (max-width: 700px) { .search-esc { display: none; } }
+
+.search-results {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.4rem 0;
+  -webkit-overflow-scrolling: touch;
+}
+.search-empty {
+  padding: 2.5rem 1.5rem;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+.search-empty strong { color: var(--white); }
+.search-hint {
+  margin-top: 1.2rem;
+  font-size: 0.7rem;
+  color: var(--muted2);
+  letter-spacing: 0.04em;
+}
+.search-hint kbd {
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  padding: 0.12rem 0.4rem;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.4);
+  color: var(--text);
+  margin: 0 1px;
+}
+
+.search-result {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1.2rem;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: background 0.2s, padding-left 0.2s;
+  border-left: 2px solid transparent;
+}
+.search-result:hover,
+.search-result.kb-active {
+  background: rgba(220,17,17,0.08);
+  border-left-color: var(--red);
+  padding-left: 1.4rem;
+}
+.search-result img {
+  width: 56px; height: 56px;
+  object-fit: cover;
+  border: 1px solid rgba(220,17,17,0.18);
+  flex-shrink: 0;
+  background: var(--bg3);
+}
+.search-result-info { flex: 1; min-width: 0; }
+.search-result-brand {
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 0.2rem;
+}
+.search-result-name {
+  font-size: 0.9rem;
+  color: var(--white);
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.search-result-name mark {
+  background: rgba(220,17,17,0.28);
+  color: var(--white);
+  padding: 0 2px;
+  font-weight: 700;
+}
+.search-result-price {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--white);
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+  text-shadow: 0 0 12px rgba(220,17,17,0.25);
+}
+@media (max-width: 600px) {
+  .search-result { padding: 0.65rem 1rem; gap: 0.75rem; }
+  .search-result img { width: 48px; height: 48px; }
+  .search-result-price { font-size: 0.95rem; }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -5849,6 +6198,20 @@ html.ticker-dismissed {
       <span class="lang-sep">/</span>
       <button type="button" class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
     </div>
+    <button class="nav-search" onclick="openSearch()" aria-label="Buscar productos" type="button" title="Buscar (/ o Ctrl+K)">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="11" cy="11" r="7"/>
+        <line x1="21" y1="21" x2="16.5" y2="16.5"/>
+      </svg>
+      <kbd class="nav-search-kbd">/</kbd>
+    </button>
+    <button class="nav-auth" onclick="openAuthModal()" aria-label="Iniciar sesión" type="button" title="Iniciar sesión / Mi cuenta">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+        <circle cx="12" cy="7" r="4"/>
+      </svg>
+      <span class="nav-auth-dot" id="nav-auth-dot" aria-hidden="true"></span>
+    </button>
     <button class="nav-wishlist" onclick="openWishlist()" aria-label="Mi lista de deseos" type="button">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
         <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
@@ -5873,6 +6236,7 @@ html.ticker-dismissed {
     <li><a href="#testimonios" onclick="toggleDrawer()">Reseñas</a></li>
     <li><a href="#faq" onclick="toggleDrawer()">FAQ</a></li>
     <li><a href="#contacto" onclick="toggleDrawer()">Contacto</a></li>
+    <li><a href="#" id="mob-auth-link" onclick="openAuthModal();toggleDrawer();return false;">Iniciar sesión</a></li>
     <li><a href="#" onclick="openAdmin();toggleDrawer();" style="color:var(--red)">Admin ●</a></li>
   </ul>
 </div>
@@ -6175,12 +6539,19 @@ html.ticker-dismissed {
 
     <!-- Mobile-only sticky bottom CTA bar (hidden on desktop via CSS) -->
     <div class="modal-sticky-bar" id="modal-sticky-bar" aria-hidden="false">
-      <div class="msb-price" id="msb-price">—</div>
-      <button class="msb-size-chip" id="msb-size-chip" type="button" onclick="scrollToModalSizes()">
-        <span id="msb-size-label" data-i18n="msbSizePrompt">Elegí talla</span>
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-      </button>
-      <button class="msb-add" type="button" onclick="addProductToCart()">
+      <div class="msb-left">
+        <div class="msb-price" id="msb-price">—</div>
+        <button class="msb-size-chip" id="msb-size-chip" type="button" onclick="scrollToModalSizes()">
+          <span id="msb-size-label" data-i18n="msbSizePrompt">Elegí talla</span>
+          <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </button>
+      </div>
+      <div class="msb-qty" id="msb-qty" aria-label="Cantidad">
+        <button class="msb-qty-btn" type="button" onclick="msbChangeQty(-1)" aria-label="Disminuir">−</button>
+        <span class="msb-qty-num" id="msb-qty-num">1</span>
+        <button class="msb-qty-btn" type="button" onclick="msbChangeQty(1)" aria-label="Aumentar">+</button>
+      </div>
+      <button class="msb-add" type="button" onclick="msbAddToCart()" id="msb-add-btn">
         <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
         <span data-i18n="msbAdd">Agregar</span>
       </button>
@@ -7182,6 +7553,276 @@ async function doSyncCartSession(forcedStatus){
 }
 
 // ════════════════════════════════════════════════════════════
+// FEATURE 42 ── SUPABASE AUTH (magic links) + CROSS-DEVICE SYNC
+// Lazy-loads @supabase/supabase-js. Sends OTP magic link on email
+// submit. Detects callback session via detectSessionInUrl. On sign-in:
+// merges remote profile (wishlist + cart) with local state; pushes
+// merged state back so future devices receive it. Local-first — if
+// the user never logs in, everything still works.
+//
+// REQUIRED TABLE:
+//   create table user_profiles (
+//     id uuid primary key references auth.users(id) on delete cascade,
+//     email text,
+//     wishlist jsonb default '[]'::jsonb,
+//     cart_items jsonb default '[]'::jsonb,
+//     updated_at timestamptz default now()
+//   );
+//   alter table user_profiles enable row level security;
+//   create policy "p_select" on user_profiles for select to authenticated using (auth.uid() = id);
+//   create policy "p_insert" on user_profiles for insert to authenticated with check (auth.uid() = id);
+//   create policy "p_update" on user_profiles for update to authenticated using (auth.uid() = id);
+// ════════════════════════════════════════════════════════════
+let _authClient    = null;
+let _authPromise   = null;
+let _currentUser   = null;
+let _authPushTimer = null;
+
+async function getAuthClient(){
+  if (_authClient) return _authClient;
+  if (_authPromise) return _authPromise;
+  _authPromise = (async () => {
+    const mod = await import('https://esm.sh/@supabase/supabase-js@2');
+    _authClient = mod.createClient(SB_URL, SB_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storageKey: 'desmos-auth'
+      }
+    });
+    // Watch for auth state changes (login + logout + token refresh)
+    _authClient.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_IN' && session && session.user) {
+        if (!_currentUser || _currentUser.id !== session.user.id) {
+          _currentUser = session.user;
+          afterSignIn(_currentUser);
+        }
+      } else if (event === 'SIGNED_OUT') {
+        _currentUser = null;
+        updateAuthUI();
+      }
+    });
+    return _authClient;
+  })();
+  return _authPromise;
+}
+
+function openAuthModal(){
+  if (_currentUser) {
+    // Already signed in — offer to sign out
+    if (confirm(`Sesión activa como ${_currentUser.email}\n\n¿Querés cerrar sesión?`)) {
+      signOut();
+    }
+    return;
+  }
+  const modal = document.getElementById('auth-modal');
+  if (!modal) return;
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+  document.addEventListener('keydown', authEscHandler);
+  setTimeout(() => {
+    const input = document.getElementById('auth-email');
+    if (input) input.focus();
+  }, 350);
+}
+function dismissAuthModal(){
+  const modal = document.getElementById('auth-modal');
+  if (modal) {
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+  }
+  document.removeEventListener('keydown', authEscHandler);
+  const status = document.getElementById('auth-status');
+  if (status) status.textContent = '';
+}
+function authEscHandler(e){
+  if (e.key === 'Escape') dismissAuthModal();
+}
+
+async function submitAuthEmail(e){
+  e.preventDefault();
+  const input = document.getElementById('auth-email');
+  const status = document.getElementById('auth-status');
+  const submitBtn = document.getElementById('auth-cta-btn');
+  const email = (input && input.value || '').trim();
+  if (!email || !email.includes('@') || email.length < 5) {
+    if (status) status.textContent = 'Email inválido.';
+    return;
+  }
+  if (status) status.textContent = 'Enviando...';
+  if (submitBtn) submitBtn.disabled = true;
+  try {
+    const client = await getAuthClient();
+    const { error } = await client.auth.signInWithOtp({
+      email: email,
+      options: { emailRedirectTo: window.location.origin + '/' }
+    });
+    if (error) throw error;
+    if (status) {
+      status.innerHTML = '<strong style="color:var(--red)">✓ Revisá tu correo.</strong> Hacé clic en el link mágico para entrar.';
+    }
+    if (input) input.value = '';
+    if (typeof track === 'function') track('Auth Magic Link Sent');
+  } catch (err) {
+    if (status) status.textContent = 'Error: ' + (err.message || 'No se pudo enviar.');
+    if (typeof track === 'function') track('Auth Magic Link Failed', { props: { error: err.message || '' }});
+  } finally {
+    if (submitBtn) submitBtn.disabled = false;
+  }
+}
+
+async function signOut(){
+  if (!_currentUser) return;
+  try {
+    const client = await getAuthClient();
+    await client.auth.signOut();
+  } catch (e) { console.warn('Sign-out error:', e); }
+  _currentUser = null;
+  updateAuthUI();
+  if (typeof showToast === 'function') showToast('Sesión cerrada');
+}
+
+async function afterSignIn(user){
+  if (!user) return;
+  try { localStorage.setItem('desmos_auth_email', user.email); } catch(e) {}
+  if (typeof setCartEmail === 'function') setCartEmail(user.email);
+  updateAuthUI();
+  await mergeRemoteProfile();
+  // Push the merged state up so other devices see it
+  schedulePushUserProfile();
+  // Close modal if open
+  dismissAuthModal();
+  if (typeof showToast === 'function') showToast('Sesión iniciada · sincronizando');
+  if (typeof track === 'function') track('Auth Signed In');
+}
+
+async function mergeRemoteProfile(){
+  if (!_currentUser) return;
+  try {
+    const client = await getAuthClient();
+    const { data, error } = await client
+      .from('user_profiles')
+      .select('wishlist, cart_items')
+      .eq('id', _currentUser.id)
+      .maybeSingle();
+    if (error) { console.warn('Profile fetch error:', error); return; }
+    if (!data) return; // first-time login — nothing to merge
+
+    // Merge wishlist (union of sets)
+    if (Array.isArray(data.wishlist) && typeof wishlist !== 'undefined') {
+      let changed = false;
+      data.wishlist.forEach(id => {
+        if (typeof id === 'number' && !wishlist.has(id)) {
+          wishlist.add(id);
+          changed = true;
+        }
+      });
+      if (changed) {
+        if (typeof saveWishlist === 'function') saveWishlist();
+        if (typeof updateWishlistCount === 'function') updateWishlistCount();
+      }
+    }
+    // Merge cart (by product+size+color; take max qty)
+    if (Array.isArray(data.cart_items)) {
+      let cartChanged = false;
+      data.cart_items.forEach(remote => {
+        const product = products.find(p => p.id === remote.productId);
+        if (!product) return;
+        const existing = cart.find(i =>
+          i.product.id === remote.productId &&
+          (i.size || '')  === (remote.size || '') &&
+          (i.color || '') === (remote.color || '')
+        );
+        if (existing) {
+          if (remote.qty > existing.qty) { existing.qty = remote.qty; cartChanged = true; }
+        } else {
+          cart.push({
+            product,
+            size:  remote.size  || '',
+            color: remote.color || '',
+            qty:   Math.max(1, Math.min(99, parseInt(remote.qty, 10) || 1))
+          });
+          cartChanged = true;
+        }
+      });
+      if (cartChanged) {
+        if (typeof saveCart === 'function') saveCart();
+        if (typeof updateCartUI === 'function') updateCartUI();
+      }
+    }
+  } catch (e) {
+    console.warn('Profile merge failed:', e);
+  }
+}
+
+function schedulePushUserProfile(){
+  if (!_currentUser) return;
+  clearTimeout(_authPushTimer);
+  _authPushTimer = setTimeout(doPushUserProfile, 900);
+}
+
+async function doPushUserProfile(){
+  if (!_currentUser) return;
+  try {
+    const client = await getAuthClient();
+    const payload = {
+      id:    _currentUser.id,
+      email: _currentUser.email,
+      wishlist:   (typeof wishlist !== 'undefined') ? [...wishlist] : [],
+      cart_items: cart.map(i => ({
+        productId: i.product && i.product.id,
+        size:  i.size  || '',
+        color: i.color || '',
+        qty:   i.qty
+      })).filter(i => i.productId != null),
+      updated_at: new Date().toISOString()
+    };
+    await client.from('user_profiles').upsert(payload, { onConflict: 'id' });
+  } catch (e) {
+    console.warn('Profile push failed:', e);
+  }
+}
+
+function updateAuthUI(){
+  const isAuth = !!_currentUser;
+  document.documentElement.classList.toggle('is-authenticated', isAuth);
+  const mobLink = document.getElementById('mob-auth-link');
+  if (mobLink) mobLink.textContent = isAuth ? `Cerrar sesión (${_currentUser.email})` : 'Iniciar sesión';
+  const navAuth = document.querySelector('.nav-auth');
+  if (navAuth) {
+    navAuth.title = isAuth ? `Sesión: ${_currentUser.email} — clic para salir` : 'Iniciar sesión';
+    navAuth.setAttribute('aria-label', navAuth.title);
+  }
+}
+
+// Init: kick off session detection on idle (magic-link callback uses
+// detectSessionInUrl, so we just need the client booted).
+(function initAuth(){
+  // Defer until idle to keep first paint snappy
+  const start = () => {
+    if (location.hash.includes('access_token=') || location.hash.includes('error_code=')) {
+      // Callback URL — load client eagerly to handle the session
+      getAuthClient().then(client => client.auth.getSession()).catch(() => {});
+    } else if (localStorage.getItem('desmos_auth_email')) {
+      // Returning user — restore session in the background
+      setTimeout(() => {
+        getAuthClient().then(client => client.auth.getSession())
+          .then(({ data }) => {
+            if (data && data.session && data.session.user) {
+              _currentUser = data.session.user;
+              afterSignIn(_currentUser);
+            }
+          })
+          .catch(() => {});
+      }, 1200);
+    }
+  };
+  if ('requestIdleCallback' in window) requestIdleCallback(start, { timeout: 2000 });
+  else setTimeout(start, 600);
+})();
+
+// ════════════════════════════════════════════════════════════
 // FEATURE 31 ── ORDER PERSISTENCE + ORDER CODE
 // On WhatsApp checkout: generate a human-readable order code,
 // persist the order to Supabase (fire-and-forget — order still
@@ -7457,6 +8098,7 @@ function toggleWishlist(id, btn){
   setTimeout(() => btn.classList.remove('popping'), 500);
   saveWishlist();
   updateWishlistCount();
+  if (typeof schedulePushUserProfile === 'function') schedulePushUserProfile();
 }
 
 function updateWishlistCount(){
@@ -8032,9 +8674,10 @@ function openProduct(id){
     discEl.textContent = `-${Math.round((1-p.price/p.originalPrice)*100)}%`;
     discEl.style.display='inline-block';
   } else { oldEl.style.display='none'; discEl.style.display='none'; }
-  // Mobile sticky bar — price sync
+  // Mobile sticky bar — price sync + reset quantity
   const msbPrice = document.getElementById('msb-price');
   if (msbPrice) msbPrice.textContent = `₡${p.price.toLocaleString()}`;
+  if (typeof resetMsbQty === 'function') resetMsbQty();
 
   // Stock indicator (modal)
   const stockEl = document.getElementById('modal-stock');
@@ -8145,6 +8788,221 @@ function selectSize(btn,s){
     msbChip.classList.add('has-value');
     msbLabel.textContent = t('msbSizeLabel', s);
     msbLabel.removeAttribute('data-i18n');
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// FEATURE 45 ── PRODUCT SEARCH + KEYBOARD SHORTCUT
+// "/" or Cmd/Ctrl+K opens an overlay search. Live-filters products
+// by name/brand/category. Arrow keys navigate results, Enter opens.
+// Skipped when the user is typing in another input.
+// ════════════════════════════════════════════════════════════
+let _searchTimer = null;
+let _searchActiveIdx = -1;
+let _searchMatches = [];
+
+function openSearch(){
+  const overlay = document.getElementById('search-overlay');
+  if (!overlay) return;
+  overlay.classList.add('open');
+  overlay.setAttribute('aria-hidden', 'false');
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => {
+    const input = document.getElementById('search-input');
+    if (input) { input.value = ''; input.focus(); renderSearchResults(''); }
+  }, 60);
+  document.addEventListener('keydown', searchEscHandler);
+  if (typeof track === 'function') track('Search Opened');
+}
+function closeSearch(){
+  const overlay = document.getElementById('search-overlay');
+  if (overlay) {
+    overlay.classList.remove('open');
+    overlay.setAttribute('aria-hidden', 'true');
+  }
+  document.body.style.overflow = '';
+  document.removeEventListener('keydown', searchEscHandler);
+  _searchActiveIdx = -1;
+  _searchMatches = [];
+}
+function searchEscHandler(e){
+  if (e.key === 'Escape') closeSearch();
+}
+
+function onSearchInput(){
+  const v = document.getElementById('search-input').value;
+  clearTimeout(_searchTimer);
+  _searchTimer = setTimeout(() => renderSearchResults(v), 120);
+}
+
+function _searchEscapeRegex(s){
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+function _searchHighlight(text, q){
+  if (!q || !text) return text || '';
+  const re = new RegExp('(' + _searchEscapeRegex(q) + ')', 'gi');
+  return String(text).replace(re, '<mark>$1</mark>');
+}
+function _searchEscapeHtml(s){
+  return String(s || '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function renderSearchResults(query){
+  const el = document.getElementById('search-results');
+  if (!el) return;
+  const q = (query || '').trim().toLowerCase();
+  _searchActiveIdx = -1;
+  if (!q) {
+    _searchMatches = [];
+    el.innerHTML = `<div class="search-empty">
+      Escribí el nombre de un producto, marca o categoría.
+      <div class="search-hint">
+        Atajos: <kbd>/</kbd> o <kbd>Ctrl</kbd>+<kbd>K</kbd> para abrir, <kbd>ESC</kbd> para cerrar, <kbd>↵</kbd> para abrir el primer resultado.
+      </div>
+    </div>`;
+    return;
+  }
+  _searchMatches = (Array.isArray(products) ? products : []).filter(p => {
+    const hay = `${p.name || ''} ${p.brand || ''} ${p.category || ''}`.toLowerCase();
+    return hay.includes(q);
+  }).slice(0, 12);
+
+  if (!_searchMatches.length) {
+    el.innerHTML = `<div class="search-empty">
+      Nada encontrado para "<strong>${_searchEscapeHtml(query)}</strong>".
+      <div class="search-hint">Probá con otra marca o categoría.</div>
+    </div>`;
+    if (typeof track === 'function') track('Search No Results', { props: { query: q }});
+    return;
+  }
+  const optImg = (typeof optimizeImg === 'function')
+    ? (u) => optimizeImg(u, 120)
+    : (u) => u;
+  el.innerHTML = _searchMatches.map((p, i) => `
+    <a class="search-result" href="javascript:void(0)" role="option" data-idx="${i}"
+       onclick="event.preventDefault();selectSearchResult(${i})">
+      <img src="${optImg(p.img || (p.imgs && p.imgs[0]) || '')}" alt="${_searchEscapeHtml(p.name)}"
+           width="56" height="56" loading="lazy" decoding="async">
+      <div class="search-result-info">
+        <div class="search-result-brand">${_searchEscapeHtml(p.brand || '')}</div>
+        <div class="search-result-name">${_searchHighlight(p.name, q)}</div>
+      </div>
+      <div class="search-result-price">₡${(p.price || 0).toLocaleString()}</div>
+    </a>`).join('');
+  if (typeof track === 'function') track('Search Results', { props: { query: q, count: _searchMatches.length }});
+}
+
+function selectSearchResult(idx){
+  const p = _searchMatches[idx];
+  if (!p) return;
+  closeSearch();
+  if (typeof openProduct === 'function') openProduct(p.id);
+}
+
+function onSearchKeydown(e){
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (!_searchMatches.length) return;
+    const max = _searchMatches.length;
+    if (e.key === 'ArrowDown') {
+      _searchActiveIdx = (_searchActiveIdx + 1) % max;
+    } else {
+      _searchActiveIdx = (_searchActiveIdx <= 0 ? max - 1 : _searchActiveIdx - 1);
+    }
+    document.querySelectorAll('.search-result').forEach(el => el.classList.remove('kb-active'));
+    const active = document.querySelector(`.search-result[data-idx="${_searchActiveIdx}"]`);
+    if (active) {
+      active.classList.add('kb-active');
+      active.scrollIntoView({ block: 'nearest' });
+    }
+    return;
+  }
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    const idx = _searchActiveIdx >= 0 ? _searchActiveIdx : 0;
+    if (_searchMatches[idx]) selectSearchResult(idx);
+  }
+}
+
+// Global keyboard shortcut for opening search
+(function bindSearchShortcuts(){
+  function isTypingInInput(){
+    const el = document.activeElement;
+    if (!el) return false;
+    const tag = (el.tagName || '').toLowerCase();
+    return tag === 'input' || tag === 'textarea' || el.isContentEditable;
+  }
+  document.addEventListener('keydown', (e) => {
+    // Cmd/Ctrl + K — always available
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      openSearch();
+      return;
+    }
+    // "/" — only when not typing elsewhere
+    if (e.key === '/' && !isTypingInInput()) {
+      // Don't fire if the search overlay is already open (let "/" go to the input)
+      const overlay = document.getElementById('search-overlay');
+      if (overlay && overlay.classList.contains('open')) return;
+      e.preventDefault();
+      openSearch();
+    }
+  });
+})();
+
+// Quantity stepper for the mobile sticky bar
+let _msbQty = 1;
+function msbChangeQty(delta){
+  _msbQty = Math.max(1, Math.min(10, _msbQty + delta));
+  const el = document.getElementById('msb-qty-num');
+  if (el) el.textContent = _msbQty;
+}
+function resetMsbQty(){
+  _msbQty = 1;
+  const el = document.getElementById('msb-qty-num');
+  if (el) el.textContent = '1';
+}
+// Wraps the standard add-to-cart so users can pick a quantity > 1
+// from the mobile sticky bar. Shakes the Add button if a required
+// size hasn't been selected yet.
+function msbAddToCart(){
+  if (!currentModalProduct) return;
+  // If product has sizes but none picked, shake + scroll to selector
+  if (Array.isArray(currentModalProduct.sizes) && currentModalProduct.sizes.length > 0) {
+    const sizeSel = document.querySelector('#modal-sizes .size-btn.active');
+    if (!sizeSel) {
+      const addBtn = document.getElementById('msb-add-btn');
+      if (addBtn) {
+        addBtn.classList.remove('shake');
+        void addBtn.offsetWidth;
+        addBtn.classList.add('shake');
+      }
+      if (typeof scrollToModalSizes === 'function') scrollToModalSizes();
+      return;
+    }
+  }
+  // Stock guard
+  if (typeof currentModalProduct.stock === 'number' && currentModalProduct.stock === 0) {
+    if (typeof showToast === 'function') showToast('Sin stock por ahora');
+    return;
+  }
+  const desiredQty = _msbQty;
+  resetMsbQty();
+  // Reuse the canonical addProductToCart flow which already runs
+  // the fly animation + cart open. For qty > 1, repeat-add after
+  // the first one to keep size/color consistency.
+  if (desiredQty <= 1) {
+    addProductToCart();
+  } else {
+    addProductToCart();
+    // Add remaining quantities without the fly animation
+    const sizeSel  = document.querySelector('#modal-sizes .size-btn.active');
+    const colorSel = document.querySelector('#modal-colors .color-btn.active');
+    const size  = sizeSel  ? sizeSel.textContent  : '';
+    const color = colorSel ? colorSel.textContent : '';
+    const product = currentModalProduct;
+    for (let i = 1; i < desiredQty; i++) addToCart(product, size, color);
   }
 }
 
@@ -9500,61 +10358,56 @@ function punchCart(){
 }
 
 // ════════════════════════════════════════════════════════════
-// FEATURE 22 ── ADD-TO-CART CONFETTI
-// Fires a one-time burst from the cart button when the user makes
-// their first add-to-cart of the session. Skips on reduced motion.
+// FEATURE 44 ── DEFERRED EFFECTS BUNDLE (lazy)
+// The confetti animation + other decorative effects live in
+// /assets/deferred-effects.js. We pre-fetch the bundle on first
+// user interaction (pointerdown/keydown/scroll) OR after ~3.5s
+// idle, whichever comes first — so the file is warm in cache by
+// the time the user adds to cart and we need fireCartConfetti().
 // ════════════════════════════════════════════════════════════
-const CONFETTI_SESSION_KEY = 'desmos_confetti_fired';
-function fireCartConfetti(){
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  try {
-    if (sessionStorage.getItem(CONFETTI_SESSION_KEY)) return;
-    sessionStorage.setItem(CONFETTI_SESSION_KEY, '1');
-  } catch(e) { /* if storage blocked, fire every time — minor */ }
-
-  const btn = document.getElementById('cart-btn');
-  if (!btn) return;
-  const rect = btn.getBoundingClientRect();
-  const cx = rect.left + rect.width  / 2;
-  const cy = rect.top  + rect.height / 2;
-
-  const container = document.createElement('div');
-  container.className = 'confetti-container';
-  document.body.appendChild(container);
-
-  const COLORS = ['#DC1111', '#ff2222', '#a50d0d', '#f0ece4', '#ff5555'];
-  const SHAPES = ['square', 'circle', 'streak'];
-  const COUNT  = 32;
-
-  for (let i = 0; i < COUNT; i++) {
-    const piece = document.createElement('span');
-    piece.className = 'confetti-piece ' + SHAPES[i % SHAPES.length];
-    // Mostly-upward burst with wide arc
-    const angle = -Math.PI / 2 + (Math.random() - 0.5) * Math.PI * 1.25;
-    const power = 220 + Math.random() * 280;
-    const dx = Math.cos(angle) * power;
-    const dy = Math.sin(angle) * power;
-    const rot  = (Math.random() - 0.5) * 900;
-    const size = 5 + Math.random() * 5;
-    const color = COLORS[Math.floor(Math.random() * COLORS.length)];
-    const dur   = 950 + Math.random() * 700;
-
-    piece.style.setProperty('--cx', cx + 'px');
-    piece.style.setProperty('--cy', cy + 'px');
-    piece.style.setProperty('--dx', dx.toFixed(1) + 'px');
-    piece.style.setProperty('--dy', dy.toFixed(1) + 'px');
-    piece.style.setProperty('--rot', rot.toFixed(0) + 'deg');
-    piece.style.setProperty('--size', size.toFixed(1) + 'px');
-    piece.style.background = color;
-    piece.style.color = color; // box-shadow uses currentColor
-    piece.style.animationDuration = dur + 'ms';
-    piece.style.animationDelay = (Math.random() * 80) + 'ms';
-    container.appendChild(piece);
-  }
-
-  // Cleanup once the longest particle finishes
-  setTimeout(() => container.remove(), 2200);
+let _deferredEffectsPromise = null;
+function loadDeferredEffects(){
+  if (window.fireCartConfetti) return Promise.resolve();
+  if (_deferredEffectsPromise) return _deferredEffectsPromise;
+  _deferredEffectsPromise = new Promise((resolve) => {
+    const s = document.createElement('script');
+    s.src   = '/assets/deferred-effects.js';
+    s.async = true;
+    s.onload  = () => resolve();
+    s.onerror = () => { _deferredEffectsPromise = null; resolve(); };
+    document.head.appendChild(s);
+  });
+  return _deferredEffectsPromise;
 }
+// Stub that lazy-loads on first call, then delegates to the real one
+function fireCartConfetti(){
+  loadDeferredEffects().then(() => {
+    if (typeof window.fireCartConfetti === 'function' && window.fireCartConfetti !== fireCartConfetti) {
+      window.fireCartConfetti();
+    }
+  });
+}
+// Pre-fetch the bundle on first interaction (warm cache before need)
+(function warmDeferredEffects(){
+  let warmed = false;
+  function warm(){
+    if (warmed) return;
+    warmed = true;
+    loadDeferredEffects();
+    ['pointerdown', 'keydown', 'scroll', 'touchstart'].forEach(ev =>
+      window.removeEventListener(ev, warm, { capture: true })
+    );
+  }
+  ['pointerdown', 'keydown', 'scroll', 'touchstart'].forEach(ev =>
+    window.addEventListener(ev, warm, { capture: true, passive: true, once: true })
+  );
+  // Fallback: warm anyway after idle
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(warm, { timeout: 3500 });
+  } else {
+    setTimeout(warm, 3500);
+  }
+})();
 
 // ════════════════════════════════════
 // CARRITO DE COMPRAS
@@ -9579,6 +10432,8 @@ function saveCart(){
     })).filter(i => i.productId != null);
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(lite));
   } catch(e) { /* storage disabled/full — fail silent */ }
+  // Cross-device sync if authenticated
+  if (typeof schedulePushUserProfile === 'function') schedulePushUserProfile();
 }
 function loadCart(){
   try {
@@ -10305,6 +11160,53 @@ openProductForm = function(id){
 
 </script>
 
+
+<!-- ═══ SEARCH OVERLAY ═══ -->
+<div id="search-overlay" role="dialog" aria-modal="true" aria-label="Búsqueda de productos" aria-hidden="true">
+  <div class="search-backdrop" onclick="closeSearch()"></div>
+  <div class="search-panel" role="search">
+    <div class="search-header">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="11" cy="11" r="7"/>
+        <line x1="21" y1="21" x2="16.5" y2="16.5"/>
+      </svg>
+      <input id="search-input" type="search" autocomplete="off" spellcheck="false"
+             placeholder="Buscar productos, marcas, categoría..." aria-label="Buscar productos"
+             oninput="onSearchInput()" onkeydown="onSearchKeydown(event)">
+      <kbd class="search-esc">ESC</kbd>
+    </div>
+    <div class="search-results" id="search-results" role="listbox">
+      <div class="search-empty">
+        Escribí el nombre de un producto, marca o categoría.
+        <div class="search-hint">
+          Atajos: <kbd>/</kbd> o <kbd>Ctrl</kbd>+<kbd>K</kbd> para abrir, <kbd>ESC</kbd> para cerrar, <kbd>↵</kbd> para abrir el primer resultado.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ AUTH MODAL (magic link) ═══ -->
+<div id="auth-modal" class="ei-modal" role="dialog" aria-modal="true" aria-labelledby="auth-title" aria-hidden="true">
+  <div class="ei-overlay" onclick="dismissAuthModal()"></div>
+  <div class="ei-card">
+    <button class="ei-close" type="button" onclick="dismissAuthModal()" aria-label="Cerrar">✕</button>
+    <div class="ei-art" aria-hidden="true">
+      <svg width="64" height="40" viewBox="0 0 64 40" fill="currentColor">
+        <path d="M32 36 C28 36 24 32 20 30 L14 34 L8 26 L4 30 L0 20 L2 16 L6 20 L10 12 L16 16 L22 8 L28 12 C30 6 32 4 32 4 C32 4 34 6 36 12 L42 8 L48 16 L54 12 L58 20 L62 16 L64 20 L60 30 L56 26 L50 34 L44 30 C40 32 36 36 32 36Z"/>
+      </svg>
+    </div>
+    <p class="ei-eyebrow"><span id="auth-eyebrow-text">Tu cuenta</span></p>
+    <h2 class="ei-title" id="auth-title">Sincronizá tu lista en todos tus dispositivos.</h2>
+    <p class="ei-text" id="auth-text">Te enviamos un link mágico a tu correo. <strong>Sin contraseñas.</strong> Tu lista de deseos y carrito te siguen entre celular, laptop y compu del gym.</p>
+    <form class="ei-form" id="auth-form" onsubmit="submitAuthEmail(event)">
+      <input id="auth-email" type="email" required autocomplete="email" placeholder="tu@correo.com" aria-label="Correo">
+      <button class="ei-cta" id="auth-cta-btn" type="submit">Enviar link</button>
+    </form>
+    <p class="ei-decline" id="auth-status" aria-live="polite"></p>
+    <button class="ei-decline-btn" type="button" onclick="dismissAuthModal()" id="auth-decline-btn">Ahora no</button>
+  </div>
+</div>
 
 <!-- ═══ EXIT-INTENT MODAL ═══ -->
 <div id="exit-intent-modal" class="ei-modal" role="dialog" aria-modal="true" aria-labelledby="ei-title" aria-hidden="true">
