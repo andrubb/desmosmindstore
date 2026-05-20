@@ -1,0 +1,5 @@
+# Netlify redirects — Desmos Mind
+# Any unknown path returns the custom 404 page with HTTP 404.
+# Keep this AFTER any specific redirects (none currently).
+
+/*    /404.html   404

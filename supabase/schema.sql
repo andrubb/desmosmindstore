@@ -66,6 +66,35 @@ create policy "anon update cart session"
   on cart_sessions for update to anon
   using (true);
 
+-- ─── User profiles for cross-device wishlist + cart sync ───
+-- Linked to Supabase Auth users (magic link sign-in).
+create table if not exists user_profiles (
+  id         uuid primary key references auth.users(id) on delete cascade,
+  email      text,
+  wishlist   jsonb default '[]'::jsonb,
+  cart_items jsonb default '[]'::jsonb,
+  updated_at timestamptz default now()
+);
+create index if not exists user_profiles_updated_at_idx
+  on user_profiles(updated_at desc);
+
+alter table user_profiles enable row level security;
+
+drop policy if exists "user reads own profile" on user_profiles;
+create policy "user reads own profile"
+  on user_profiles for select to authenticated
+  using (auth.uid() = id);
+
+drop policy if exists "user inserts own profile" on user_profiles;
+create policy "user inserts own profile"
+  on user_profiles for insert to authenticated
+  with check (auth.uid() = id);
+
+drop policy if exists "user updates own profile" on user_profiles;
+create policy "user updates own profile"
+  on user_profiles for update to authenticated
+  using (auth.uid() = id);
+
 -- ─── Optional: schedule the abandoned-cart job ───
 -- (Run in the Supabase Dashboard → Database → Cron, NOT here in SQL editor —
 --  pg_cron extension must be enabled first.)
