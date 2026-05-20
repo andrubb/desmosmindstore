@@ -7552,6 +7552,982 @@ footer::before {
   .cta-band-eyebrow { font-size: 0.55rem; letter-spacing: 0.28em; }
   .cta-band-sub br { display: none; }
 }
+
+/* ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+   FEATURE 49 ── PRODUCTS SECTION + MODAL OVERHAUL
+   Editorial drop header · premium filter bar · featured hero ·
+   luxury modal · branded empty state.
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ */
+
+/* ═══════════════════════════════════════════════════════════
+   49.1 — EDITORIAL DROP HEADER
+═══════════════════════════════════════════════════════════ */
+.editorial-drop { position: relative; }
+.drop-header {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: flex-end;
+  padding-bottom: clamp(2.5rem, 5vw, 4rem);
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+  border-bottom: 1px solid var(--line-faint);
+  position: relative;
+}
+.drop-header-left { position: relative; }
+.drop-header-right {
+  padding-bottom: 0.4rem;
+}
+.drop-index {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.6rem;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 0.14em;
+}
+.drop-index-num {
+  color: var(--red);
+  font-size: 1.4rem;
+  text-shadow: 0 0 14px rgba(220,17,17,0.45);
+}
+.drop-index-divider { color: var(--text-faint); }
+.drop-index-label {
+  color: var(--text-faint);
+  font-size: 0.8rem;
+  letter-spacing: 0.32em;
+}
+.drop-title {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 9vw, 6.5rem);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 0.88;
+  color: var(--text-strong);
+  margin: 0;
+  text-shadow: 0 0 60px rgba(220,17,17,0.18);
+}
+.drop-title em {
+  color: var(--red);
+  font-style: italic;
+  text-shadow: 0 0 30px rgba(220,17,17,0.5);
+}
+.drop-rule {
+  display: block;
+  width: 64px;
+  height: 2px;
+  background: var(--red);
+  box-shadow: 0 0 14px var(--red);
+  margin-top: 1.6rem;
+}
+.drop-eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin: 0 0 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.drop-eyebrow::before {
+  content: '';
+  width: 24px; height: 1px;
+  background: var(--red);
+  box-shadow: 0 0 6px var(--red);
+}
+.drop-lead {
+  font-family: var(--font-body);
+  font-size: 1.02rem;
+  line-height: 1.65;
+  color: var(--text-body);
+  margin: 0 0 1.6rem;
+  font-weight: 300;
+  max-width: 460px;
+}
+.drop-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-weak);
+}
+.drop-meta-item strong {
+  color: var(--red);
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  letter-spacing: 0.04em;
+  margin-right: 0.25rem;
+}
+.drop-meta-divider {
+  width: 1px;
+  height: 14px;
+  background: var(--line-soft);
+}
+
+@media (max-width: 800px) {
+  .drop-header {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    align-items: flex-start;
+  }
+  .drop-title { font-size: clamp(2.6rem, 11vw, 4rem); }
+  .drop-lead { max-width: none; font-size: 0.95rem; }
+  .drop-meta { gap: 0.7rem; font-size: 0.62rem; }
+  .drop-meta-item strong { font-size: 0.95rem; }
+}
+
+/* Repositioned coming-soon banner */
+.drop-banner {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+  padding: 1.3rem 1.6rem;
+  background: linear-gradient(135deg, rgba(220,17,17,0.07), rgba(220,17,17,0.01));
+  border: 1px solid var(--line-soft);
+  border-left: 3px solid var(--red);
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+  flex-wrap: wrap;
+}
+.drop-banner::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 220px; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(220,17,17,0.05));
+  pointer-events: none;
+}
+.drop-banner-body { flex: 1; min-width: 200px; }
+.drop-banner-body .coming-soon-tag {
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 0.3rem;
+  display: block;
+}
+.drop-banner-copy {
+  font-size: 0.85rem;
+  color: var(--text-body);
+  line-height: 1.55;
+  margin: 0;
+  font-weight: 300;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   49.2 — PREMIUM FILTER BAR
+═══════════════════════════════════════════════════════════ */
+.products-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-bottom: 1.8rem;
+}
+.products-toolbar-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-bottom: 0;
+}
+.products-filters {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg2);
+  border: 1px solid var(--line-faint);
+  padding: 4px;
+  clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+}
+.filter-btn {
+  border: none !important;
+  background: transparent !important;
+  color: var(--text-weak);
+  padding: 0.55rem 1rem !important;
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.25s ease, background 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+  clip-path: none !important;
+  box-shadow: none !important;
+}
+.filter-btn:hover { color: var(--text-strong); }
+.filter-btn-count {
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  color: var(--text-faint);
+  padding: 0 0.32rem;
+  background: rgba(220,17,17,0.08);
+  min-width: 22px;
+  text-align: center;
+  transition: color 0.25s ease, background 0.25s ease;
+}
+.filter-btn.active {
+  color: white !important;
+  background: var(--red) !important;
+  box-shadow: 0 4px 16px rgba(220,17,17,0.4), inset 0 -1px 0 rgba(0,0,0,0.2) !important;
+}
+.filter-btn.active .filter-btn-count {
+  background: rgba(0,0,0,0.25);
+  color: white;
+}
+.filter-btn:focus-visible { outline-offset: 0; }
+
+.products-toolbar-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-wrap: nowrap;
+}
+.products-density {
+  display: inline-flex;
+  border: 1px solid var(--line-faint);
+  background: var(--bg2);
+  clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
+}
+.density-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-faint);
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color 0.25s ease, background 0.25s ease;
+  padding: 0;
+}
+.density-btn:hover { color: var(--text-body); }
+.density-btn.active {
+  background: var(--red);
+  color: white;
+}
+
+.products-result-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-top: 0.3rem;
+}
+.products-result-count {
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--text-weak);
+}
+.products-result-count strong {
+  color: var(--red);
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  letter-spacing: 0.04em;
+  margin-right: 0.3rem;
+}
+.products-clear-btn {
+  background: transparent;
+  border: 1px solid var(--line-faint);
+  color: var(--text-weak);
+  padding: 0.4rem 0.85rem;
+  font-family: var(--font-body);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.25s ease;
+}
+.products-clear-btn:hover {
+  border-color: var(--red);
+  color: var(--red);
+  background: rgba(220,17,17,0.05);
+}
+
+/* Density toggle controls the grid columns */
+.products-grid[data-density="comfortable"] {
+  grid-template-columns: repeat(2, 1fr) !important;
+}
+.products-grid[data-density="comfortable"] .prod-card { aspect-ratio: auto; }
+@media (min-width: 700px) {
+  .products-grid[data-density="comfortable"] {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+@media (min-width: 1200px) {
+  .products-grid[data-density="comfortable"] {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .products-filters {
+    overflow-x: auto;
+    width: 100%;
+    -webkit-overflow-scrolling: touch;
+  }
+  .products-toolbar-right { gap: 0.5rem; }
+  .products-density { display: none; }   /* dense by default on mobile */
+  .filter-btn-count { font-size: 0.7rem; min-width: 18px; }
+  .products-result-row { padding: 0.4rem 0 0; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   49.3 — FEATURED PRODUCT HERO CARD (spans full grid width)
+═══════════════════════════════════════════════════════════ */
+.featured-hero {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  background: linear-gradient(135deg, var(--bg2) 0%, var(--bg3) 100%);
+  border: 1px solid var(--line-soft);
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  margin-bottom: 4px;        /* match grid gap */
+  cursor: pointer;
+  isolation: isolate;
+  transition: border-color 0.45s ease, box-shadow 0.45s ease;
+}
+.featured-hero::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 5px; height: 100%;
+  background: linear-gradient(180deg, var(--red), rgba(220,17,17,0.2));
+  z-index: 2;
+  box-shadow: 0 0 18px rgba(220,17,17,0.5);
+}
+.featured-hero:hover {
+  border-color: var(--line-mid);
+  box-shadow: var(--shadow-lg), var(--shadow-red-md);
+}
+.featured-hero .fh-image {
+  position: relative;
+  background: var(--bg3);
+  overflow: hidden;
+  min-height: 380px;
+}
+.featured-hero .fh-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(0.2) contrast(1.05);
+  transition: transform 0.8s cubic-bezier(.16,1,.3,1),
+              filter 0.55s ease;
+}
+.featured-hero:hover .fh-image img {
+  transform: scale(1.06);
+  filter: grayscale(0) contrast(1.08);
+}
+.featured-hero .fh-image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 55%, rgba(10,10,10,0.75));
+  pointer-events: none;
+  z-index: 1;
+}
+.fh-tag {
+  position: absolute;
+  top: 1.4rem;
+  left: 1.4rem;
+  z-index: 3;
+  background: var(--red);
+  color: white;
+  font-family: var(--font-body);
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  padding: 0.5rem 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 6px 18px rgba(220,17,17,0.55);
+  clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px);
+}
+.fh-tag-dot {
+  width: 6px; height: 6px;
+  background: white;
+  border-radius: 50%;
+  animation: fh-pulse 1.5s ease-in-out infinite;
+}
+@keyframes fh-pulse {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50%     { opacity: 0.6; transform: scale(1.4); }
+}
+.fh-body {
+  padding: clamp(1.6rem, 3vw, 2.6rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.95rem;
+  position: relative;
+}
+.fh-brand {
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin: 0;
+}
+.fh-name {
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, 3.5vw, 2.6rem);
+  letter-spacing: 0.04em;
+  line-height: 1.05;
+  color: var(--text-strong);
+  margin: 0;
+}
+.fh-tagline {
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 300;
+  line-height: 1.55;
+  color: var(--text-body);
+  margin: 0;
+  max-width: 380px;
+}
+.fh-price-row {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  margin-top: 0.4rem;
+}
+.fh-price {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  color: var(--text-strong);
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 20px rgba(220,17,17,0.3);
+}
+.fh-price-old {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--text-faint);
+  text-decoration: line-through;
+}
+.fh-cta-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-top: 0.4rem;
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--red);
+  transition: gap 0.3s ease;
+}
+.featured-hero:hover .fh-cta-row { gap: 1rem; }
+
+@media (max-width: 800px) {
+  .featured-hero { grid-template-columns: 1fr; }
+  .featured-hero .fh-image { min-height: 280px; aspect-ratio: 4/3; }
+  .featured-hero .fh-image::after {
+    background: linear-gradient(180deg, transparent 50%, rgba(10,10,10,0.85));
+  }
+  .fh-tagline { max-width: none; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   49.4 — BRANDED EMPTY STATE
+═══════════════════════════════════════════════════════════ */
+.products-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: clamp(3.5rem, 8vw, 6rem) clamp(1.5rem, 4vw, 3rem);
+  background: linear-gradient(180deg, var(--bg2) 0%, var(--bg3) 100%);
+  border: 1px solid var(--line-faint);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+.products-empty-art {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+.products-empty-art::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  background: radial-gradient(circle, rgba(220,17,17,0.25), transparent 70%);
+  filter: blur(8px);
+  animation: cart-empty-pulse 3s ease-in-out infinite;
+}
+.products-empty-art svg {
+  position: relative;
+  z-index: 1;
+  color: var(--red);
+  filter: drop-shadow(0 0 12px rgba(220,17,17,0.5));
+}
+.products-empty-eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin: 0;
+}
+.products-empty-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+  letter-spacing: 0.04em;
+  color: var(--text-strong);
+  margin: 0;
+  line-height: 1;
+}
+.products-empty-text {
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  color: var(--text-weak);
+  font-weight: 300;
+  margin: 0;
+  max-width: 360px;
+  line-height: 1.6;
+}
+.products-empty-divider {
+  width: 40px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--red), transparent);
+  box-shadow: 0 0 8px rgba(220,17,17,0.5);
+  margin: 0.3rem 0;
+}
+.products-empty-actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.7rem;
+  justify-content: center;
+}
+.products-empty-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--red);
+  color: white;
+  text-decoration: none;
+  border: 0;
+  padding: 0.85rem 1.5rem;
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  cursor: pointer;
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  transition: background 0.25s ease, box-shadow 0.3s ease, transform 0.18s ease;
+}
+.products-empty-btn:hover {
+  background: var(--red-bright);
+  box-shadow: 0 0 26px rgba(220,17,17,0.55);
+  transform: translateY(-2px);
+}
+.products-empty-btn-ghost {
+  background: transparent;
+  color: var(--text-body);
+  border: 1px solid var(--line-faint);
+}
+.products-empty-btn-ghost:hover {
+  border-color: var(--red);
+  color: var(--red);
+  background: rgba(220,17,17,0.04);
+  box-shadow: none;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   49.5 — LUXURY PRODUCT MODAL
+═══════════════════════════════════════════════════════════ */
+#prod-modal.luxury-modal {
+  background: rgba(0,0,0,0.86);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: clamp(0.75rem, 2.5vw, 2rem);
+  align-items: stretch;
+  justify-content: center;
+}
+#prod-modal.luxury-modal .modal-inner {
+  position: relative;
+  background: linear-gradient(180deg, var(--bg2) 0%, var(--bg) 100%);
+  border: 1px solid var(--line-mid);
+  box-shadow:
+    0 40px 100px rgba(0,0,0,0.85),
+    0 0 80px rgba(220,17,17,0.12),
+    inset 0 1px 0 rgba(255,255,255,0.04) !important;
+  display: grid !important;
+  grid-template-columns: 1.15fr 1fr !important;
+  width: 100%;
+  max-width: 1180px;
+  margin: auto;
+  max-height: 92vh;
+  overflow: hidden;
+}
+@media (max-width: 900px) {
+  #prod-modal.luxury-modal .modal-inner {
+    grid-template-columns: 1fr !important;
+    max-height: 100vh !important;
+    height: 100dvh;
+  }
+}
+
+/* Full-screen state */
+#prod-modal.luxury-modal.is-fullscreen { padding: 0; }
+#prod-modal.luxury-modal.is-fullscreen .modal-inner {
+  max-width: 100%;
+  max-height: 100vh;
+  height: 100vh;
+  border: none;
+  border-radius: 0;
+  grid-template-columns: 1.5fr 1fr !important;
+}
+@media (max-width: 900px) {
+  #prod-modal.luxury-modal.is-fullscreen .modal-inner {
+    grid-template-columns: 1fr !important;
+  }
+}
+.modal-tool.modal-fullscreen .ms-fs-collapse { display: none; }
+#prod-modal.luxury-modal.is-fullscreen .modal-tool.modal-fullscreen .ms-fs-expand { display: none; }
+#prod-modal.luxury-modal.is-fullscreen .modal-tool.modal-fullscreen .ms-fs-collapse { display: block; }
+
+/* Toolbar (top-right: close + full-screen) */
+.modal-toolbar {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 12;
+  display: inline-flex;
+  gap: 6px;
+}
+.modal-tool {
+  width: 36px; height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-weak);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+.modal-tool:hover {
+  border-color: var(--red);
+  color: var(--red);
+  background: rgba(220,17,17,0.12);
+}
+.modal-tool:active { transform: scale(0.93); }
+@media (max-width: 700px) {
+  .modal-toolbar { top: 10px; right: 10px; }
+  .modal-tool { width: 40px; height: 40px; }
+  .modal-fullscreen { display: none; } /* mobile is already fullscreen */
+}
+
+/* GALLERY */
+#prod-modal.luxury-modal .modal-gallery {
+  position: relative;
+  background: #060606;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.modal-gallery-stage {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #060606;
+}
+#prod-modal.luxury-modal .modal-main-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: opacity 0.3s ease;
+}
+.modal-img-counter {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  background: rgba(0,0,0,0.7);
+  color: var(--text-strong);
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid rgba(220,17,17,0.3);
+  z-index: 5;
+}
+#prod-modal.luxury-modal .modal-thumbnails {
+  display: flex;
+  gap: 6px;
+  padding: 10px;
+  background: rgba(0,0,0,0.4);
+  border-top: 1px solid var(--line-faint);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+#prod-modal.luxury-modal .modal-thumb {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border: 1px solid var(--line-faint);
+  opacity: 0.55;
+  cursor: pointer;
+  transition: opacity 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+}
+#prod-modal.luxury-modal .modal-thumb:hover {
+  opacity: 1;
+  border-color: var(--line-soft);
+}
+#prod-modal.luxury-modal .modal-thumb.active {
+  opacity: 1;
+  border-color: var(--red);
+  box-shadow: 0 0 14px rgba(220,17,17,0.45);
+}
+
+/* INFO BODY */
+#prod-modal.luxury-modal .modal-body {
+  padding: clamp(1.6rem, 3vw, 2.8rem) clamp(1.6rem, 3vw, 2.6rem);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  background: linear-gradient(180deg, var(--bg2) 0%, var(--bg3) 100%);
+}
+.modal-brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.modal-brand-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.85rem;
+  background: rgba(220,17,17,0.1);
+  border: 1px solid var(--line-soft);
+  color: var(--red);
+  font-family: var(--font-body);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+}
+.brand-chip-dot {
+  width: 6px; height: 6px;
+  background: var(--red);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--red);
+}
+#prod-modal.luxury-modal .modal-brand {
+  margin: 0;
+  font-size: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+}
+.modal-sku {
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+#prod-modal.luxury-modal .modal-name {
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, 3.5vw, 2.6rem);
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  line-height: 1;
+  color: var(--text-strong);
+  margin: 0;
+}
+.modal-type-badge {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.7rem;
+  width: fit-content;
+}
+.modal-type-badge.stock {
+  background: rgba(34,197,94,0.12);
+  color: #4ade80;
+  border: 1px solid rgba(34,197,94,0.3);
+}
+.modal-type-badge.encargo {
+  background: rgba(220,17,17,0.12);
+  color: var(--red-bright);
+  border: 1px solid rgba(220,17,17,0.32);
+}
+
+.modal-price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  padding-bottom: 1.2rem;
+  border-bottom: 1px solid var(--line-faint);
+}
+#prod-modal.luxury-modal .modal-price-main {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  letter-spacing: 0.04em;
+  color: var(--text-strong);
+  text-shadow: 0 0 22px rgba(220,17,17,0.32);
+}
+#prod-modal.luxury-modal .modal-price-old {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--text-faint);
+  text-decoration: line-through;
+}
+#prod-modal.luxury-modal .modal-discount {
+  background: var(--red);
+  color: white;
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  padding: 0.32rem 0.6rem;
+  box-shadow: 0 4px 14px rgba(220,17,17,0.45);
+}
+
+/* Inline trust strip */
+.modal-trust {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.2rem;
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  color: var(--text-body);
+}
+.modal-trust li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.modal-trust li svg {
+  color: var(--red);
+  flex-shrink: 0;
+}
+
+.modal-selector-block { margin-top: 0.4rem; }
+.modal-selector-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.55rem;
+}
+.modal-size-guide {
+  font-family: var(--font-body);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-weak);
+  text-decoration: none;
+  transition: color 0.25s ease;
+}
+.modal-size-guide:hover { color: var(--red); }
+#prod-modal.luxury-modal .modal-label {
+  font-family: var(--font-body);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin: 0 0 0.55rem;
+}
+
+.modal-desc-block { margin-top: 0.6rem; }
+.modal-desc-block .modal-label { margin-bottom: 0.7rem; }
+#prod-modal.luxury-modal .modal-desc-text {
+  display: block !important;
+  max-height: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: var(--text-body);
+  font-weight: 300;
+}
+
+#prod-modal.luxury-modal .modal-actions {
+  margin-top: 0.6rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--line-faint);
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+@media (max-width: 900px) {
+  #prod-modal.luxury-modal .modal-gallery {
+    aspect-ratio: 1;
+    flex: none;
+  }
+  #prod-modal.luxury-modal .modal-thumbnails {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    justify-content: flex-start;
+  }
+  #prod-modal.luxury-modal .modal-thumb { flex: 0 0 auto; }
+  .modal-trust { gap: 0.4rem 0.85rem; font-size: 0.65rem; }
+}
 </style>
 
 <!-- ═══ GSAP + ScrollTrigger ═══ -->
@@ -7931,14 +8907,39 @@ footer::before {
   </div>
 </section>
 
-<!-- Product Modal -->
-<div id="prod-modal">
+<!-- Product Modal — LUXURY -->
+<div id="prod-modal" class="luxury-modal">
   <div class="modal-inner" id="modal-inner">
-    <button class="modal-close" onclick="closeModal()">✕</button>
+    <!-- Toolbar row (close + full-screen) -->
+    <div class="modal-toolbar">
+      <button class="modal-tool modal-fullscreen" onclick="toggleModalFullscreen()" aria-label="Pantalla completa" type="button" title="Pantalla completa">
+        <svg class="ms-fs-expand" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <polyline points="4 14 4 20 10 20"/>
+          <polyline points="20 10 20 4 14 4"/>
+          <line x1="4" y1="20" x2="10" y2="14"/>
+          <line x1="20" y1="4" x2="14" y2="10"/>
+        </svg>
+        <svg class="ms-fs-collapse" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <polyline points="10 4 10 10 4 10"/>
+          <polyline points="14 20 14 14 20 14"/>
+          <line x1="10" y1="10" x2="4" y2="4"/>
+          <line x1="14" y1="14" x2="20" y2="20"/>
+        </svg>
+      </button>
+      <button class="modal-tool modal-close" onclick="closeModal()" aria-label="Cerrar" type="button">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
+          <line x1="18" y1="6" x2="6" y2="18"/>
+          <line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </button>
+    </div>
 
-    <!-- LEFT: Gallery -->
+    <!-- LEFT: Gallery — main image + side thumbs on desktop -->
     <div class="modal-gallery">
-      <img class="modal-main-img" id="modal-main-img" src="" alt="">
+      <div class="modal-gallery-stage">
+        <img class="modal-main-img" id="modal-main-img" src="" alt="" loading="eager" decoding="async">
+        <span class="modal-img-counter" id="modal-img-counter" aria-hidden="true">1 / 1</span>
+      </div>
       <div class="modal-thumbnails" id="modal-thumbs"></div>
       <svg class="swipe-hint left" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
       <svg class="swipe-hint right" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
@@ -7946,7 +8947,14 @@ footer::before {
 
     <!-- RIGHT: Info -->
     <div class="modal-body">
-      <p class="modal-brand" id="modal-brand"></p>
+      <div class="modal-brand-row">
+        <span class="modal-brand-chip" id="modal-brand-chip">
+          <span class="brand-chip-dot" aria-hidden="true"></span>
+          <span class="modal-brand" id="modal-brand"></span>
+        </span>
+        <span class="modal-sku" id="modal-sku">SKU —</span>
+      </div>
+
       <h2 class="modal-name" id="modal-name"></h2>
       <span class="modal-type-badge" id="modal-type-badge"></span>
 
@@ -7958,22 +8966,31 @@ footer::before {
 
       <p class="modal-stock" id="modal-stock" aria-live="polite"></p>
 
-      <div id="modal-sizes-wrap">
-        <p class="modal-label" data-i18n="modalSize">TALLA</p>
+      <!-- Inline trust strip -->
+      <ul class="modal-trust" aria-label="Garantías">
+        <li><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> 100% Auténtico</li>
+        <li><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Importado USA</li>
+        <li><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg> Cambio 14 días</li>
+      </ul>
+
+      <div id="modal-sizes-wrap" class="modal-selector-block">
+        <div class="modal-selector-head">
+          <p class="modal-label" data-i18n="modalSize">TALLA</p>
+          <a href="#" class="modal-size-guide" onclick="event.preventDefault();window.open('/articles/guia-tallas-importadas.html','_blank')">Guía de tallas →</a>
+        </div>
         <div class="size-btns" id="modal-sizes"></div>
       </div>
 
-      <div id="modal-colors-wrap">
+      <div id="modal-colors-wrap" class="modal-selector-block">
         <p class="modal-label" data-i18n="modalColor">COLOR</p>
         <div class="color-btns" id="modal-colors"></div>
       </div>
 
-      <!-- Description accordion -->
-      <div class="modal-desc-toggle" id="modal-desc-toggle" onclick="toggleModalDesc()">
-        <span data-i18n="modalDescToggle">DESCRIPCIÓN DEL PRODUCTO</span>
-        <span class="modal-desc-toggle-arrow">▼</span>
+      <!-- Description always-visible block (no longer a toggle) -->
+      <div class="modal-desc-block">
+        <p class="modal-label" data-i18n="modalDescToggle">DESCRIPCIÓN DEL PRODUCTO</p>
+        <div class="modal-desc-text" id="modal-desc"></div>
       </div>
-      <div class="modal-desc-text" id="modal-desc"></div>
 
       <div class="modal-actions">
         <button class="modal-btn-cart" onclick="addProductToCart()">
@@ -8043,50 +9060,120 @@ footer::before {
 
 <div class="divider"></div>
 
-<!-- ═══ HOW IT WORKS ═══ -->
-<section class="products-section" id="stock">
+<!-- ═══ PRODUCTS — EDITORIAL DROP ═══ -->
+<section class="products-section editorial-drop" id="stock">
   <div class="container">
-    <div class="sec-header reveal">
-      <div class="sec-eyebrow">
-        <div class="eyebrow-line"></div>
-        <svg width="16" height="10" viewBox="0 0 100 60" fill="#DC1111"><path d="M50 38 C44 36 36 32 26 28 C18 25 10 24 2 26 C0 26 0 24 2 22 C8 17 18 14 26 16 C32 17 38 20 44 26 C46 28 48 32 50 38Z"/><path d="M50 38 C56 36 64 32 74 28 C82 25 90 24 98 26 C100 26 100 24 98 22 C92 17 82 14 74 16 C68 17 62 20 56 26 C54 28 52 32 50 38Z"/></svg>
-        <div class="eyebrow-line"></div>
+
+    <!-- Editorial header: asymmetric, magazine drop style -->
+    <header class="drop-header reveal">
+      <div class="drop-header-left">
+        <div class="drop-index" aria-hidden="true">
+          <span class="drop-index-num">02</span>
+          <span class="drop-index-divider">/</span>
+          <span class="drop-index-label">DROP</span>
+        </div>
+        <h2 class="drop-title">
+          Stock <em>en</em>
+          <br>Costa <em>Rica</em>
+        </h2>
+        <span class="drop-rule" aria-hidden="true"></span>
       </div>
-      <h2 class="sec-title">Stock en Costa Rica</h2>
-      <p class="sec-subtitle">Productos listos para entrega inmediata en Costa Rica</p>
+      <div class="drop-header-right">
+        <p class="drop-eyebrow">Disponible ahora · Entrega 1-3 días</p>
+        <p class="drop-lead">
+          Curado a mano, importado de USA, listo para enviar desde San José.
+          Cada pieza pasa por nuestras manos antes de pasar por las tuyas.
+        </p>
+        <div class="drop-meta">
+          <span class="drop-meta-item"><strong id="drop-meta-count">—</strong> piezas</span>
+          <span class="drop-meta-divider" aria-hidden="true"></span>
+          <span class="drop-meta-item"><strong>5</strong> marcas</span>
+          <span class="drop-meta-divider" aria-hidden="true"></span>
+          <span class="drop-meta-item"><strong>SINPE</strong> aceptado</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Coming-soon banner (kept, repositioned outside the toolbar) -->
+    <div class="drop-banner reveal">
+      <div class="coming-soon-pulse" aria-hidden="true"></div>
+      <div class="drop-banner-body">
+        <div class="coming-soon-tag">PRÓXIMAMENTE · STOCK COMPLETO</div>
+        <p class="drop-banner-copy">
+          Estamos llenando los racks. Mientras tanto, podés ordenar
+          cualquier pieza por encargo desde USA — llega en 7-14 días.
+        </p>
+      </div>
+      <a href="#catalogo" class="btn-primary coming-soon-cta">Ver Catálogo →</a>
     </div>
 
+    <!-- Filter + sort bar -->
     <div class="products-toolbar reveal">
-      <div class="coming-soon-banner">
-        <div class="coming-soon-pulse" aria-hidden="true"></div>
-        <div class="coming-soon-tag">PRÓXIMAMENTE</div>
-        <div class="coming-soon-text">
-          <p>Stock Disponible en Costa Rica</p>
-          <p>Estamos preparando inventario para entrega inmediata. Por ahora podés ordenar cualquier producto por encargo desde USA.</p>
-        </div>
-        <a href="#catalogo" class="btn-primary coming-soon-cta">Ver Catálogo →</a>
-      </div>
       <div class="products-toolbar-controls">
-        <div class="products-filters">
-          <button class="filter-btn active" onclick="filterProducts('all',this)" data-i18n="filterAll">Todos</button>
-          <button class="filter-btn" onclick="filterProducts('ropa',this)" data-i18n="filterApparel">Ropa</button>
-          <button class="filter-btn" onclick="filterProducts('suplementos',this)" data-i18n="filterSupps">Suplementos</button>
-          <button class="filter-btn" onclick="filterProducts('accesorios',this)" data-i18n="filterAccessories">Accesorios</button>
+        <div class="products-filters" role="tablist" aria-label="Filtrar por categoría">
+          <button class="filter-btn active" onclick="filterProducts('all',this)" data-i18n="filterAll" role="tab" aria-selected="true">
+            <span class="filter-btn-label">Todos</span>
+            <span class="filter-btn-count" id="fc-all">·</span>
+          </button>
+          <button class="filter-btn" onclick="filterProducts('ropa',this)" data-i18n="filterApparel" role="tab" aria-selected="false">
+            <span class="filter-btn-label">Ropa</span>
+            <span class="filter-btn-count" id="fc-ropa">·</span>
+          </button>
+          <button class="filter-btn" onclick="filterProducts('suplementos',this)" data-i18n="filterSupps" role="tab" aria-selected="false">
+            <span class="filter-btn-label">Suplementos</span>
+            <span class="filter-btn-count" id="fc-suplementos">·</span>
+          </button>
+          <button class="filter-btn" onclick="filterProducts('accesorios',this)" data-i18n="filterAccessories" role="tab" aria-selected="false">
+            <span class="filter-btn-label">Accesorios</span>
+            <span class="filter-btn-count" id="fc-accesorios">·</span>
+          </button>
         </div>
-        <div class="products-sort">
-          <span class="products-sort-label" data-i18n="sortLabel">Ordenar:</span>
-          <select id="product-sort" onchange="setSort(this.value)" aria-label="Ordenar productos">
-            <option value="trending" data-i18n="sortTrending">Trending</option>
-            <option value="newest" data-i18n="sortNewest">Más nuevo</option>
-            <option value="price-asc" data-i18n="sortPriceAsc">Precio ↑</option>
-            <option value="price-desc" data-i18n="sortPriceDesc">Precio ↓</option>
-          </select>
+        <div class="products-toolbar-right">
+          <div class="products-density" role="group" aria-label="Densidad de la grilla">
+            <button class="density-btn" data-density="comfortable" onclick="setGridDensity('comfortable',this)" aria-label="Vista cómoda" title="Cómoda">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <rect x="3" y="3" width="8" height="8"/>
+                <rect x="13" y="3" width="8" height="8"/>
+                <rect x="3" y="13" width="8" height="8"/>
+                <rect x="13" y="13" width="8" height="8"/>
+              </svg>
+            </button>
+            <button class="density-btn active" data-density="dense" onclick="setGridDensity('dense',this)" aria-label="Vista densa" title="Densa">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <rect x="2" y="2" width="6" height="6"/>
+                <rect x="10" y="2" width="6" height="6"/>
+                <rect x="18" y="2" width="4" height="6"/>
+                <rect x="2" y="10" width="6" height="6"/>
+                <rect x="10" y="10" width="6" height="6"/>
+                <rect x="18" y="10" width="4" height="6"/>
+                <rect x="2" y="18" width="6" height="4"/>
+                <rect x="10" y="18" width="6" height="4"/>
+                <rect x="18" y="18" width="4" height="4"/>
+              </svg>
+            </button>
+          </div>
+          <div class="products-sort">
+            <span class="products-sort-label" data-i18n="sortLabel">Ordenar:</span>
+            <select id="product-sort" onchange="setSort(this.value)" aria-label="Ordenar productos">
+              <option value="trending" data-i18n="sortTrending">Trending</option>
+              <option value="newest" data-i18n="sortNewest">Más nuevo</option>
+              <option value="price-asc" data-i18n="sortPriceAsc">Precio ↑</option>
+              <option value="price-desc" data-i18n="sortPriceDesc">Precio ↓</option>
+            </select>
+          </div>
         </div>
+      </div>
+      <div class="products-result-row" id="products-result-row">
+        <span class="products-result-count" id="products-result-count">— piezas</span>
+        <button class="products-clear-btn" id="products-clear-btn" type="button" onclick="filterProducts('all', document.querySelector('.filter-btn'))" hidden>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          Limpiar filtro
+        </button>
       </div>
     </div>
 
-    <div class="products-grid" id="products-grid">
-      <!-- Products rendered by JS -->
+    <div class="products-grid" id="products-grid" data-density="dense">
+      <!-- Products rendered by JS — first item may be the featured hero card -->
     </div>
 
 </section>
@@ -8795,6 +9882,16 @@ async function loadAllData(){
     }
     const brands = await sbFetch('brands','GET',null,'?order=position.asc&active=eq.true');
     if(brands && brands.length){ siteBrands = brands; renderMarquee(); }
+
+    // Supabase-first reviews + categories — overwrite localStorage cache
+    if (typeof loadReviewsFromSupabase === 'function') {
+      const reviewsOk = await loadReviewsFromSupabase();
+      if (reviewsOk && typeof renderReviews === 'function') renderReviews();
+    }
+    if (typeof loadCategoriesFromSupabase === 'function') {
+      const catsOk = await loadCategoriesFromSupabase();
+      if (catsOk && typeof renderCategories === 'function') renderCategories();
+    }
   } catch(e){ console.error('Supabase load error:', e); }
 }
 
@@ -9953,6 +11050,128 @@ function renderSkeletons(count = 8){
   grid.innerHTML = cards.join('');
 }
 
+// ════════════════════════════════════════════════════════════
+// FEATURE 49 helpers — featured hero, empty state, filter counts,
+// result row, density toggle, modal fullscreen.
+// ════════════════════════════════════════════════════════════
+function buildFeaturedHeroHtml(p){
+  const imgs = Array.isArray(p.imgs) && p.imgs.length ? p.imgs : [p.img];
+  const heroImg = (typeof optimizeImg === 'function')
+    ? optimizeImg(imgs[0] || p.img || '', 1200)
+    : (imgs[0] || p.img || '');
+  const hasDiscount = p.originalPrice && p.originalPrice > p.price;
+  const tagline = (p.desc || `Pieza destacada · ${p.brand || 'Desmos Mind'} · importada de USA`).slice(0, 140);
+  const altText = `${p.brand || ''} ${p.name || ''}`.trim();
+  return `
+    <a class="featured-hero" href="javascript:void(0)" onclick="openProduct(${p.id})" data-product-id="${p.id}" aria-label="${altText}">
+      <div class="fh-image">
+        <img src="${heroImg}" alt="${altText}" loading="eager" decoding="async"
+          width="1200" height="800"
+          onerror="this.src='https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=1200&fm=webp&q=78'">
+        <span class="fh-tag"><span class="fh-tag-dot" aria-hidden="true"></span>FEATURED · BESTSELLER</span>
+      </div>
+      <div class="fh-body">
+        <p class="fh-brand">${p.brand || ''}</p>
+        <h3 class="fh-name">${p.name || ''}</h3>
+        <p class="fh-tagline">${tagline}</p>
+        <div class="fh-price-row">
+          <span class="fh-price">₡${(p.price || 0).toLocaleString()}</span>
+          ${hasDiscount ? `<span class="fh-price-old">₡${p.originalPrice.toLocaleString()}</span>` : ''}
+        </div>
+        <span class="fh-cta-row">Ver detalles <span aria-hidden="true">→</span></span>
+      </div>
+    </a>`;
+}
+
+function buildProductsEmptyState(filter){
+  const isWishlist = filter === '__wishlist__';
+  const eyebrow = isWishlist ? 'TU LISTA' : 'SIN RESULTADOS';
+  const title   = isWishlist ? 'Nada en favoritos.' : 'Nada por aquí.';
+  const text    = isWishlist
+    ? 'Tocá el corazón en cualquier pieza del catálogo y la guardamos para que volvás luego.'
+    : 'Esta categoría está vacía por ahora. Probá con otra o escribinos qué andás buscando — lo conseguimos.';
+  const primaryAction = isWishlist
+    ? `<button type="button" class="products-empty-btn" onclick="filterProducts('all', document.querySelector('.filter-btn'))">Ver todo el catálogo</button>`
+    : `<button type="button" class="products-empty-btn" onclick="filterProducts('all', document.querySelector('.filter-btn'))">Ver todas las piezas</button>`;
+  return `
+    <div class="products-empty" role="status">
+      <div class="products-empty-art" aria-hidden="true">
+        <svg width="68" height="42" viewBox="0 0 32 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+          <path d="M16 18 C14 18 12 16 10 15 L7 17 L4 13 L2 15 L0 10 L1 8 L3 10 L5 6 L8 8 L11 4 L14 6 C15 3 16 2 16 2 C16 2 17 3 18 6 L21 4 L24 8 L27 6 L29 10 L31 8 L32 10 L30 15 L28 13 L25 17 L22 15 C20 16 18 18 16 18Z"/>
+        </svg>
+      </div>
+      <p class="products-empty-eyebrow">${eyebrow}</p>
+      <h3 class="products-empty-title">${title}</h3>
+      <div class="products-empty-divider" aria-hidden="true"></div>
+      <p class="products-empty-text">${text}</p>
+      <div class="products-empty-actions">
+        ${primaryAction}
+        <a class="products-empty-btn products-empty-btn-ghost" href="https://wa.me/50685946741" target="_blank" rel="noopener">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          Hacer encargo
+        </a>
+      </div>
+    </div>`;
+}
+
+function updateFilterCounts(){
+  if (!Array.isArray(products)) return;
+  const counts = { all: products.length, ropa: 0, suplementos: 0, accesorios: 0 };
+  products.forEach(p => {
+    if (counts[p.category] != null) counts[p.category] += 1;
+  });
+  ['all', 'ropa', 'suplementos', 'accesorios'].forEach(k => {
+    const el = document.getElementById('fc-' + k);
+    if (el) el.textContent = counts[k];
+  });
+}
+
+function updateResultRow(filter, count){
+  const countEl = document.getElementById('products-result-count');
+  const clearBtn = document.getElementById('products-clear-btn');
+  const metaCountEl = document.getElementById('drop-meta-count');
+  if (countEl) {
+    const label = (filter === '__wishlist__') ? 'en tu lista'
+                : (filter === 'all')          ? 'piezas disponibles'
+                                              : `en ${filter}`;
+    countEl.innerHTML = `<strong>${count}</strong> ${label}`;
+  }
+  if (clearBtn) {
+    clearBtn.hidden = (filter === 'all' || count === 0);
+  }
+  if (metaCountEl) {
+    metaCountEl.textContent = (Array.isArray(products) ? products.length : 0);
+  }
+}
+
+// Grid density toggle
+function setGridDensity(level, btn){
+  const grid = document.getElementById('products-grid');
+  if (!grid) return;
+  grid.setAttribute('data-density', level);
+  document.querySelectorAll('.density-btn').forEach(b => b.classList.toggle('active', b === btn));
+  try { localStorage.setItem('desmos_grid_density', level); } catch(e) {}
+}
+(function initDensity(){
+  try {
+    const saved = localStorage.getItem('desmos_grid_density');
+    if (saved === 'comfortable') {
+      const btn = document.querySelector('.density-btn[data-density="comfortable"]');
+      if (btn) setTimeout(() => btn.click(), 0);
+    }
+  } catch(e) {}
+})();
+
+// Modal fullscreen toggle
+function toggleModalFullscreen(){
+  const m = document.getElementById('prod-modal');
+  if (!m) return;
+  m.classList.toggle('is-fullscreen');
+  if (typeof track === 'function') {
+    track('Modal Fullscreen Toggle', { props: { state: m.classList.contains('is-fullscreen') ? 'on' : 'off' }});
+  }
+}
+
 function renderProducts(filter='all'){
   const grid = document.getElementById('products-grid');
   if(!grid) return;
@@ -9969,15 +11188,29 @@ function renderProducts(filter='all'){
   } else {
     filtered = products.filter(p => p.category === filter);
   }
+  // Update filter counts + result row
+  if (typeof updateFilterCounts === 'function') updateFilterCounts();
+  if (typeof updateResultRow === 'function') updateResultRow(filter, filtered.length);
+
   if(!filtered.length){
-    const emptyMsg = (typeof t === 'function')
-      ? (filter === '__wishlist__' ? t('emptyWishlist') : t('emptyCategory'))
-      : (filter === '__wishlist__' ? 'TU LISTA ESTÁ EN BLANCO.' : 'NADA POR AQUÍ.');
-    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:4rem;color:var(--muted2);font-family:var(--font-body);font-weight:600;font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;">'+emptyMsg+'</div>';
+    grid.innerHTML = buildProductsEmptyState(filter);
     return;
   }
   const sorted = (typeof sortProducts === 'function') ? sortProducts(filtered) : filtered;
-  grid.innerHTML = sorted.map((p,i)=>{
+
+  // Featured hero card: render once at the top when filter is 'all' or '__wishlist__'
+  // and there is a designated bestseller in the result set.
+  const featured = (filter === 'all' || filter === '__wishlist__')
+    ? sorted.find(p => p.bestseller && p.type === 'stock' && (typeof p.stock !== 'number' || p.stock > 0))
+    : null;
+  let heroHtml = '';
+  if (featured) {
+    heroHtml = buildFeaturedHeroHtml(featured);
+  }
+  // Skip the featured product from the regular grid below
+  const gridList = featured ? sorted.filter(p => p.id !== featured.id) : sorted;
+
+  grid.innerHTML = heroHtml + gridList.map((p,i)=>{
     const imgs = Array.isArray(p.imgs) && p.imgs.length ? p.imgs : [p.img];
     const rawMain = imgs[0] || 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600';
     const rawHover = imgs[1] || rawMain;
@@ -10156,18 +11389,27 @@ function openProduct(id){
     modalMain.setAttribute('decoding', 'async');
   }
 
-  // Thumbnails
+  // Thumbnails (luxury modal: side or bottom strip)
   const thumbsEl = document.getElementById('modal-thumbs');
   if(imgs.length > 1){
     thumbsEl.innerHTML = imgs.map((img,i)=>`
       <img class="modal-thumb ${i===0?'active':''}" src="${optimizeImg(img, 120)}" alt="${p.name} ${i+1}"
-        width="60" height="60" loading="lazy" decoding="async"
-        onclick="switchModalImg(this,'${optimizeImg(img, 900)}')">`).join('');
+        width="60" height="60" loading="lazy" decoding="async" data-thumb-index="${i}"
+        onclick="switchModalImg(this,'${optimizeImg(img, 1200)}')">`).join('');
     thumbsEl.style.display='flex';
   } else { thumbsEl.style.display='none'; }
 
-  // Info
-  document.getElementById('modal-brand').textContent = p.brand;
+  // Image counter
+  const counterEl = document.getElementById('modal-img-counter');
+  if (counterEl) {
+    counterEl.textContent = `1 / ${imgs.length || 1}`;
+    counterEl.style.display = imgs.length > 1 ? 'inline-block' : 'none';
+  }
+
+  // Info — brand chip + SKU
+  document.getElementById('modal-brand').textContent = p.brand || '';
+  const skuEl = document.getElementById('modal-sku');
+  if (skuEl) skuEl.textContent = `SKU · DM-${p.id}`;
   document.getElementById('modal-name').textContent = p.name;
 
   // Type badge
@@ -10247,12 +11489,25 @@ function openProduct(id){
     colorsEl.querySelector('.color-btn').classList.add('active');
   } else { colorsWrap.style.display='none'; }
 
-  // Description
+  // Description — luxury modal shows it always-on, no toggle
   const descEl = document.getElementById('modal-desc');
-  descEl.textContent = p.desc || '';
-  descEl.classList.remove('open');
+  if (descEl) {
+    descEl.textContent = p.desc || 'Sin descripción todavía. Escribinos por WhatsApp para más detalles de esta pieza.';
+    descEl.classList.remove('open');
+  }
   const toggle = document.getElementById('modal-desc-toggle');
-  toggle.classList.remove('open');
+  if (toggle) toggle.classList.remove('open');
+
+  // Reset modal scroll + fullscreen state on each open
+  const mInner = document.getElementById('modal-inner');
+  if (mInner) {
+    const body = mInner.querySelector('.modal-body');
+    if (body) body.scrollTop = 0;
+  }
+  const mWrap = document.getElementById('prod-modal');
+  if (mWrap && mWrap.classList.contains('is-fullscreen')) {
+    mWrap.classList.remove('is-fullscreen');
+  }
 
   document.getElementById('prod-modal').classList.add('open');
   // Prevent body scroll without breaking iOS momentum
@@ -10267,9 +11522,25 @@ function prodModalEscHandler(e){
 }
 
 function switchModalImg(thumb, src){
-  document.getElementById('modal-main-img').src = src;
+  const mainImg = document.getElementById('modal-main-img');
+  if (mainImg && window.gsap) {
+    // Smooth crossfade via GSAP if available
+    window.gsap.to(mainImg, { opacity: 0, duration: 0.18, ease: 'power1.in', onComplete: () => {
+      mainImg.src = src;
+      window.gsap.to(mainImg, { opacity: 1, duration: 0.32, ease: 'power2.out' });
+    }});
+  } else if (mainImg) {
+    mainImg.src = src;
+  }
   document.querySelectorAll('.modal-thumb').forEach(t=>t.classList.remove('active'));
   thumb.classList.add('active');
+  // Update image counter
+  const counter = document.getElementById('modal-img-counter');
+  if (counter) {
+    const idx = parseInt(thumb.getAttribute('data-thumb-index') || '0', 10);
+    const total = document.querySelectorAll('.modal-thumb').length || 1;
+    counter.textContent = `${idx + 1} / ${total}`;
+  }
 }
 
 function toggleModalDesc(){
@@ -10963,9 +12234,62 @@ const DEFAULT_REVIEWS = [
   {id:2, text:"Pedí tres tanks de Gymshark por encargo. Llegaron en exactamente 18 días y los precios son increíbles comparado a importarlos yo mismo.", name:"Andrés V.", loc:"Heredia, CR", stars:5},
   {id:3, text:"La creatina llegó súper rápido. Definitivamente ya no compro en ningún otro lado mi suplementación.", name:"Sofía R.", loc:"Alajuela, CR", stars:5},
 ];
+// Reviews are Supabase-first. localStorage is just an offline cache so the
+// section paints something fast on cold start; loadReviewsFromSupabase()
+// overwrites the array once the network responds.
 let reviews = safeStorage.getJSON('dm_reviews', null) || DEFAULT_REVIEWS;
+let _reviewsSupabaseOk = false;
+
+async function loadReviewsFromSupabase(){
+  try {
+    const rows = await sbFetch('reviews', 'GET', null, '?order=position.asc,id.asc&active=eq.true');
+    if (!Array.isArray(rows)) return false;
+    _reviewsSupabaseOk = true;
+    reviews = rows.map(r => ({
+      id: r.id,
+      text: r.text || '',
+      name: r.name || '',
+      loc:  r.location || '',
+      stars: r.rating || 5
+    }));
+    safeStorage.setJSON('dm_reviews', reviews);
+    return true;
+  } catch (e) {
+    // Supabase unavailable / table missing — keep cached/default reviews
+    return false;
+  }
+}
 
 function saveReviews(){ safeStorage.setJSON('dm_reviews', reviews); }
+async function persistReviewRemote(r, isUpdate){
+  if (typeof sbFetch !== 'function') return;
+  const row = {
+    name: r.name,
+    location: r.loc || '',
+    rating: r.stars || 5,
+    text: r.text || '',
+    verified: true,
+    initials: getInitials(r.name),
+    position: r.position || 0,
+    active: true
+  };
+  try {
+    if (isUpdate && typeof r.id === 'number' && r.id < 1e12) {
+      // Real DB id (small numeric bigserial)
+      await sbFetch('reviews', 'PATCH', row, `?id=eq.${r.id}`);
+    } else {
+      const saved = await sbFetch('reviews', 'POST', row, '');
+      if (Array.isArray(saved) && saved[0]) r.id = saved[0].id;
+    }
+  } catch (e) {
+    console.warn('Review remote persist failed:', e.message || e);
+  }
+}
+async function deleteReviewRemote(r){
+  if (typeof sbFetch !== 'function' || !r || r.id == null) return;
+  try { await sbFetch('reviews', 'DELETE', null, `?id=eq.${r.id}`); }
+  catch (e) { console.warn('Review remote delete failed:', e.message || e); }
+}
 
 // Construye iniciales del nombre (ej. "Diego M." -> "DM", "Sofía R." -> "SR")
 function getInitials(name){
@@ -11015,27 +12339,33 @@ function renderAdminReviews(){
     </div>`).join('');
 }
 
-function addReview(){
+async function addReview(){
   const text = prompt('Texto de la reseña:'); if(!text) return;
   const name = prompt('Nombre (ej: DIEGO M.):'); if(!name) return;
   const loc  = prompt('Ubicación (ej: San José, CR):') || 'Costa Rica';
   const stars= parseInt(prompt('Estrellas (1-5):') || '5') || 5;
-  reviews.push({id:Date.now(), text, name, loc, stars});
+  const r = { id: Date.now(), text, name, loc, stars };
+  await persistReviewRemote(r, false);
+  reviews.push(r);
   saveReviews(); renderReviews(); renderAdminReviews();
   showToast('Reseña agregada ✓');
 }
-function editReview(i){
+async function editReview(i){
   const r = reviews[i];
   const text  = prompt('Texto:', r.text); if(text===null) return;
   const name  = prompt('Nombre:', r.name); if(name===null) return;
   const loc   = prompt('Ubicación:', r.loc); if(loc===null) return;
   const stars = parseInt(prompt('Estrellas (1-5):', r.stars||5)) || 5;
-  reviews[i] = {...r, text, name, loc, stars};
+  const updated = {...r, text, name, loc, stars};
+  await persistReviewRemote(updated, true);
+  reviews[i] = updated;
   saveReviews(); renderReviews(); renderAdminReviews();
   showToast('Reseña actualizada ✓');
 }
-function deleteReview(i){
+async function deleteReview(i){
   if(!confirm(t('confirmDelReview'))) return;
+  const r = reviews[i];
+  await deleteReviewRemote(r);
   reviews.splice(i,1);
   saveReviews(); renderReviews(); renderAdminReviews();
   showToast('Reseña eliminada');
@@ -11159,7 +12489,10 @@ async function loadDropsFromSupabase(){
         tag: r.tag||'',
         fecha: r.fecha||'',
         titulo: r.titulo||'',
-        desc: r.desc||'',
+        // Supabase column is `descripcion` (not `desc` — `desc` is a SQL
+        // reserved word). Keep the local property as `desc` for backwards
+        // compatibility with the rest of the app.
+        desc: r.descripcion || r.desc || '',
         img: r.img||'',
         cta: r.cta||'',
         ctaLink: r.cta_link||'',
@@ -11188,7 +12521,8 @@ async function saveDropToSupabase(dropData, isEdit){
     tag: dropData.tag,
     fecha: dropData.fecha,
     titulo: dropData.titulo,
-    desc: dropData.desc,
+    // Column name in Supabase is `descripcion` (SQL `desc` is reserved).
+    descripcion: dropData.desc,
     img: dropData.img,
     cta: dropData.cta,
     cta_link: dropData.ctaLink,
@@ -11291,7 +12625,7 @@ function renderAdminDrops(){
       <strong style="color:var(--red);letter-spacing:0.12em;">⚠ MODO LOCAL</strong> — Los drops se guardan solo en este navegador.<br>
       Para que se vean en todos los dispositivos, crea la tabla en Supabase:<br>
       <code style="display:block;margin-top:0.5rem;background:rgba(0,0,0,0.4);padding:0.5rem;font-size:0.6rem;color:#aaa;border-left:2px solid var(--red);word-break:break-all;">
-CREATE TABLE drops (id bigserial primary key, tag text, fecha text, titulo text, desc text, img text, cta text, cta_link text, position int default 0, active boolean default true, created_at timestamptz default now());<br>ALTER TABLE drops ENABLE ROW LEVEL SECURITY;<br>CREATE POLICY "public read" ON drops FOR SELECT USING (true);<br>CREATE POLICY "anon write" ON drops FOR ALL USING (true) WITH CHECK (true);
+CREATE TABLE drops (id bigserial primary key, tag text, fecha text, titulo text, descripcion text, img text, cta text, cta_link text, position int default 0, active boolean default true, created_at timestamptz default now());<br>ALTER TABLE drops ENABLE ROW LEVEL SECURITY;<br>CREATE POLICY "public read" ON drops FOR SELECT USING (true);<br>CREATE POLICY "anon write" ON drops FOR ALL USING (true) WITH CHECK (true);
       </code>
     </div>`;
 
@@ -11402,27 +12736,38 @@ function handleDropImgSelect(input){
 }
 
 async function uploadDropImage(file){
-  // 1. Try Supabase Storage
+  // Compress first to reduce storage usage
+  let blob = file;
   try {
-    const ext = file.name.split('.').pop().toLowerCase() || 'jpg';
-    const fileName = `drops/${Date.now()}-${Math.random().toString(36).substr(2,6)}.${ext}`;
-    const res = await fetch(`${SB_URL}/storage/v1/object/${BUCKET}/${fileName}`, {
-      method: 'POST',
-      headers: {
-        'apikey': SB_KEY,
-        'Authorization': `Bearer ${SB_KEY}`,
-        'Content-Type': file.type || 'image/jpeg',
-        'x-upsert': 'true',
-      },
-      body: file,
-    });
-    if(res.ok){
-      return `${SB_URL}/storage/v1/object/public/${BUCKET}/${fileName}`;
-    }
-  } catch(e){ /* fallback */ }
+    const compressed = await compressImageBlob(file, 1600, 0.85);
+    if (compressed && compressed.size < file.size) blob = compressed;
+  } catch(e) { /* upload original if compress fails */ }
 
-  // 2. Fallback: compressed base64
-  return await compressImageToBase64(file, 1200, 0.82);
+  const ext = ((file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g,'') || 'jpg');
+  const safeExt = (ext === 'jpeg' ? 'jpg' : ext);
+  const fileName = `drops/${Date.now()}-${Math.random().toString(36).substr(2,6)}.${safeExt}`;
+  const res = await fetch(`${SB_URL}/storage/v1/object/${BUCKET}/${fileName}`, {
+    method: 'POST',
+    headers: {
+      'apikey': SB_KEY,
+      'Authorization': `Bearer ${SB_KEY}`,
+      'Content-Type': blob.type || file.type || 'image/jpeg',
+      'x-upsert': 'true',
+    },
+    body: blob,
+  });
+  if(res.ok){
+    return `${SB_URL}/storage/v1/object/public/${BUCKET}/${fileName}`;
+  }
+  // Surface real reason — no base64 fallback (storing base64 bloats the DB)
+  const errTxt = await res.text();
+  throw new Error(
+    res.status === 404
+      ? `Bucket "${BUCKET}" no existe. Configurá Storage en el dashboard.`
+      : res.status === 401 || res.status === 403
+        ? `Permiso denegado por RLS en el bucket "${BUCKET}".`
+        : `Storage error ${res.status}: ${errTxt.slice(0,160)}`
+  );
 }
 
 async function saveDropForm(){
@@ -11535,9 +12880,61 @@ const DEFAULT_CATEGORIES = [
    img:'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=800&q=80',
    img2:'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80'},
 ];
+// Categories — Supabase-first with localStorage cache so the cat-grid
+// paints something fast on cold start. loadCategoriesFromSupabase()
+// overwrites the array once the network responds.
 let categories = JSON.parse(localStorage.getItem('dm_categories')||'null') || DEFAULT_CATEGORIES;
+let _categoriesSupabaseOk = false;
+
+async function loadCategoriesFromSupabase(){
+  try {
+    const rows = await sbFetch('categories', 'GET', null, '?order=position.asc,id.asc&active=eq.true');
+    if (!Array.isArray(rows)) return false;
+    _categoriesSupabaseOk = true;
+    categories = rows.map(r => ({
+      id: r.id,
+      name: r.name,
+      desc: r.count_text || '',
+      filter: r.filter || (r.slug || '').toLowerCase(),
+      img:  r.img || '',
+      img2: r.img || ''
+    }));
+    localStorage.setItem('dm_categories', JSON.stringify(categories));
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
 
 function saveCategories(){ localStorage.setItem('dm_categories', JSON.stringify(categories)); }
+
+async function persistCategoryRemote(cat, isUpdate){
+  if (typeof sbFetch !== 'function') return;
+  const row = {
+    slug: (cat.filter || cat.name || '').toLowerCase().replace(/\s+/g, '-'),
+    name: cat.name,
+    img: cat.img || '',
+    count_text: cat.desc || '',
+    filter: cat.filter || cat.name.toLowerCase(),
+    position: cat.position || 0,
+    active: true
+  };
+  try {
+    if (isUpdate && typeof cat.id === 'number' && cat.id < 1e12) {
+      await sbFetch('categories', 'PATCH', row, `?id=eq.${cat.id}`);
+    } else {
+      const saved = await sbFetch('categories', 'POST', row, '');
+      if (Array.isArray(saved) && saved[0]) cat.id = saved[0].id;
+    }
+  } catch (e) {
+    console.warn('Category remote persist failed:', e.message || e);
+  }
+}
+async function deleteCategoryRemote(cat){
+  if (typeof sbFetch !== 'function' || !cat || cat.id == null) return;
+  try { await sbFetch('categories', 'DELETE', null, `?id=eq.${cat.id}`); }
+  catch (e) { console.warn('Category remote delete failed:', e.message || e); }
+}
 
 function renderCategories(){
   const grid = document.getElementById('cat-grid');
@@ -11577,29 +12974,35 @@ function renderAdminCategories(){
     </div>`).join('');
 }
 
-function addCategory(){
+async function addCategory(){
   const name = prompt('Nombre de la categoría (ej: Ropa):'); if(!name) return;
   const desc = prompt('Descripción corta:') || '';
   const filter = prompt('Filtro interno (ej: ropa, accesorios, suplementos):') || name.toLowerCase();
   const img  = prompt('URL imagen principal:') || '';
   const img2 = prompt('URL imagen hover (opcional — diferente al pasar el mouse):') || img;
-  categories.push({id:Date.now(), name, desc, filter, img, img2});
+  const cat = { id: Date.now(), name, desc, filter, img, img2 };
+  await persistCategoryRemote(cat, false);
+  categories.push(cat);
   saveCategories(); renderCategories(); renderAdminCategories();
   showToast('Categoría agregada ✓');
 }
-function editCategory(i){
+async function editCategory(i){
   const cat = categories[i];
   const name  = prompt('Nombre:', cat.name); if(name===null) return;
   const desc  = prompt('Descripción:', cat.desc); if(desc===null) return;
   const filter= prompt('Filtro:', cat.filter); if(filter===null) return;
   const img   = prompt('URL imagen principal:', cat.img); if(img===null) return;
   const img2  = prompt('URL imagen hover:', cat.img2||cat.img); if(img2===null) return;
-  categories[i] = {...cat, name, desc, filter, img, img2};
+  const updated = {...cat, name, desc, filter, img, img2};
+  await persistCategoryRemote(updated, true);
+  categories[i] = updated;
   saveCategories(); renderCategories(); renderAdminCategories();
   showToast('Categoría actualizada ✓');
 }
-function deleteCategory(i){
+async function deleteCategory(i){
   if(!confirm(t('confirmDelCategory', categories[i].name))) return;
+  const cat = categories[i];
+  await deleteCategoryRemote(cat);
   categories.splice(i,1);
   saveCategories(); renderCategories(); renderAdminCategories();
   showToast('Categoría eliminada');
@@ -12434,49 +13837,82 @@ async function uploadToSupabase(field){
   const file = fileInput.files[0];
   if(!file){ setUploadStatus(field,'Seleccioná una imagen primero','err'); return; }
 
-  setUploadStatus(field, 'Procesando imagen...', 'loading');
+  setUploadStatus(field, 'Subiendo a Supabase Storage...', 'loading');
   showProgress(field, 20);
 
+  // Compress before upload to keep the bucket small.
+  let blob = file;
   try {
-    // Compress & convert to base64 (works without bucket setup)
-    const base64 = await compressImageToBase64(file, 800, 0.75);
-    showProgress(field, 60);
+    const compressed = await compressImageBlob(file, 1400, 0.82);
+    if (compressed && compressed.size < file.size) blob = compressed;
+  } catch(e) { /* compression failed — fall back to original file */ }
+  showProgress(field, 60);
 
-    // Try Supabase Storage first
-    try {
-      const ext = file.name.split('.').pop().toLowerCase();
-      const fileName = `products/${Date.now()}-${Math.random().toString(36).substr(2,5)}.${ext}`;
-      const res = await fetch(`${SB_URL}/storage/v1/object/${BUCKET}/${fileName}`, {
-        method: 'POST',
-        headers: {
-          'apikey': SB_KEY,
-          'Authorization': `Bearer ${SB_KEY}`,
-          'Content-Type': file.type,
-          'x-upsert': 'true',
-        },
-        body: file,
-      });
-      if(res.ok){
-        const publicUrl = `${SB_URL}/storage/v1/object/public/${BUCKET}/${fileName}`;
-        setFieldValue(field, publicUrl);
-        showProgress(field, 100);
-        setUploadStatus(field, '✓ Subida a Supabase Storage', 'ok');
-        showToast('Imagen subida ✓');
-        return;
-      }
-    } catch(e){ /* fallback to base64 */ }
-
-    // Fallback: use base64 (stored locally & in img field)
-    showProgress(field, 90);
-    setFieldValue(field, base64);
-    showProgress(field, 100);
-    setUploadStatus(field, '✓ Imagen lista (formato local — configura Storage para CDN)', 'ok');
-    showToast('Imagen cargada ✓');
-
+  try {
+    const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g,'');
+    const safeExt = (ext === 'jpeg' ? 'jpg' : (ext || 'jpg'));
+    const fileName = `products/${Date.now()}-${Math.random().toString(36).substr(2,5)}.${safeExt}`;
+    const res = await fetch(`${SB_URL}/storage/v1/object/${BUCKET}/${fileName}`, {
+      method: 'POST',
+      headers: {
+        'apikey': SB_KEY,
+        'Authorization': `Bearer ${SB_KEY}`,
+        'Content-Type': blob.type || file.type || 'image/jpeg',
+        'x-upsert': 'true',
+      },
+      body: blob,
+    });
+    if(res.ok){
+      const publicUrl = `${SB_URL}/storage/v1/object/public/${BUCKET}/${fileName}`;
+      setFieldValue(field, publicUrl);
+      showProgress(field, 100);
+      setUploadStatus(field, '✓ Subida a Supabase Storage', 'ok');
+      showToast('Imagen subida ✓');
+      return;
+    }
+    // Storage rejected — surface the real reason so the admin can fix RLS/bucket
+    const errTxt = await res.text();
+    showProgress(field, 0);
+    if (res.status === 404) {
+      setUploadStatus(field,
+        `Bucket "${BUCKET}" no existe. Creá el bucket en Supabase → Storage (public) y volvé a intentar.`,
+        'err');
+    } else if (res.status === 401 || res.status === 403) {
+      setUploadStatus(field,
+        `Permiso denegado por RLS. Agregá una policy de insert para anon en storage.objects con bucket_id='${BUCKET}'.`,
+        'err');
+    } else {
+      setUploadStatus(field, `Error ${res.status}: ${errTxt.slice(0,180)}`, 'err');
+    }
+    showToast('No se pudo subir — revisa la configuración de Storage');
   } catch(e){
     showProgress(field, 0);
-    setUploadStatus(field, 'Error: ' + e.message, 'err');
+    setUploadStatus(field, 'Error de red: ' + e.message, 'err');
   }
+}
+
+// Compress an image File → Blob (smaller jpeg, max-side capped).
+async function compressImageBlob(file, maxSide, quality){
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+        const w = Math.round(img.width * scale);
+        const h = Math.round(img.height * scale);
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, w, h);
+        canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('toBlob null')), 'image/jpeg', quality);
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
 }
 
 function setFieldValue(field, url){
