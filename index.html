@@ -342,7 +342,6 @@ p      { font-family:var(--font-body);    font-size:var(--fs-body); line-height:
     drop-shadow(0 0 28px rgba(255,0,0,0.78))
     drop-shadow(0 0 70px rgba(220,17,17,0.42));
   animation:
-    svgAtmoReveal 1.4s 0.2s cubic-bezier(.16,1,.3,1) forwards,
     svgFloat 7s 1.6s ease-in-out infinite,
     svgGlow  5s 1.6s ease-in-out infinite;
   will-change:transform,opacity,filter;
@@ -598,16 +597,11 @@ section{padding:6rem 2.5rem;}
 }
 
 /* Reveal animation */
-.reveal{
-  opacity:0;transform:translateY(28px);
-  transition:opacity 0.8s cubic-bezier(.16,1,.3,1),
-             transform 0.8s cubic-bezier(.16,1,.3,1);
-}
+.reveal{opacity:0;transform:translateY(28px);}
 .reveal.up{transform:translateY(28px);}
 .reveal.left{transform:translateX(-30px);}
 .reveal.right{transform:translateX(30px);}
 .reveal.scale{transform:scale(0.95);}
-.reveal.visible{opacity:1;transform:none;}
 
 /* Divider */
 .divider{
@@ -3269,28 +3263,8 @@ img { transition: opacity 0.4s ease; }
    FEATURE 3 ── SCROLL REVEAL (sections + stagger items)
 ═══════════════════════════════════════════════════════════ */
 @media (prefers-reduced-motion: no-preference) {
-  .reveal-section {
-    opacity: 0;
-    transform: translateY(36px);
-    transition: opacity .9s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1);
-    will-change: opacity, transform;
-  }
-  .reveal-section.in {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  .reveal-item {
-    opacity: 0;
-    transform: translateY(24px);
-    transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1);
-    transition-delay: var(--reveal-delay, 0ms);
-    will-change: opacity, transform;
-  }
-  .reveal-item.in {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  .reveal-section { opacity: 0; transform: translateY(36px); }
+  .reveal-item    { opacity: 0; transform: translateY(24px); }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -6108,6 +6082,11 @@ html.ticker-dismissed {
   }
 }
 </style>
+
+<!-- ═══ GSAP + ScrollTrigger ═══ -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script>if(window.gsap && window.ScrollTrigger) gsap.registerPlugin(ScrollTrigger);</script>
 
 <!-- ═══ PLAUSIBLE ANALYTICS (privacy-friendly, no cookies) ═══ -->
 <script defer data-domain="desmosmind.netlify.app" src="https://plausible.io/js/script.tagged-events.js"></script>
@@ -9080,14 +9059,25 @@ function toggleDrawer(){
 // ════════════════════════════════════
 // SCROLL REVEAL
 // ════════════════════════════════════
-const revealObserver = new IntersectionObserver((entries)=>{
-  entries.forEach((e,i)=>{
-    if(e.isIntersecting){
-      setTimeout(()=>e.target.classList.add('visible'), 0);
-      revealObserver.unobserve(e.target);
-    }
-  });
-},{threshold:0.08,rootMargin:'0px 0px -40px 0px'});
+// GSAP-powered reveal shim — exposes .observe() so dynamic render
+// functions (renderProducts, renderReviews, etc.) continue to work.
+const revealObserver = (function(){
+  const seen = new Set();
+  function observe(el){
+    if(seen.has(el)) return;
+    seen.add(el);
+    const dir = el.classList.contains('left')  ? {x:-30,y:0}
+              : el.classList.contains('right') ? {x:30, y:0}
+              : el.classList.contains('scale') ? {scale:0.95,y:0}
+              : {y:28};
+    gsap.fromTo(el,
+      {opacity:0,...dir},
+      {opacity:1,x:0,y:0,scale:1,duration:0.8,ease:'power3.out',
+       scrollTrigger:{trigger:el,start:'top 92%',once:true}}
+    );
+  }
+  return {observe, unobserve:()=>{}};
+})();
 document.querySelectorAll('.reveal').forEach(el=>revealObserver.observe(el));
 
 // ════════════════════════════════════
@@ -11001,9 +10991,7 @@ openProductForm = function(id){
 
 // ════════════════════════════════════════════════════════════
 // FEATURE 2 ── MAGNETIC BUTTONS
-// Damped cursor-pull on primary CTAs (skipped on touch / reduced motion).
-// Auto-attaches to .btn-primary / .modal-btn-cart / .cart-wa-btn,
-// excluding admin and form modal contexts.
+// GSAP quickTo magnetic pull on primary CTAs (skipped on touch / reduced motion).
 // ════════════════════════════════════════════════════════════
 (function initMagneticButtons(){
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -11020,39 +11008,16 @@ openProductForm = function(id){
   function attach(btn){
     if (btn.dataset.magnetic) return;
     btn.dataset.magnetic = '1';
-
-    let tx = 0, ty = 0, cx = 0, cy = 0;
-    let rafId = null;
-    let inside = false;
+    const xTo = gsap.quickTo(btn, 'x', {duration:0.5, ease:'power3.out'});
+    const yTo = gsap.quickTo(btn, 'y', {duration:0.5, ease:'power3.out'});
     const STRENGTH_X = 0.3;
     const STRENGTH_Y = 0.4;
-
-    function loop(){
-      cx += (tx - cx) * 0.18;
-      cy += (ty - cy) * 0.18;
-      btn.style.transform = `translate(${cx.toFixed(2)}px, ${cy.toFixed(2)}px)`;
-      if (Math.abs(tx - cx) > 0.1 || Math.abs(ty - cy) > 0.1) {
-        rafId = requestAnimationFrame(loop);
-      } else {
-        rafId = null;
-        if (!inside) btn.style.transform = '';
-      }
-    }
-
-    btn.addEventListener('mouseenter', () => { inside = true; });
     btn.addEventListener('mousemove', (e) => {
       const r = btn.getBoundingClientRect();
-      const x = e.clientX - r.left - r.width  / 2;
-      const y = e.clientY - r.top  - r.height / 2;
-      tx = x * STRENGTH_X;
-      ty = y * STRENGTH_Y;
-      if (!rafId) loop();
+      xTo((e.clientX - r.left - r.width  / 2) * STRENGTH_X);
+      yTo((e.clientY - r.top  - r.height / 2) * STRENGTH_Y);
     });
-    btn.addEventListener('mouseleave', () => {
-      inside = false;
-      tx = 0; ty = 0;
-      if (!rafId) loop();
-    });
+    btn.addEventListener('mouseleave', () => { xTo(0); yTo(0); });
   }
 
   function rescan(){
@@ -11060,10 +11025,8 @@ openProductForm = function(id){
       if (!isExcluded(btn)) attach(btn);
     });
   }
-
   rescan();
 
-  // Re-scan when dynamic product/cart content renders (debounced)
   let scanTimer = null;
   const mo = new MutationObserver((mutations) => {
     let added = false;
@@ -11078,84 +11041,62 @@ openProductForm = function(id){
 })();
 
 // ════════════════════════════════════════════════════════════
-// FEATURE 3 ── SCROLL REVEAL (sections + grid stagger)
-// IntersectionObserver-based reveal:
-//   • Sections (except hero) fade up as they enter the viewport.
-//   • Items inside known grids stagger in with incremental delay.
-//   • Respects prefers-reduced-motion (no marking, no animation).
-//   • Handles dynamic content via MutationObserver on grids that have
-//     already triggered (new items revealed immediately).
+// FEATURE 3 ── SCROLL REVEAL — GSAP ScrollTrigger
+//   • Sections (except hero) fade up on enter.
+//   • Known grid children stagger in.
+//   • Product cards batch-stagger via ScrollTrigger.batch().
+//   • MutationObserver re-applies to dynamically added grid items.
 // ════════════════════════════════════════════════════════════
 (function initScrollReveal(){
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   const STAGGER_GRIDS = [
-    '.trust-grid',
-    '.cat-grid',
-    '.how-grid',
-    '.test-grid',
-    '.faq-list'
+    '.trust-grid', '.cat-grid', '.how-grid', '.test-grid', '.faq-list'
   ];
-  const STAGGER_MS = 70;
-  const STAGGER_MAX = 600;
 
-  // 1. Mark sections (except hero)
-  document.querySelectorAll('section').forEach(section => {
-    if (section.classList.contains('hero')) return;
+  // Sections fade up
+  document.querySelectorAll('section:not(.hero)').forEach(section => {
     section.classList.add('reveal-section');
+    gsap.fromTo(section,
+      {opacity:0, y:40},
+      {opacity:1, y:0, duration:0.9, ease:'power3.out',
+       scrollTrigger:{trigger:section, start:'top 88%', once:true}}
+    );
   });
 
-  // 2. Mark grid items (per-parent indexing)
-  function markGridItems(grid){
-    Array.from(grid.children).forEach((child, idx) => {
-      if (child.dataset.revealMarked) return;
-      child.dataset.revealMarked = '1';
-      child.classList.add('reveal-item');
-      const delay = Math.min(idx * STAGGER_MS, STAGGER_MAX);
-      child.style.setProperty('--reveal-delay', delay + 'ms');
-      // If grid is already revealed, fade in immediately
-      if (grid.dataset.revealTriggered) {
-        requestAnimationFrame(() => child.classList.add('in'));
-      }
-    });
+  // Grid item stagger
+  function animateGrid(grid){
+    if(grid.dataset.gsapReveal) return;
+    grid.dataset.gsapReveal = '1';
+    gsap.fromTo(Array.from(grid.children),
+      {opacity:0, y:24},
+      {opacity:1, y:0, duration:0.6, stagger:0.07, ease:'power3.out',
+       scrollTrigger:{trigger:grid, start:'top 88%', once:true}}
+    );
   }
+  document.querySelectorAll(STAGGER_GRIDS.join(',')).forEach(animateGrid);
 
-  document.querySelectorAll(STAGGER_GRIDS.join(',')).forEach(markGridItems);
+  // Product cards — batch stagger entrance
+  ScrollTrigger.batch('.prod-card', {
+    start: 'top 90%',
+    onEnter: batch => gsap.fromTo(batch,
+      {opacity:0, y:40},
+      {opacity:1, y:0, duration:0.7, stagger:0.07, ease:'power3.out'}
+    ),
+    once: true,
+  });
 
-  // 3. IntersectionObserver
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-      entry.target.classList.add('in');
-      // Trigger stagger children
-      entry.target.querySelectorAll('.reveal-item').forEach(item => {
-        item.classList.add('in');
-      });
-      // Mark each contained grid as triggered (for future dynamic items)
-      entry.target.querySelectorAll(STAGGER_GRIDS.join(',')).forEach(g => {
-        g.dataset.revealTriggered = '1';
-      });
-      io.unobserve(entry.target);
-    });
-  }, { rootMargin: '-60px 0px', threshold: 0.04 });
-
-  document.querySelectorAll('.reveal-section').forEach(s => io.observe(s));
-
-  // 4. Watch for dynamic items added to known grids after their section
-  // already triggered (e.g., products re-render, FAQ adds).
+  // Watch for dynamic grid children (re-renders)
   const gridMO = new MutationObserver((mutations) => {
-    for (const m of mutations) {
-      if (!m.addedNodes.length) continue;
-      // If the target itself is one of our grids, mark new children
-      const parent = m.target;
-      if (parent.matches && parent.matches(STAGGER_GRIDS.join(','))) {
-        markGridItems(parent);
-      }
+    for(const m of mutations){
+      if(!m.addedNodes.length) continue;
+      if(m.target.matches && m.target.matches(STAGGER_GRIDS.join(',')))
+        animateGrid(m.target);
     }
   });
-  document.querySelectorAll(STAGGER_GRIDS.join(',')).forEach(grid => {
-    gridMO.observe(grid, { childList: true });
-  });
+  document.querySelectorAll(STAGGER_GRIDS.join(',')).forEach(g =>
+    gridMO.observe(g, {childList:true})
+  );
 })();
 
 </script>
@@ -11499,111 +11440,74 @@ openProductForm = function(id){
 </script>
 <script>
 // ════════════════════════════════════
-// BAT SCROLL ANIMATION — STICKY STAGE
+// BAT SCROLL ANIMATION — GSAP ScrollTrigger
 // ════════════════════════════════════
 (function(){
   const bat     = document.querySelector('.hero-bat-svg');
   const stage   = document.querySelector('.hero-scroll-stage');
   const glow    = document.querySelector('.hero-glow');
   const content = document.querySelector('.hero-content');
-  const title   = document.querySelector('.hero-title');
-  const tagline = document.querySelector('.hero-tagline');
-  const btns    = document.querySelector('.hero-btns');
-  const stats   = document.querySelector('.hero-stats');
-  const eyebrow = document.querySelector('.hero-eyebrow');
-  const sub     = document.querySelector('.hero-sub');
-  if(!bat || !stage) return;
+  if(!bat) return;
 
-  const ease    = t => t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
-  const clamp   = (v,a,b) => Math.min(Math.max(v,a),b);
-  const norm    = (v,a,b) => clamp((v-a)/(b-a),0,1);
+  // Entrance: fade in (replaces removed svgAtmoReveal CSS animation)
+  const entranceTween = gsap.to(bat, {
+    opacity: 1, duration: 1.4, delay: 0.2, ease: 'power3.out'
+  });
 
-  let raf = null;
-  let paused = false;
+  if(!stage) return;
 
-  function tick(){
-    raf = null;
-    const stageTop  = stage.getBoundingClientRect().top + window.scrollY;
-    const stageH    = stage.offsetHeight - window.innerHeight;
-    const scrolled  = window.scrollY - stageTop;
-    // progress 0→1 across the scrollable portion of the stage
-    const p = clamp(scrolled / stageH, 0, 1);
-
-    // Pause/resume CSS float
-    if(p > 0.01 && !paused){
-      bat.style.animationPlayState = 'paused';
-      paused = true;
-    } else if(p <= 0.01 && paused){
-      bat.style.animationPlayState = 'running';
-      paused = false;
+  // Hand centering to GSAP and pause CSS float when scroll begins
+  const batTL = gsap.timeline({
+    scrollTrigger: {
+      trigger: stage,
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: 1,
+      onEnter() {
+        entranceTween.kill();
+        gsap.set(bat, {xPercent:-50, yPercent:-50, opacity:1});
+        bat.style.animationPlayState = 'paused';
+      },
+      onLeaveBack() {
+        bat.style.animationPlayState = 'running';
+        gsap.set(bat, {clearProps:'transform,opacity'});
+      }
     }
+  });
 
-    if(p <= 0){
-      bat.style.transform = '';
-      bat.style.opacity   = '';
-      bat.style.filter    = '';
-      if(glow) glow.style.opacity = '';
-      [content,title,tagline,btns,stats,eyebrow,sub].forEach(el=>{ if(el){ el.style.opacity=''; el.style.transform=''; }});
-      return;
-    }
+  // Phase 1 (0–20%): awaken — pulse scale
+  batTL.to(bat, {scale:1.05, duration:0.2, ease:'sine.inOut'});
 
-    // ── PHASE 1: 0–0.2 — AWAKEN: heartbeat + glow flare ──
-    // ── PHASE 2: 0.2–0.55 — FLAP: wing beats + slow rise ──
-    // ── PHASE 3: 0.55–1.0 — FLY: accelerate up + vanish ──
+  // Phase 2 (20–55%): rise with wing-spread
+  batTL.to(bat, {
+    y:-50, scaleX:1.13, scaleY:0.9, skewX:3,
+    filter:'drop-shadow(0 0 16px rgba(255,20,20,1)) drop-shadow(0 0 50px rgba(255,0,0,0.85)) drop-shadow(0 0 100px rgba(220,17,17,0.5))',
+    duration:0.35, ease:'power2.inOut'
+  });
 
-    let sx=1, sy=1, ty=0, tx=0, skew=0, batOpacity=1, bright=1;
+  // Phase 3 (55–100%): fly up and vanish
+  batTL.to(bat, {
+    y:-260, scaleX:0.75, scaleY:0.65, skewX:0, opacity:0,
+    filter:'drop-shadow(0 0 4px rgba(255,20,20,0.4))',
+    duration:0.45, ease:'power3.in'
+  });
 
-    if(p < 0.2){
-      const t = norm(p, 0, 0.2);
-      const pulse = Math.sin(t * Math.PI * 4) * 0.05;
-      sx = 1 + pulse;
-      sy = 1 + pulse * 0.6;
-      bright = 1 + t * 1.2;
-      if(glow) glow.style.opacity = 0.8 + t * 1.4;
-
-    } else if(p < 0.55){
-      const t = norm(p, 0.2, 0.55);
-      const flap = Math.sin(t * Math.PI * 5 * 2); // 5 full beats
-      sx   = 1.05 + Math.abs(flap) * 0.08;
-      sy   = 1.0  - Math.abs(flap) * 0.1;
-      skew = flap * 4;
-      ty   = -ease(t) * 50;
-      bright = 2 - t * 0.5;
-      batOpacity = 1;
-      if(glow) glow.style.opacity = 1.8 - t * 0.6;
-
-    } else {
-      const t = norm(p, 0.55, 1.0);
-      const et = ease(t);
-      sx   = 1.1  - et * 0.35;
-      sy   = 0.95 - et * 0.3;
-      ty   = -50  - et * 220;
-      tx   = Math.sin(et * Math.PI * 2) * 30;
-      batOpacity = 1 - et * 1.2;
-      bright = 2.5 - et * 2.2;
-      if(glow) glow.style.opacity = Math.max(0, 1.2 - et * 1.5);
-    }
-
-    bat.style.transform = `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(${sx},${sy}) skewX(${skew}deg)`;
-    bat.style.opacity   = Math.max(0, Math.min(1, batOpacity));
-    bat.style.filter    = `drop-shadow(0 0 ${8+bright*8}px rgba(255,20,20,1)) drop-shadow(0 0 ${28+bright*22}px rgba(255,0,0,${0.7+bright*0.08})) drop-shadow(0 0 ${65+bright*35}px rgba(220,17,17,${0.35+bright*0.04}))`;
-
-    // Content: stays fully visible until phase 2, then fades and rises
-    const contentFade = norm(p, 0.25, 0.7);
-    const contentEase = ease(contentFade);
-    if(content){
-      content.style.opacity  = Math.max(0, 1 - contentEase * 1.1);
-      content.style.transform = `translateY(${-contentEase * 60}px)`;
-    }
+  // Glow flare then fade
+  if(glow){
+    gsap.timeline({
+      scrollTrigger:{trigger:stage,start:'top top',end:'bottom bottom',scrub:1}
+    })
+    .to(glow, {opacity:2.2, duration:0.35})
+    .to(glow, {opacity:0,   duration:0.65});
   }
 
-  function onScroll(){
-    if(!raf) raf = requestAnimationFrame(tick);
+  // Hero content fades and rises from 25% scroll onward
+  if(content){
+    gsap.timeline({
+      scrollTrigger:{trigger:stage,start:'top top',end:'bottom bottom',scrub:1}
+    })
+    .to(content, {opacity:0, y:-60, duration:0.45, ease:'power2.in'}, 0.25);
   }
-
-  window.addEventListener('scroll', onScroll, { passive: true });
-  // Run once on load in case page is already scrolled
-  tick();
 })();
 
 // ════════════════════════════════════════════════════════════
