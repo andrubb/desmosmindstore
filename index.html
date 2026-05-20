@@ -8528,6 +8528,211 @@ footer::before {
   #prod-modal.luxury-modal .modal-thumb { flex: 0 0 auto; }
   .modal-trust { gap: 0.4rem 0.85rem; font-size: 0.65rem; }
 }
+
+/* ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+   FEATURE 50 ── PHASE 2 HERO/NAV/DROPS/CATS/BRANDS POLISH
+   No changes to hero particles canvas. Stronger glitch on DESMOS,
+   added breathing red glow on MIND, scroll-hint fade-out on first
+   scroll. Categories, drops, brands also tightened.
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ */
+
+/* ── 50.1 STRONGER GLITCH on DESMOS/MIND ── */
+.hero-title-desmos::before {
+  animation: glitch-top-pro 2.6s infinite linear !important;
+}
+.hero-title-desmos::after {
+  animation: glitch-bot-pro 2.6s infinite linear !important;
+  animation-delay: 0.13s;
+}
+.hero-title-mind::before {
+  animation: glitch-top-pro 2.6s infinite linear !important;
+  animation-delay: 0.2s;
+}
+.hero-title-mind::after {
+  animation: glitch-bot-pro 2.6s infinite linear !important;
+  animation-delay: 0.32s;
+}
+@keyframes glitch-top-pro {
+  0%, 70%, 100% { opacity: 0; transform: translateX(0); }
+  71% { opacity: 1; transform: translateX(-12px); clip-path: polygon(0 8%, 100% 8%, 100% 32%, 0 32%); }
+  72% { opacity: 0; }
+  74% { opacity: 0.9; transform: translateX(8px); clip-path: polygon(0 18%, 100% 18%, 100% 42%, 0 42%); }
+  75% { opacity: 0; }
+  78% { opacity: 1; transform: translateX(-10px); clip-path: polygon(0 5%, 100% 5%, 100% 24%, 0 24%); }
+  80% { opacity: 0; }
+  85% { opacity: 0.7; transform: translateX(14px); clip-path: polygon(0 12%, 100% 12%, 100% 36%, 0 36%); }
+  87% { opacity: 0; }
+  92% { opacity: 0.85; transform: translateX(-8px); clip-path: polygon(0 22%, 100% 22%, 100% 46%, 0 46%); }
+  93% { opacity: 0; }
+}
+@keyframes glitch-bot-pro {
+  0%, 72%, 100% { opacity: 0; transform: translateX(0); }
+  73% { opacity: 1; transform: translateX(12px); clip-path: polygon(0 58%, 100% 58%, 100% 80%, 0 80%); }
+  74% { opacity: 0; }
+  77% { opacity: 0.85; transform: translateX(-8px); clip-path: polygon(0 68%, 100% 68%, 100% 90%, 0 90%); }
+  79% { opacity: 0; }
+  82% { opacity: 1; transform: translateX(10px); clip-path: polygon(0 55%, 100% 55%, 100% 76%, 0 76%); }
+  83% { opacity: 0; }
+  88% { opacity: 0.7; transform: translateX(-14px); clip-path: polygon(0 62%, 100% 62%, 100% 84%, 0 84%); }
+  90% { opacity: 0; }
+  95% { opacity: 0.8; transform: translateX(6px); clip-path: polygon(0 70%, 100% 70%, 100% 92%, 0 92%); }
+  96% { opacity: 0; }
+}
+
+/* ── 50.2 MIND breathing red glow (4s loop, opacity 0.4 → 1 → 0.4) ── */
+.hero-title-mind {
+  animation: mind-breathe 4s ease-in-out infinite;
+}
+@keyframes mind-breathe {
+  0%, 100% {
+    text-shadow:
+      0 0 8px rgba(220,17,17,0.4),
+      0 0 22px rgba(220,17,17,0.32),
+      0 4px 24px rgba(0,0,0,0.95);
+  }
+  50% {
+    text-shadow:
+      0 0 18px rgba(255,40,40,1),
+      0 0 38px rgba(220,17,17,0.85),
+      0 0 70px rgba(220,17,17,0.45),
+      0 4px 24px rgba(0,0,0,0.95);
+  }
+}
+
+/* ── 50.3 Scroll hint — animated arrow + fade after first scroll ── */
+.scroll-hint {
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.scroll-hint.faded {
+  opacity: 0 !important;
+  transform: translateX(-50%) translateY(20px);
+  pointer-events: none;
+}
+
+/* ── 50.4 Drops slider cinematic upgrades ── */
+.drop-slide {
+  background-size: cover !important;
+  background-position: center !important;
+  position: relative;
+  overflow: hidden;
+  min-height: clamp(380px, 60vh, 600px);
+}
+.drop-slide::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(5,5,5,0.55) 60%, rgba(5,5,5,0.92) 100%),
+    radial-gradient(ellipse 80% 70% at 30% 50%, rgba(220,17,17,0.15), transparent 70%);
+  pointer-events: none;
+  z-index: 1;
+}
+.drop-slide-content {
+  position: relative;
+  z-index: 2;
+  padding: clamp(2rem, 5vw, 4rem);
+  max-width: 720px;
+}
+.drop-slide-content h3 {
+  text-shadow: 0 4px 24px rgba(0,0,0,0.85);
+}
+.drop-slide-content p {
+  text-shadow: 0 2px 12px rgba(0,0,0,0.75);
+  color: rgba(255,255,255,0.92) !important;
+}
+.drop-slide-content .btn-primary {
+  box-shadow:
+    0 6px 24px rgba(220,17,17,0.55),
+    0 0 0 1px rgba(255,255,255,0.05) inset;
+}
+.drops-nav-btn,
+.drops-arrow {
+  background: rgba(0,0,0,0.6) !important;
+  border: 1px solid rgba(220,17,17,0.35) !important;
+  color: white !important;
+  transition: background 0.3s, border-color 0.3s, box-shadow 0.4s, transform 0.25s;
+}
+.drops-nav-btn:hover,
+.drops-arrow:hover {
+  background: rgba(220,17,17,0.85) !important;
+  border-color: var(--red) !important;
+  box-shadow: 0 0 26px rgba(220,17,17,0.6) !important;
+  transform: translateY(-50%) scale(1.05);
+}
+
+/* Countdown timer overlay on drops with a `fecha` field that contains
+   an ISO date. Hidden by default; the JS renderer fills it in. */
+.drop-countdown {
+  display: inline-flex;
+  gap: 0.8rem;
+  margin-top: 1.4rem;
+  font-family: var(--font-display);
+  letter-spacing: 0.06em;
+}
+.drop-countdown-unit {
+  text-align: center;
+  background: rgba(0,0,0,0.55);
+  border: 1px solid rgba(220,17,17,0.32);
+  padding: 0.5rem 0.85rem;
+  min-width: 56px;
+}
+.drop-countdown-num {
+  font-size: 1.6rem;
+  color: var(--white);
+  line-height: 1;
+  text-shadow: 0 0 12px rgba(220,17,17,0.4);
+}
+.drop-countdown-label {
+  font-family: var(--font-body);
+  font-size: 0.55rem;
+  letter-spacing: 0.22em;
+  color: var(--text-weak);
+  text-transform: uppercase;
+  margin-top: 0.3rem;
+}
+
+/* ── 50.5 Brands marquee — hover pause + per-brand red glow ── */
+.brands-band:hover .marquee-track {
+  animation-play-state: paused;
+}
+.brand-item {
+  cursor: default;
+  position: relative;
+  transition: color 0.3s ease, text-shadow 0.3s ease, transform 0.3s ease;
+}
+.brand-item:hover {
+  color: white;
+  text-shadow:
+    0 0 12px rgba(220,17,17,0.85),
+    0 0 26px rgba(220,17,17,0.5);
+  transform: scale(1.05);
+}
+
+/* ── 50.6 Category card 3D tilt is already on .cat-card via scroll
+   parallax. Add hover-driven tilt enhancement (CSS-only, low overhead). */
+.cat-card {
+  transform-origin: center;
+  will-change: transform;
+}
+.cat-card:hover {
+  z-index: 2;
+}
+
+/* ── 50.7 Navbar scrolled — extra blur intensity ── */
+@media (min-width: 901px) {
+  #navbar.scrolled {
+    background: rgba(3, 3, 3, 0.78) !important;
+    backdrop-filter: blur(20px) saturate(1.2) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(1.2) !important;
+  }
+}
+@media (max-width: 900px) {
+  #navbar.scrolled {
+    background: rgba(3, 3, 3, 0.96) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+  }
+}
 </style>
 
 <!-- ═══ GSAP + ScrollTrigger ═══ -->
@@ -15579,6 +15784,89 @@ function updateBottomTabBadges(){
 })();
 
 // ════════════════════════════════════════════════════════════
+// FEATURE 50 ── PHASE 2 POLISH (scroll-hint fade, cat→filter,
+// drops countdown). Plays nice with existing motion code.
+// ════════════════════════════════════════════════════════════
+(function initScrollHintFade(){
+  const hint = document.querySelector('.scroll-hint');
+  if (!hint) return;
+  let faded = false;
+  function fade(){
+    if (faded) return;
+    if (window.scrollY > 80) {
+      faded = true;
+      hint.classList.add('faded');
+      window.removeEventListener('scroll', fade);
+    }
+  }
+  window.addEventListener('scroll', fade, { passive: true });
+})();
+
+// Category click → smooth scroll to products + apply matching filter
+(function initCategoryClickFilter(){
+  document.addEventListener('click', (e) => {
+    const card = e.target.closest && e.target.closest('.cat-card');
+    if (!card) return;
+    // The onclick attribute already calls filterProducts; we just smooth-scroll
+    // to the stock section AFTER the filter is applied.
+    setTimeout(() => {
+      const stock = document.getElementById('stock');
+      if (stock) {
+        const top = stock.getBoundingClientRect().top + window.scrollY - 80;
+        window.scrollTo({ top, behavior: 'smooth' });
+      }
+    }, 100);
+  });
+})();
+
+// Drops countdown — if a drop's `fecha` field parses as an ISO date in the
+// future, render days/hours/minutes/seconds inside its slide.
+function renderDropCountdowns(){
+  const slides = document.querySelectorAll('.drop-slide');
+  slides.forEach((slide, idx) => {
+    const drop = drops && drops[idx];
+    if (!drop || !drop.fecha) return;
+    const target = Date.parse(drop.fecha);
+    if (isNaN(target) || target < Date.now()) return;
+    let mount = slide.querySelector('.drop-countdown');
+    if (!mount) {
+      mount = document.createElement('div');
+      mount.className = 'drop-countdown';
+      mount.innerHTML = ['days','hours','mins','secs'].map(u =>
+        `<div class="drop-countdown-unit"><div class="drop-countdown-num" data-u="${u}">0</div><div class="drop-countdown-label">${u}</div></div>`
+      ).join('');
+      const content = slide.querySelector('.drop-slide-content') || slide;
+      content.appendChild(mount);
+    }
+  });
+}
+function tickDropCountdowns(){
+  document.querySelectorAll('.drop-countdown').forEach((cd, idx) => {
+    const slide = cd.closest('.drop-slide');
+    const dropIdx = Array.from(document.querySelectorAll('.drop-slide')).indexOf(slide);
+    const drop = drops && drops[dropIdx];
+    if (!drop || !drop.fecha) return;
+    const target = Date.parse(drop.fecha);
+    if (isNaN(target)) return;
+    const diff = Math.max(0, target - Date.now());
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    const set = (u, v) => {
+      const el = cd.querySelector(`[data-u="${u}"]`);
+      if (el) el.textContent = String(v).padStart(2,'0');
+    };
+    set('days', d); set('hours', h); set('mins', m); set('secs', s);
+  });
+}
+// Boot the countdown when drops render
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => { renderDropCountdowns(); tickDropCountdowns(); }, 600);
+  setInterval(tickDropCountdowns, 1000);
+});
+
+// ════════════════════════════════════════════════════════════
 // FEATURE 47 ── GSAP NON-HERO ENHANCEMENTS
 // Lazy-loads GSAP + ScrollTrigger ONLY after first interaction
 // or 3.5s idle. NEVER touches hero particles, glitch, bat scroll,
@@ -15723,6 +16011,65 @@ function updateBottomTabBadges(){
         }
       });
     });
+
+    // ── 47.7 Hero text parallax (does NOT touch particles or bat canvas) ──
+    const heroContent = document.querySelector('.hero-content, .hero .hero-content');
+    if (heroContent) {
+      gsap.to(heroContent, {
+        y: -90,
+        opacity: 0.4,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.hero',
+          start: 'top top',
+          end: 'bottom top',
+          scrub: 0.6
+        }
+      });
+    }
+
+    // ── 47.8 Category card 3D tilt-follow on cursor (desktop only) ──
+    if (!isTouch) {
+      document.querySelectorAll('.cat-card').forEach(card => {
+        let rx = 0, ry = 0;
+        card.addEventListener('mousemove', (e) => {
+          const r = card.getBoundingClientRect();
+          const px = (e.clientX - r.left) / r.width;
+          const py = (e.clientY - r.top)  / r.height;
+          rx = (0.5 - py) * 8;
+          ry = (px - 0.5) * 8;
+          gsap.to(card, {
+            rotateX: rx, rotateY: ry,
+            duration: 0.35, ease: 'power2.out',
+            transformPerspective: 1100,
+            transformOrigin: 'center'
+          });
+        });
+        card.addEventListener('mouseleave', () => {
+          gsap.to(card, { rotateX: 0, rotateY: 0, duration: 0.55, ease: 'power3.out' });
+        });
+      });
+    }
+
+    // ── 47.9 Products grid stagger on enter ──
+    const productsGrid = document.getElementById('products-grid');
+    if (productsGrid) {
+      ScrollTrigger.create({
+        trigger: productsGrid,
+        start: 'top 82%',
+        once: true,
+        onEnter: () => {
+          const cards = productsGrid.querySelectorAll('.prod-card, .featured-hero');
+          if (cards.length) {
+            gsap.from(cards, {
+              y: 28, opacity: 0,
+              duration: 0.55, ease: 'power2.out',
+              stagger: 0.05
+            });
+          }
+        }
+      });
+    }
 
     // Telemetry — confirm enhancements booted
     if (typeof track === 'function') track('GSAP Boot');
