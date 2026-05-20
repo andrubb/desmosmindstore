@@ -48,7 +48,7 @@
 <!-- ═══ FUENTES ═══ -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,700&family=Barlow+Condensed:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <!-- ═══ DATOS ESTRUCTURADOS (Schema.org) — para Google ═══ -->
 <script type="application/ld+json">
@@ -8852,6 +8852,662 @@ select:focus, textarea:focus {
   .featured-hero .fh-body { padding: 1.4rem 1.2rem !important; }
   .fh-name { font-size: 1.4rem !important; }
 }
+
+/* ═══ PREMIUM POLISH LAYER (frontend-design skill) ═══ */
+/* ═══════════════════════════════════════════════════════════════
+   DESMOS MIND — FRONTEND-DESIGN PREMIUM POLISH LAYER
+   Injected on top of existing styles. Zero breakage.
+   Targets: typography depth, texture, motion, spacing, editorial feel.
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── 1. FONT UPGRADE — add editorial weight ── */
+:root {
+  --font-condensed: 'Barlow Condensed', sans-serif;
+  /* Extended palette */
+  --red-ultra: #ff0000;
+  --red-coal:  rgba(220,17,17,0.06);
+  --grain-opacity: 0.035;
+  --glass: rgba(255,255,255,0.03);
+  --glass-border: rgba(255,255,255,0.07);
+}
+
+/* ── 2. GLOBAL GRAIN TEXTURE — cinematic atmosphere ── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity: var(--grain-opacity);
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: overlay;
+  animation: grain-shift 0.5s steps(2) infinite;
+}
+@keyframes grain-shift {
+  0%   { transform: translate(0, 0); }
+  25%  { transform: translate(-1%, 1%); }
+  50%  { transform: translate(1%, -1%); }
+  75%  { transform: translate(-1%, -1%); }
+  100% { transform: translate(1%, 1%); }
+}
+
+/* ── 3. HERO — depth & atmosphere ── */
+#hero {
+  background: 
+    radial-gradient(ellipse 80% 60% at 50% 30%, rgba(220,17,17,0.07) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 30% at 20% 70%, rgba(220,17,17,0.04) 0%, transparent 50%),
+    #050505;
+}
+
+/* Hero title — deeper shadow stack */
+.hero-title-desmos {
+  text-shadow: 
+    0 0 80px rgba(220,17,17,0.3),
+    0 0 160px rgba(220,17,17,0.1),
+    2px 2px 0 rgba(0,0,0,0.8);
+  letter-spacing: 0.04em;
+}
+
+.hero-title-mind {
+  text-shadow: 
+    0 0 40px rgba(220,17,17,0.5),
+    0 0 100px rgba(220,17,17,0.2);
+  letter-spacing: 0.02em;
+}
+
+/* Hero eyebrow — sharper */
+.hero-eyebrow-text {
+  font-family: var(--font-condensed);
+  font-weight: 600;
+  letter-spacing: 0.35em;
+  font-size: 0.7rem;
+  color: rgba(212,208,200,0.6);
+}
+
+/* Hero tagline — refined */
+.hero-tagline {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: clamp(0.9rem, 1.5vw, 1.05rem);
+  line-height: 1.75;
+  color: rgba(212,208,200,0.65);
+  letter-spacing: 0.02em;
+  max-width: 42ch;
+}
+
+/* Hero sub — condensed style */
+.hero-sub {
+  font-family: var(--font-condensed);
+  font-weight: 500;
+  letter-spacing: 0.25em;
+  font-size: 0.8rem;
+  color: rgba(220,17,17,0.8);
+  text-transform: uppercase;
+}
+
+/* Hero stats — editorial */
+.hero-stat-num {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  line-height: 1;
+  letter-spacing: 0.04em;
+  color: var(--white);
+}
+.hero-stat-num em {
+  color: var(--red);
+  font-style: normal;
+}
+.hero-stat-label {
+  font-family: var(--font-condensed);
+  font-size: 0.62rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--muted2);
+  font-weight: 600;
+}
+
+/* ── 4. NAVBAR — ultra-refined ── */
+#navbar {
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.4s ease, background 0.4s ease;
+}
+#navbar.scrolled {
+  border-bottom-color: rgba(220,17,17,0.12);
+}
+
+/* Nav links — condensed bold */
+.nav-links a {
+  font-family: var(--font-condensed);
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+}
+
+/* ── 5. BRANDS MARQUEE — premium feel ── */
+.brands-band {
+  border-top: 1px solid rgba(220,17,17,0.08);
+  border-bottom: 1px solid rgba(220,17,17,0.08);
+  background: linear-gradient(90deg, var(--bg) 0%, rgba(220,17,17,0.02) 50%, var(--bg) 100%);
+}
+
+.brand-item {
+  font-family: var(--font-condensed);
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.3em;
+  color: rgba(212,208,200,0.35);
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+.brand-item:hover {
+  color: var(--white);
+  text-shadow: 0 0 20px rgba(220,17,17,0.6);
+}
+
+.brand-sep {
+  color: rgba(220,17,17,0.3) !important;
+  font-size: 0.5rem;
+}
+
+/* ── 6. SECTION HEADERS — editorial upgrade ── */
+.sec-eyebrow {
+  font-family: var(--font-condensed);
+  font-weight: 700;
+  letter-spacing: 0.35em;
+  font-size: 0.65rem;
+  color: var(--red);
+  text-transform: uppercase;
+}
+
+/* ── 7. PRODUCT CARDS — luxury depth ── */
+.prod-card {
+  background: linear-gradient(145deg, var(--bg3) 0%, rgba(14,14,14,0.8) 100%);
+  border: 1px solid var(--border);
+  transition: transform 0.4s var(--ease-emph), border-color 0.3s ease, box-shadow 0.4s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.prod-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(220,17,17,0.04) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.prod-card:hover::before {
+  opacity: 1;
+}
+
+.prod-card:hover {
+  transform: translateY(-6px) scale(1.01);
+  border-color: rgba(220,17,17,0.35);
+  box-shadow: 
+    0 20px 60px rgba(0,0,0,0.6),
+    0 0 0 1px rgba(220,17,17,0.1),
+    0 8px 30px rgba(220,17,17,0.08);
+}
+
+/* Card image container */
+.prod-img-wrap {
+  overflow: hidden;
+  position: relative;
+}
+.prod-img-wrap img {
+  transition: transform 0.6s var(--ease-emph);
+  will-change: transform;
+}
+.prod-card:hover .prod-img-wrap img {
+  transform: scale(1.06);
+}
+
+/* Card name */
+.prod-name {
+  font-family: var(--font-display);
+  letter-spacing: 0.06em;
+  line-height: 1.1;
+}
+
+/* Card price */
+.prod-price {
+  font-family: var(--font-condensed);
+  font-weight: 700;
+  color: var(--white);
+  font-size: 1.05rem;
+  letter-spacing: 0.05em;
+}
+
+/* Brand badge on cards */
+.prod-brand {
+  font-family: var(--font-condensed);
+  font-weight: 700;
+  font-size: 0.58rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(220,17,17,0.7);
+}
+
+/* ── 8. PRODUCT MODAL — Darc Sport / Palace level ── */
+.modal-inner {
+  background: 
+    linear-gradient(135deg, rgba(220,17,17,0.03) 0%, transparent 40%),
+    linear-gradient(to bottom, var(--bg2) 0%, var(--bg) 100%);
+  border: 1px solid rgba(220,17,17,0.15);
+}
+
+/* Modal product name */
+#modal-name {
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+  line-height: 1.0;
+  color: var(--white);
+  text-shadow: 0 2px 20px rgba(0,0,0,0.5);
+}
+
+/* Modal price */
+#modal-price {
+  font-family: var(--font-condensed);
+  font-weight: 800;
+  font-size: 1.6rem;
+  letter-spacing: 0.05em;
+  color: var(--white);
+}
+
+/* Modal brand chip */
+.modal-brand-chip {
+  font-family: var(--font-condensed) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.22em !important;
+  font-size: 0.6rem !important;
+  text-transform: uppercase;
+  background: rgba(220,17,17,0.08) !important;
+  border: 1px solid rgba(220,17,17,0.2) !important;
+  padding: 0.3rem 0.7rem !important;
+  border-radius: 2px !important;
+}
+
+/* Modal thumb images */
+.modal-thumb {
+  border: 1px solid rgba(255,255,255,0.06);
+  transition: border-color 0.25s ease, opacity 0.25s ease;
+  border-radius: 2px;
+  overflow: hidden;
+}
+.modal-thumb:hover,
+.modal-thumb.active {
+  border-color: var(--red) !important;
+}
+
+/* Modal add to cart */
+.modal-btn-cart,
+#msb-add-btn {
+  font-family: var(--font-condensed);
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+}
+.modal-btn-cart::after,
+#msb-add-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+  transition: left 0.5s ease;
+}
+.modal-btn-cart:hover::after,
+#msb-add-btn:hover::after {
+  left: 100%;
+}
+
+/* ── 9. FILTER BAR — premium chips ── */
+.filter-btn {
+  font-family: var(--font-condensed);
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  position: relative;
+}
+.filter-btn.active {
+  box-shadow: 
+    0 0 0 1px var(--red),
+    0 0 20px rgba(220,17,17,0.2),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+/* ── 10. FEATURED HERO CARD ── */
+.featured-hero {
+  background: linear-gradient(135deg, rgba(220,17,17,0.06) 0%, var(--bg3) 50%, rgba(0,0,0,0.8) 100%) !important;
+  border: 1px solid rgba(220,17,17,0.2) !important;
+  box-shadow: 
+    0 0 0 1px rgba(220,17,17,0.06),
+    0 30px 80px rgba(0,0,0,0.5),
+    inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+.fh-name {
+  font-family: var(--font-display);
+  letter-spacing: 0.04em;
+  line-height: 1.0;
+  text-shadow: 0 0 40px rgba(0,0,0,0.8);
+}
+
+.fh-tag {
+  font-family: var(--font-condensed);
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  font-size: 0.6rem;
+}
+
+/* ── 11. TRUST BADGES ── */
+.trust-item {
+  transition: transform 0.3s ease;
+}
+.trust-item:hover {
+  transform: translateY(-3px);
+}
+
+.trust-label {
+  font-family: var(--font-condensed);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  font-size: 0.72rem;
+}
+
+/* ── 12. DROPS SLIDER ── */
+.drop-slide {
+  position: relative;
+}
+.drop-slide::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: 
+    linear-gradient(to top, rgba(5,5,5,0.85) 0%, transparent 50%),
+    linear-gradient(to right, rgba(5,5,5,0.4) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.drop-title {
+  font-family: var(--font-display);
+  letter-spacing: 0.05em;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.9);
+}
+
+.drop-tag {
+  font-family: var(--font-condensed);
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  font-size: 0.6rem;
+}
+
+/* ── 13. CATEGORIES ── */
+.cat-card {
+  background: linear-gradient(145deg, var(--bg3), rgba(9,9,9,0.9));
+  border: 1px solid var(--border);
+  transition: transform 0.4s var(--ease-emph), border-color 0.3s ease, box-shadow 0.4s ease;
+  overflow: hidden;
+  position: relative;
+}
+.cat-card::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--red);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s var(--ease-emph));
+}
+.cat-card:hover::before {
+  transform: scaleX(1);
+}
+.cat-card:hover {
+  border-color: rgba(220,17,17,0.3);
+  box-shadow: 0 15px 50px rgba(0,0,0,0.5), 0 0 0 1px rgba(220,17,17,0.08);
+}
+
+.cat-label {
+  font-family: var(--font-condensed);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
+/* ── 14. TESTIMONIALS ── */
+.review-card {
+  background: linear-gradient(145deg, rgba(14,14,14,0.9), rgba(9,9,9,0.95));
+  border: 1px solid var(--border-white);
+  transition: transform 0.4s var(--ease-emph), border-color 0.3s ease, box-shadow 0.4s ease;
+}
+.review-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(220,17,17,0.15);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+
+/* ── 15. FAQ ── */
+.faq-q {
+  font-family: var(--font-condensed);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+/* ── 16. CONTACT CARDS ── */
+.contact-card {
+  background: linear-gradient(145deg, rgba(14,14,14,0.9), rgba(9,9,9,0.95));
+  border: 1px solid var(--border-white);
+  transition: transform 0.35s var(--ease-emph), border-color 0.3s ease;
+}
+.contact-card:hover {
+  transform: translateY(-4px);
+}
+
+/* ── 17. FOOTER — editorial ── */
+.footer-col-title {
+  font-family: var(--font-condensed);
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+}
+
+/* ── 18. BUTTONS — premium tactile ── */
+.btn-primary {
+  font-family: var(--font-condensed);
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.3s ease, background 0.3s ease;
+}
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  transition: left 0.6s ease;
+}
+.btn-primary:hover::before { left: 100%; }
+.btn-primary:active { transform: scale(0.96); }
+
+.btn-ghost {
+  font-family: var(--font-condensed);
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
+/* ── 19. SCROLLBAR — thinner and more elegant ── */
+::-webkit-scrollbar { width: 2px; }
+::-webkit-scrollbar-thumb { 
+  background: linear-gradient(to bottom, var(--red), rgba(220,17,17,0.3));
+  border-radius: 1px;
+}
+
+/* ── 20. SELECTION color ── */
+::selection {
+  background: rgba(220,17,17,0.3);
+  color: var(--white);
+}
+
+/* ── 21. LOADER — premium ── */
+#page-loader {
+  background: var(--bg) !important;
+}
+#page-loader .loader-logo {
+  font-family: var(--font-display);
+  letter-spacing: 0.15em;
+}
+
+/* ── 22. BOTTOM TAB BAR — glass morphism ── */
+#bottom-tab-bar {
+  background: rgba(5,5,5,0.88) !important;
+  backdrop-filter: blur(20px) saturate(1.4) !important;
+  border-top: 1px solid rgba(220,17,17,0.12) !important;
+}
+
+/* ── 23. CART PANEL — elevated ── */
+#cart-panel {
+  background: linear-gradient(to bottom, var(--bg2), var(--bg)) !important;
+  border-left: 1px solid rgba(220,17,17,0.12) !important;
+}
+
+/* ── 24. SEARCH OVERLAY ── */
+#search-overlay {
+  background: rgba(5,5,5,0.96) !important;
+  backdrop-filter: blur(30px) !important;
+}
+
+/* ── 25. WA FLOAT — pulse ring ── */
+#wa-float::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  border: 2px solid rgba(37,211,102,0.4);
+  animation: wa-ring-pulse 3s ease-out infinite;
+}
+@keyframes wa-ring-pulse {
+  0%   { transform: scale(1);   opacity: 0.6; }
+  70%  { transform: scale(1.3); opacity: 0; }
+  100% { transform: scale(1.3); opacity: 0; }
+}
+
+/* ── 26. TICKER BAR ── */
+.ticker-bar {
+  background: var(--red) !important;
+  border-bottom: none !important;
+}
+.ticker-text {
+  font-family: var(--font-condensed);
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  font-size: 0.65rem;
+}
+
+/* ── 27. SECTION dividers — subtle red glow ── */
+section + section::before,
+.section-divider {
+  background: linear-gradient(90deg, transparent 0%, rgba(220,17,17,0.2) 50%, transparent 100%) !important;
+}
+
+/* ── 28. PRODUCT SECTION editorial header ── */
+.sec-index {
+  font-family: var(--font-condensed);
+  font-weight: 800;
+  color: rgba(220,17,17,0.15);
+  font-size: clamp(5rem, 12vw, 9rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* ── 29. EMPTY STATE ── */
+.products-empty {
+  border: 1px solid rgba(220,17,17,0.1);
+  background: linear-gradient(135deg, rgba(220,17,17,0.03) 0%, transparent 60%);
+}
+
+/* ── 30. RESULT ROW ── */
+#products-result-count {
+  font-family: var(--font-condensed);
+  font-weight: 600;
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  color: var(--muted2);
+}
+
+/* ── 31. DENSITY TOGGLE ── */
+.density-btn {
+  font-family: var(--font-condensed);
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  font-size: 0.65rem;
+}
+
+/* ── 32. ADMIN PANEL — keeps dark theme consistent ── */
+#admin-panel {
+  background: var(--bg) !important;
+}
+.admin-tab {
+  font-family: var(--font-condensed);
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  font-size: 0.7rem;
+}
+
+/* ── 33. PAGE LOAD ANIMATION ── */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.hero-content > * {
+  animation: fade-up 0.8s var(--ease-emph) both;
+}
+.hero-content > *:nth-child(1) { animation-delay: 0.1s; }
+.hero-content > *:nth-child(2) { animation-delay: 0.25s; }
+.hero-content > *:nth-child(3) { animation-delay: 0.35s; }
+.hero-content > *:nth-child(4) { animation-delay: 0.45s; }
+.hero-content > *:nth-child(5) { animation-delay: 0.55s; }
+.hero-content > *:nth-child(6) { animation-delay: 0.65s; }
+
+/* ── 34. MOBILE REFINEMENTS ── */
+@media (max-width: 600px) {
+  .hero-tagline { font-size: 0.88rem; }
+  .brand-item { font-size: 0.65rem; letter-spacing: 0.2em; }
+  .prod-name { font-size: 1rem; }
+  .sec-index { font-size: 5rem; }
+}
+
+/* ── 35. FOCUS RING — accessibility + brand ── */
+:focus-visible {
+  outline: 2px solid rgba(220,17,17,0.6);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+
 </style>
 
 <!-- ═══ GSAP + ScrollTrigger ═══ -->
