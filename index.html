@@ -6615,6 +6615,943 @@ img { max-width: 100%; height: auto; }
   .ticker-msg,
   .hero-bat-svg { animation: none !important; }
 }
+
+/* ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+   FEATURE 48 ── SURGICAL SECTION PASS
+   Targeted polish for: FAQ, Testimonials, Contact, Footer, CTA Band.
+   No hero changes.
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ */
+
+/* ═══════════════════════════════════════════════════════════
+   48.1 — FAQ (GSAP-friendly accordion)
+═══════════════════════════════════════════════════════════ */
+.faq { background: var(--bg); }
+.faq .container { max-width: 880px; }
+.faq-list {
+  counter-reset: faq;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.faq-item {
+  background: var(--bg2);
+  border: 1px solid var(--line-faint);
+  border-radius: 0;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.35s ease,
+              background 0.45s ease,
+              transform 0.4s cubic-bezier(.16,1,.3,1);
+  counter-increment: faq;
+}
+.faq-item::before {
+  content: counter(faq, decimal-leading-zero);
+  position: absolute;
+  top: 1.05rem;
+  left: 1.4rem;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+  opacity: 0.7;
+  transition: color 0.3s ease, opacity 0.3s ease;
+}
+.faq-item:hover {
+  border-color: var(--line-soft);
+  transform: translateX(2px);
+}
+.faq-item:hover::before { color: var(--red); opacity: 1; }
+.faq-item.open {
+  background: linear-gradient(180deg, rgba(220,17,17,0.06), rgba(220,17,17,0.01));
+  border-color: var(--line-mid);
+  border-left: 0;
+  padding-left: 0;
+  box-shadow: var(--shadow-sm), inset 3px 0 0 var(--red);
+}
+.faq-item.open::before { color: var(--red); opacity: 1; }
+
+.faq-q {
+  width: 100%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.3rem 1.6rem 1.3rem 4rem;   /* 4rem leaves room for the number */
+  font-family: var(--font-body);
+  font-size: 0.98rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-align: left;
+  line-height: 1.4;
+  transition: color 0.3s ease;
+}
+.faq-q-text { flex: 1; color: var(--text-strong); }
+.faq-item.open .faq-q-text { color: var(--red); }
+.faq-q:hover .faq-q-text { color: var(--red); }
+
+/* + / × icon — two crossed bars, rotates on open */
+.faq-icon {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  display: inline-block;
+}
+.faq-icon-h,
+.faq-icon-v {
+  position: absolute;
+  background: var(--red);
+  border-radius: 1px;
+  transition: transform 0.45s cubic-bezier(.16,1,.3,1),
+              opacity 0.3s ease;
+}
+.faq-icon-h {
+  top: 50%; left: 0;
+  width: 100%; height: 2px;
+  transform: translateY(-50%);
+}
+.faq-icon-v {
+  top: 0; left: 50%;
+  width: 2px; height: 100%;
+  transform: translateX(-50%);
+}
+.faq-item.open .faq-icon-v {
+  transform: translateX(-50%) rotate(90deg);
+  opacity: 0;
+}
+.faq-item.open .faq-icon-h {
+  transform: translateY(-50%) rotate(180deg);
+}
+
+.faq-a {
+  /* GSAP animates max-height inline; CSS keeps content hidden by default */
+  height: 0;
+  overflow: hidden;
+  padding: 0 1.6rem 0 4rem;
+  color: var(--text-weak);
+  font-size: 0.93rem;
+  line-height: 1.7;
+  font-weight: 300;
+  letter-spacing: 0.01em;
+}
+.faq-a-inner {
+  padding-bottom: 1.4rem;
+  padding-top: 0.2rem;
+}
+/* Tail CTA after last FAQ */
+.faq-tail {
+  margin-top: 2.5rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-weak);
+}
+.faq-tail a {
+  color: var(--red);
+  font-weight: 700;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.25s ease;
+}
+.faq-tail a:hover { border-bottom-color: var(--red); }
+
+@media (max-width: 600px) {
+  .faq-q { padding: 1.1rem 1.2rem 1.1rem 3.4rem; font-size: 0.9rem; }
+  .faq-a { padding: 0 1.2rem 0 3.4rem; font-size: 0.88rem; }
+  .faq-item::before { top: 1rem; left: 1.1rem; font-size: 0.85rem; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   48.2 — TESTIMONIALS premium
+═══════════════════════════════════════════════════════════ */
+.testimonials { background: var(--bg2); }
+.test-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(12px, 1.5vw, 18px);
+}
+@media (max-width: 900px) { .test-grid { grid-template-columns: 1fr; } }
+.test-card {
+  background: linear-gradient(180deg, var(--bg3) 0%, rgba(14,14,14,0.95) 100%);
+  border: 1px solid var(--line-faint);
+  padding: 2rem 1.8rem 1.8rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  transition: border-color 0.4s ease,
+              transform 0.45s cubic-bezier(.16,1,.3,1),
+              box-shadow 0.45s ease,
+              background 0.5s ease;
+}
+.test-card::before {
+  content: '"';
+  position: absolute;
+  top: -8px;
+  left: 18px;
+  font-family: var(--font-display);
+  font-size: 5.5rem;
+  color: rgba(220,17,17,0.15);
+  line-height: 1;
+  pointer-events: none;
+  transition: color 0.5s ease, transform 0.5s ease;
+}
+.test-card:hover::before {
+  color: rgba(220,17,17,0.32);
+  transform: scale(1.05);
+}
+.test-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--red), transparent);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.5s cubic-bezier(.16,1,.3,1);
+}
+.test-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--line-soft);
+  box-shadow: var(--shadow-md), var(--shadow-red-sm);
+  background: linear-gradient(180deg, var(--bg3) 0%, rgba(20,12,12,0.95) 100%);
+}
+.test-card:hover::after { transform: scaleX(1); }
+
+.test-header {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  border-bottom: 1px solid var(--line-faint);
+  padding-bottom: 1rem;
+  margin-bottom: 0;
+}
+.test-avatar {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+  color: var(--white);
+  background: linear-gradient(135deg, var(--red), var(--red-dim));
+  position: relative;
+  /* Outer gothic ring */
+  box-shadow:
+    0 0 0 2px rgba(5,5,5,1),
+    0 0 0 3px rgba(220,17,17,0.4),
+    0 6px 14px rgba(0,0,0,0.5);
+  border-radius: 0;
+  clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px),
+                     calc(100% - 4px) 100%, 0 100%, 0 4px);
+}
+.test-meta { flex: 1; min-width: 0; }
+.test-name-new {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-strong);
+  margin: 0 0 0.18rem;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  letter-spacing: 0.01em;
+}
+.test-verified {
+  width: 15px;
+  height: 15px;
+  background: var(--red);
+  color: white;
+  border-radius: 50%;
+  font-size: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  box-shadow: 0 0 8px rgba(220,17,17,0.45);
+}
+.test-loc-new {
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  color: var(--text-faint);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin: 0;
+}
+.test-stars {
+  color: var(--red);
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-shadow: 0 0 8px rgba(220,17,17,0.4);
+}
+.test-text {
+  font-family: var(--font-body);
+  font-size: 0.93rem;
+  line-height: 1.7;
+  color: var(--text-body);
+  font-weight: 300;
+  margin: 0;
+  position: relative;
+  flex: 1;
+}
+.test-text::first-letter {
+  color: var(--text-strong);
+  font-weight: 500;
+}
+
+@media (max-width: 600px) {
+  .test-card { padding: 1.6rem 1.4rem 1.4rem; }
+  .test-card::before { font-size: 4.5rem; left: 14px; }
+  .test-text { font-size: 0.9rem; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   48.3 — CONTACT elevated
+═══════════════════════════════════════════════════════════ */
+.contact-section { background: var(--bg); position: relative; }
+.contact-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 1px; height: 60px;
+  background: linear-gradient(180deg, var(--red), transparent);
+  opacity: 0.55;
+}
+.contact-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(10px, 1.2vw, 14px);
+}
+@media (max-width: 1000px) { .contact-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px)  { .contact-grid { grid-template-columns: 1fr; } }
+.contact-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.2rem;
+  padding: 1.6rem 1.4rem 1.4rem;
+  background: linear-gradient(180deg, var(--bg2), var(--bg3));
+  border: 1px solid var(--line-faint);
+  color: var(--text);
+  text-decoration: none;
+  overflow: hidden;
+  transition: border-color 0.4s ease,
+              transform 0.45s cubic-bezier(.16,1,.3,1),
+              box-shadow 0.4s ease,
+              background 0.5s ease;
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px),
+                     calc(100% - 8px) 100%, 0 100%, 0 8px);
+}
+.contact-card:hover {
+  border-color: var(--line-mid);
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md), var(--shadow-red-sm);
+  background: linear-gradient(180deg, var(--bg2), rgba(20,10,10,0.95));
+}
+.contact-card-static { cursor: default; }
+.contact-card-static:hover {
+  transform: none;
+  border-color: var(--line-faint);
+  box-shadow: none;
+  background: linear-gradient(180deg, var(--bg2), var(--bg3));
+}
+.contact-card::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--red), transparent);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.5s cubic-bezier(.16,1,.3,1);
+}
+.contact-card:hover::before { transform: scaleX(1); }
+.contact-card-static::before { display: none; }
+
+.contact-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(220,17,17,0.08);
+  border: 1px solid var(--line-soft);
+  color: var(--red);
+  transition: background 0.35s ease,
+              border-color 0.35s ease,
+              transform 0.35s cubic-bezier(.16,1,.3,1),
+              box-shadow 0.35s ease;
+  clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px),
+                     calc(100% - 4px) 100%, 0 100%, 0 4px);
+}
+.contact-card:hover .contact-icon {
+  background: var(--red);
+  color: white;
+  border-color: var(--red);
+  transform: scale(1.05) rotate(-2deg);
+  box-shadow: 0 8px 20px rgba(220,17,17,0.45);
+}
+
+.contact-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.32rem;
+  flex: 1;
+  min-width: 0;
+}
+.contact-label {
+  font-family: var(--font-body);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin: 0;
+}
+.contact-val {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+  color: var(--text-strong);
+  margin: 0;
+  word-break: break-word;
+}
+.contact-meta {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  color: var(--text-weak);
+  letter-spacing: 0.04em;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.contact-meta-dot {
+  width: 7px; height: 7px;
+  background: #4ade80;        /* "online" green dot */
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(74,222,128,0.7);
+  animation: contact-pulse 1.6s ease-in-out infinite;
+}
+@keyframes contact-pulse {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50%     { opacity: 0.6; transform: scale(1.3); }
+}
+.contact-arrow {
+  position: absolute;
+  top: 1.4rem;
+  right: 1.3rem;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--text-faint);
+  transition: color 0.3s ease, transform 0.4s cubic-bezier(.16,1,.3,1);
+}
+.contact-card:hover .contact-arrow {
+  color: var(--red);
+  transform: translate(4px, -4px);
+}
+
+/* Primary contact card (WhatsApp) gets a glow accent */
+.contact-card-primary {
+  border-color: var(--line-soft);
+  background: linear-gradient(180deg, var(--bg2), rgba(15,8,8,0.95));
+}
+.contact-card-primary .contact-icon {
+  background: var(--red);
+  color: white;
+  border-color: var(--red);
+  box-shadow: 0 6px 18px rgba(220,17,17,0.4);
+}
+.contact-card-primary:hover .contact-icon {
+  transform: scale(1.08) rotate(-3deg);
+  box-shadow: 0 10px 28px rgba(220,17,17,0.6);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   48.4 — FOOTER editorial
+═══════════════════════════════════════════════════════════ */
+footer {
+  background: linear-gradient(180deg, var(--bg) 0%, #030303 100%);
+  position: relative;
+  border-top: 1px solid var(--line-soft);
+  padding-bottom: 2rem;
+}
+footer::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 140px;
+  height: 2px;
+  background: var(--red);
+  box-shadow: 0 0 18px var(--red), 0 0 38px rgba(220,17,17,0.5);
+}
+
+/* Manifesto strip */
+.footer-manifesto {
+  padding-top: 4rem;
+  padding-bottom: 3rem;
+  text-align: center;
+  position: relative;
+}
+.footer-manifesto-eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.45em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin: 0 0 1.2rem;
+  text-shadow: 0 0 12px rgba(220,17,17,0.35);
+}
+.footer-manifesto-line {
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 6vw, 4.5rem);
+  letter-spacing: 0.04em;
+  line-height: 0.95;
+  color: var(--text-strong);
+  margin: 0;
+  text-shadow: 0 0 50px rgba(220,17,17,0.18);
+}
+.footer-manifesto-line em {
+  color: var(--red);
+  font-style: normal;
+  text-shadow: 0 0 40px rgba(220,17,17,0.5);
+}
+.footer-manifesto-rule {
+  width: 60px;
+  height: 1px;
+  background: var(--red);
+  box-shadow: 0 0 14px var(--red);
+  margin: 2rem auto 0;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr 1fr 1.4fr;
+  gap: clamp(2rem, 4vw, 3.5rem);
+  margin-bottom: 3rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid var(--line-faint);
+}
+@media (max-width: 900px) {
+  .footer-grid { grid-template-columns: 1fr 1fr; gap: 2.2rem 1.5rem; }
+  .footer-brand-col { grid-column: 1 / -1; }
+}
+@media (max-width: 500px) {
+  .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+}
+
+.footer-brand-col .nav-logo-text {
+  font-family: var(--font-display);
+  letter-spacing: 0.12em;
+}
+.footer-brand-desc {
+  margin: 1.4rem 0 1.8rem;
+  max-width: 360px;
+  color: var(--text-weak);
+  font-weight: 300;
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+.footer-social { gap: 0.6rem; }
+
+.footer-col-title {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin: 0 0 1.4rem;
+  position: relative;
+  padding-bottom: 0.8rem;
+}
+.footer-col-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 26px; height: 1px;
+  background: var(--red);
+}
+.footer-links { list-style: none; padding: 0; margin: 0; }
+.footer-links li { margin-bottom: 0.8rem; }
+.footer-links a {
+  color: var(--text-weak);
+  text-decoration: none;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  transition: color 0.25s ease, padding-left 0.25s ease;
+  display: inline-block;
+  position: relative;
+}
+.footer-links a::before {
+  content: '';
+  position: absolute;
+  left: -10px; top: 50%;
+  width: 0; height: 1px;
+  background: var(--red);
+  transition: width 0.3s ease;
+  transform: translateY(-50%);
+}
+.footer-links a:hover {
+  color: var(--text-strong);
+  padding-left: 12px;
+}
+.footer-links a:hover::before { width: 8px; }
+
+.newsletter-desc {
+  color: var(--text-weak);
+  font-size: 0.82rem;
+  margin: 0 0 0.85rem;
+  line-height: 1.5;
+}
+.footer-newsletter-fine {
+  font-size: 0.65rem;
+  color: var(--text-faint);
+  margin: 0.8rem 0 0;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+}
+.footer-newsletter-fine a {
+  color: var(--text-weak);
+  text-decoration: underline;
+  text-decoration-color: var(--line-soft);
+  text-underline-offset: 2px;
+}
+.footer-newsletter-fine a:hover { color: var(--red); }
+
+/* Payment + shipping strip */
+.footer-payment-strip {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  padding: 1.4rem 0;
+  border-top: 1px solid var(--line-faint);
+  border-bottom: 1px solid var(--line-faint);
+  margin-top: 0.5rem;
+}
+.footer-payment-label {
+  font-family: var(--font-body);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--red);
+  flex-shrink: 0;
+}
+.footer-payment-icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+.payment-pill {
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-body);
+  padding: 0.4rem 0.85rem;
+  border: 1px solid var(--line-faint);
+  background: rgba(255,255,255,0.02);
+  transition: border-color 0.25s ease, color 0.25s ease, background 0.25s ease;
+}
+.payment-pill:hover {
+  border-color: var(--line-mid);
+  color: var(--text-strong);
+  background: rgba(220,17,17,0.04);
+}
+.payment-pill.ship { color: var(--red); border-color: var(--line-soft); }
+.payment-divider {
+  width: 1px;
+  height: 18px;
+  background: var(--line-soft);
+  margin: 0 0.4rem;
+}
+
+/* Footer bottom — finer */
+.footer-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 0.4rem;
+}
+.footer-copy,
+.footer-cr {
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  margin: 0;
+}
+.footer-cr {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.footer-legal {
+  font-size: 0.65rem;
+  letter-spacing: 0.18em;
+}
+
+@media (max-width: 600px) {
+  .footer-manifesto { padding-top: 3rem; padding-bottom: 2.2rem; }
+  .footer-payment-strip { padding: 1.1rem 0; gap: 0.85rem; }
+  .footer-payment-label { font-size: 0.55rem; letter-spacing: 0.22em; }
+  .payment-pill { font-size: 0.58rem; padding: 0.32rem 0.65rem; }
+  .payment-divider { display: none; }
+  .footer-bottom { justify-content: center; text-align: center; }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   48.5 — CTA BAND dramatic
+═══════════════════════════════════════════════════════════ */
+.cta-band {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 30%, rgba(220,17,17,1), rgba(165,13,13,1) 60%, rgba(120,8,8,1)),
+    var(--red);
+  padding: clamp(4rem, 9vw, 7rem) var(--container-px);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.cta-band::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    /* Subtle scan lines */
+    repeating-linear-gradient(0deg, transparent 0px, transparent 3px, rgba(0,0,0,0.07) 3px, rgba(0,0,0,0.07) 4px),
+    /* Noise overlay */
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
+  mix-blend-mode: overlay;
+}
+.cta-band::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+  z-index: 2;
+}
+
+/* Scan-line that travels across periodically */
+.cta-scan {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: -20%;
+  width: 30%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+  pointer-events: none;
+  z-index: 1;
+  animation: cta-scan 5s ease-in-out infinite;
+}
+@keyframes cta-scan {
+  0%, 100% { left: -30%; opacity: 0; }
+  50%      { left: 100%; opacity: 1; }
+}
+
+/* Corner brackets */
+.cta-corner {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  z-index: 3;
+  pointer-events: none;
+}
+.cta-corner::before,
+.cta-corner::after {
+  content: '';
+  position: absolute;
+  background: rgba(255,255,255,0.9);
+  box-shadow: 0 0 12px rgba(255,255,255,0.5);
+}
+.cta-corner::before { width: 2px; height: 100%; top: 0; left: 0; }
+.cta-corner::after  { width: 100%; height: 2px; top: 0; left: 0; }
+.cta-corner.tl { top: 18px; left: 18px; }
+.cta-corner.tr { top: 18px; right: 18px; transform: scaleX(-1); }
+.cta-corner.bl { bottom: 18px; left: 18px; transform: scaleY(-1); }
+.cta-corner.br { bottom: 18px; right: 18px; transform: scale(-1); }
+
+.cta-band-inner {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cta-band-eyebrow {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.9);
+  background: rgba(0,0,0,0.3);
+  padding: 0.5rem 1.2rem;
+  margin-bottom: 1.6rem;
+  border: 1px solid rgba(255,255,255,0.2);
+  clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px);
+}
+
+.cta-band-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 7vw, 5.5rem);
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 0.9;
+  color: white;
+  margin: 0 0 1.3rem;
+  text-shadow:
+    0 2px 0 rgba(0,0,0,0.4),
+    0 4px 30px rgba(0,0,0,0.5);
+  position: relative;
+}
+.cta-band-title em {
+  font-style: normal;
+  color: white;
+  position: relative;
+  display: inline-block;
+}
+.cta-band-title em::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 0.05em;
+  height: 4px;
+  background: rgba(255,255,255,0.5);
+  transform: scaleX(0);
+  transform-origin: left;
+  animation: cta-underline 2.5s ease-out 0.5s forwards;
+}
+@keyframes cta-underline {
+  to { transform: scaleX(1); }
+}
+
+.cta-band-sub {
+  font-family: var(--font-body);
+  font-size: clamp(0.92rem, 1.6vw, 1.08rem);
+  font-weight: 400;
+  color: rgba(255,255,255,0.88);
+  margin: 0 0 2.4rem;
+  max-width: 640px;
+  letter-spacing: 0.02em;
+  line-height: 1.6;
+}
+
+.cta-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.4rem;
+}
+.cta-band-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  background: white;
+  color: var(--red) !important;
+  text-decoration: none;
+  padding: 1.15rem 2.2rem;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  transition: background 0.25s ease,
+              transform 0.2s cubic-bezier(.16,1,.3,1),
+              box-shadow 0.35s ease,
+              color 0.25s ease;
+  box-shadow:
+    0 6px 24px rgba(0,0,0,0.4),
+    0 0 0 2px rgba(0,0,0,0.1);
+  position: relative;
+  overflow: hidden;
+}
+.cta-band-btn::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -120%;
+  width: 100%; height: 100%;
+  background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.5) 50%, transparent 70%);
+  transition: left 0.7s cubic-bezier(.4,0,.2,1);
+}
+.cta-band-btn:hover::before { left: 120%; }
+.cta-band-btn:hover {
+  transform: translateY(-3px);
+  background: #fff8f8;
+  box-shadow:
+    0 14px 36px rgba(0,0,0,0.6),
+    0 0 24px rgba(255,255,255,0.4),
+    0 0 0 2px rgba(0,0,0,0.15);
+}
+.cta-band-btn:active { transform: translateY(0) scale(0.98); }
+.cta-band-btn-arrow {
+  font-size: 1.1rem;
+  font-weight: 700;
+  transition: transform 0.3s cubic-bezier(.16,1,.3,1);
+}
+.cta-band-btn:hover .cta-band-btn-arrow { transform: translateX(4px); }
+
+.cta-band-trust {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--font-body);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.75);
+}
+.cta-trust-dot {
+  width: 7px; height: 7px;
+  background: #4ade80;
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(74,222,128,0.8);
+  animation: cta-trust-pulse 1.6s ease-in-out infinite;
+}
+@keyframes cta-trust-pulse {
+  0%,100% { opacity: 1; transform: scale(1); }
+  50%     { opacity: 0.7; transform: scale(1.3); }
+}
+
+@media (max-width: 600px) {
+  .cta-corner { width: 20px; height: 20px; }
+  .cta-corner.tl, .cta-corner.tr { top: 12px; }
+  .cta-corner.bl, .cta-corner.br { bottom: 12px; }
+  .cta-corner.tl, .cta-corner.bl { left: 12px; }
+  .cta-corner.tr, .cta-corner.br { right: 12px; }
+  .cta-band-title { font-size: clamp(2rem, 9vw, 3rem); letter-spacing: 0.02em; }
+  .cta-band-title br { display: none; }
+  .cta-band-title em { display: inline; }
+  .cta-band-eyebrow { font-size: 0.55rem; letter-spacing: 0.28em; }
+  .cta-band-sub br { display: none; }
+}
 </style>
 
 <!-- ═══ GSAP + ScrollTrigger ═══ -->
@@ -7156,14 +8093,26 @@ img { max-width: 100%; height: auto; }
 
 <!-- ═══ CTA BAND ═══ -->
 <div class="cta-band">
-  <div class="container">
-    <span class="cta-band-eyebrow">PEDIDOS A LA MEDIDA</span>
-    <h2 class="cta-band-title" id="cta-title-text">¿Querés algo específico?</h2>
-    <p class="cta-band-sub" id="cta-sub-text">Traemos cualquier producto de YoungLA, Gymshark, DarcSport, Breath The Divinity y más — directo desde USA a Costa Rica.</p>
-    <a href="https://wa.me/50685946741?text=Hola!%20Quiero%20hacer%20un%20encargo%20personalizado%20a%20DESMOSMIND" target="_blank" rel="noopener" class="btn-white">
-      <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-      Contactar por WhatsApp
-    </a>
+  <span class="cta-corner tl" aria-hidden="true"></span>
+  <span class="cta-corner tr" aria-hidden="true"></span>
+  <span class="cta-corner bl" aria-hidden="true"></span>
+  <span class="cta-corner br" aria-hidden="true"></span>
+  <span class="cta-scan" aria-hidden="true"></span>
+  <div class="container cta-band-inner">
+    <span class="cta-band-eyebrow">PEDIDOS A LA MEDIDA · IMPORT ON DEMAND</span>
+    <h2 class="cta-band-title" id="cta-title-text">¿Querés algo<br><em>específico?</em></h2>
+    <p class="cta-band-sub" id="cta-sub-text">YoungLA · Gymshark · Darc Sport · Breath The Divinity · Alphalete<br>Traemos lo que sea — directo desde USA a Costa Rica.</p>
+    <div class="cta-actions">
+      <a href="https://wa.me/50685946741?text=Hola!%20Quiero%20hacer%20un%20encargo%20personalizado%20a%20DESMOSMIND" target="_blank" rel="noopener" class="btn-white cta-band-btn">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        Hacer mi encargo
+        <span class="cta-band-btn-arrow" aria-hidden="true">→</span>
+      </a>
+      <span class="cta-band-trust">
+        <span class="cta-trust-dot" aria-hidden="true"></span>
+        Respondemos en menos de 1 hora
+      </span>
+    </div>
   </div>
 </div>
 
@@ -7285,44 +8234,46 @@ img { max-width: 100%; height: auto; }
         <div class="eyebrow-line"></div>
       </div>
       <h2 class="sec-title">Preguntas Frecuentes</h2>
+      <p class="sec-subtitle">Lo que más nos preguntan. Si no encontrás respuesta, escribinos directo por WhatsApp.</p>
     </div>
     <div class="faq-list reveal">
       <div class="faq-item">
         <button class="faq-q" onclick="toggleFaq(this)">
           <span class="faq-q-text">¿Cuánto tiempo demora un pedido por encargo?</span>
-          <span class="faq-chevron">▼</span>
+          <span class="faq-icon" aria-hidden="true"><span class="faq-icon-h"></span><span class="faq-icon-v"></span></span>
         </button>
-        <div class="faq-a">El tiempo típico es de 2 a 3 semanas desde que confirmamos tu pedido. Esto incluye el tiempo de compra en USA y el envío internacional. Te mantenemos informado en todo momento por WhatsApp.</div>
+        <div class="faq-a"><div class="faq-a-inner">El tiempo típico es de 2 a 3 semanas desde que confirmamos tu pedido. Esto incluye el tiempo de compra en USA y el envío internacional. Te mantenemos informado en todo momento por WhatsApp.</div></div>
       </div>
       <div class="faq-item">
         <button class="faq-q" onclick="toggleFaq(this)">
           <span class="faq-q-text">¿Cuáles son los métodos de pago aceptados?</span>
-          <span class="faq-chevron">▼</span>
+          <span class="faq-icon" aria-hidden="true"><span class="faq-icon-h"></span><span class="faq-icon-v"></span></span>
         </button>
-        <div class="faq-a">Aceptamos SINPE Móvil y transferencia bancaria. Para encargos, pedimos un adelanto del 50% al confirmar el pedido y el resto al momento de entrega.</div>
+        <div class="faq-a"><div class="faq-a-inner">Aceptamos SINPE Móvil y transferencia bancaria. Para encargos, pedimos un adelanto del 50% al confirmar el pedido y el resto al momento de entrega.</div></div>
       </div>
       <div class="faq-item">
         <button class="faq-q" onclick="toggleFaq(this)">
           <span class="faq-q-text">¿Hacen envíos a todo Costa Rica?</span>
-          <span class="faq-chevron">▼</span>
+          <span class="faq-icon" aria-hidden="true"><span class="faq-icon-h"></span><span class="faq-icon-v"></span></span>
         </button>
-        <div class="faq-a">Sí, enviamos a todo el país mediante Correos de Costa Rica o Cargo Express. El costo de envío varía según la zona y el peso del paquete.</div>
+        <div class="faq-a"><div class="faq-a-inner">Sí, enviamos a todo el país mediante Correos de Costa Rica o Cargo Express. El costo de envío varía según la zona y el peso del paquete.</div></div>
       </div>
       <div class="faq-item">
         <button class="faq-q" onclick="toggleFaq(this)">
           <span class="faq-q-text">¿Los productos son 100% originales?</span>
-          <span class="faq-chevron">▼</span>
+          <span class="faq-icon" aria-hidden="true"><span class="faq-icon-h"></span><span class="faq-icon-v"></span></span>
         </button>
-        <div class="faq-a">Absolutamente. Compramos directamente en las tiendas oficiales de YoungLA, Gymshark y demás marcas en USA. Todos los productos tienen sus etiquetas y empaques originales.</div>
+        <div class="faq-a"><div class="faq-a-inner">Absolutamente. Compramos directamente en las tiendas oficiales de YoungLA, Gymshark y demás marcas en USA. Todos los productos tienen sus etiquetas y empaques originales.</div></div>
       </div>
       <div class="faq-item">
         <button class="faq-q" onclick="toggleFaq(this)">
           <span class="faq-q-text">¿Puedo devolver un producto?</span>
-          <span class="faq-chevron">▼</span>
+          <span class="faq-icon" aria-hidden="true"><span class="faq-icon-h"></span><span class="faq-icon-v"></span></span>
         </button>
-        <div class="faq-a">Aceptamos cambios de talla dentro de los 7 días después de recibido el producto, siempre que esté en condiciones originales. Para encargos, no aceptamos devoluciones por cambio de opinión.</div>
+        <div class="faq-a"><div class="faq-a-inner">Aceptamos cambios de talla dentro de los 14 días después de recibido el producto, siempre que esté en condiciones originales con etiquetas. Para encargos personalizados, no aceptamos devoluciones por cambio de opinión.</div></div>
       </div>
     </div>
+    <p class="faq-tail">¿No encontrás tu pregunta? <a href="https://wa.me/50685946741" target="_blank" rel="noopener">Escribinos por WhatsApp →</a></p>
   </div>
 </section>
 
@@ -7339,29 +8290,48 @@ img { max-width: 100%; height: auto; }
       <p class="sec-subtitle">¿Tienes preguntas? Estamos aquí para ayudarte</p>
     </div>
     <div class="contact-grid reveal">
-      <a class="contact-card" href="https://wa.me/50685946741" target="_blank">
-        <div class="contact-icon">
-          <svg width="24" height="24" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+      <a class="contact-card contact-card-primary" href="https://wa.me/50685946741" target="_blank" rel="noopener">
+        <div class="contact-icon" aria-hidden="true">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
         </div>
-        <div><p class="contact-label">WhatsApp</p><p class="contact-val">+506 8594-6741</p></div>
+        <div class="contact-body">
+          <p class="contact-label">WhatsApp</p>
+          <p class="contact-val">+506 8594-6741</p>
+          <p class="contact-meta"><span class="contact-meta-dot" aria-hidden="true"></span>Respuesta &lt; 1h</p>
+        </div>
+        <span class="contact-arrow" aria-hidden="true">↗</span>
       </a>
-      <a class="contact-card" href="https://instagram.com/desmos_mind" target="_blank">
-        <div class="contact-icon">
-          <svg width="24" height="24" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.5" fill="white" stroke="none"/></svg>
+      <a class="contact-card" href="https://instagram.com/desmos_mind" target="_blank" rel="noopener">
+        <div class="contact-icon" aria-hidden="true">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
         </div>
-        <div><p class="contact-label">Instagram</p><p class="contact-val">@desmos_mind</p></div>
+        <div class="contact-body">
+          <p class="contact-label">Instagram</p>
+          <p class="contact-val">@desmos_mind</p>
+          <p class="contact-meta">Drops &amp; lookbook</p>
+        </div>
+        <span class="contact-arrow" aria-hidden="true">↗</span>
       </a>
       <a class="contact-card" href="mailto:info@desmosmind.com">
-        <div class="contact-icon">
-          <svg width="24" height="24" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <div class="contact-icon" aria-hidden="true">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
         </div>
-        <div><p class="contact-label">Email</p><p class="contact-val">info@desmosmind.com</p></div>
+        <div class="contact-body">
+          <p class="contact-label">Email</p>
+          <p class="contact-val">info@desmosmind.com</p>
+          <p class="contact-meta">Para encargos B2B</p>
+        </div>
+        <span class="contact-arrow" aria-hidden="true">↗</span>
       </a>
-      <div class="contact-card">
-        <div class="contact-icon">
-          <svg width="24" height="24" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <div class="contact-card contact-card-static">
+        <div class="contact-icon" aria-hidden="true">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
         </div>
-        <div><p class="contact-label">Ubicación</p><p class="contact-val">Costa Rica</p></div>
+        <div class="contact-body">
+          <p class="contact-label">Operamos en</p>
+          <p class="contact-val">Costa Rica</p>
+          <p class="contact-meta">Envíos a todo el país</p>
+        </div>
       </div>
     </div>
   </div>
@@ -7369,23 +8339,30 @@ img { max-width: 100%; height: auto; }
 
 <!-- ═══ FOOTER ═══ -->
 <footer>
+  <!-- Manifesto strip — sits above the columns -->
+  <div class="container footer-manifesto">
+    <p class="footer-manifesto-eyebrow">DESMOS · MIND · BORN IN DARKNESS</p>
+    <h3 class="footer-manifesto-line">Vestí tu mente.<br><em>El cuerpo sigue.</em></h3>
+    <div class="footer-manifesto-rule" aria-hidden="true"></div>
+  </div>
+
   <div class="container">
     <div class="footer-grid">
-      <div>
-        <a href="#" class="nav-logo" style="display:inline-flex;margin-bottom:0;">
-          <svg width="36" height="24" viewBox="0 0 100 60" fill="none">
+      <div class="footer-brand-col">
+        <a href="#" class="nav-logo" style="display:inline-flex;margin-bottom:0;" aria-label="Volver al inicio">
+          <svg width="36" height="24" viewBox="0 0 100 60" fill="none" aria-hidden="true">
             <path d="M50 38 C42 37 32 31 20 26 C12 22 4 21 0 23 C-1 24 0 22 2 20 C9 14 20 11 30 14 C37 16 43 20 48 28 C49 31 50 36 50 40Z" fill="#DC1111"/>
             <path d="M50 38 C58 37 68 31 80 26 C88 22 96 21 100 23 C101 24 100 22 98 20 C91 14 80 11 70 14 C63 16 57 20 52 28 C51 31 50 36 50 40Z" fill="#DC1111"/>
             <ellipse cx="50" cy="35" rx="4" ry="6" fill="#DC1111"/>
           </svg>
           <span class="nav-logo-text" style="font-size:1.1rem;">DESMOS<em>MIND</em></span>
         </a>
-        <p class="footer-brand-desc">Ropa fitness premium importada. Estética nocturna para atletas que dominan la oscuridad.</p>
+        <p class="footer-brand-desc">Streetwear gótico y ropa de gym premium importada de USA a Costa Rica. Para atletas que dominan la oscuridad.</p>
         <div class="footer-social">
-          <a class="social-btn" href="https://instagram.com/desmos_mind" target="_blank">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/></svg>
+          <a class="social-btn" href="https://instagram.com/desmos_mind" target="_blank" rel="noopener" aria-label="Instagram">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
           </a>
-          <a class="social-btn" href="https://wa.me/50685946741" target="_blank">
+          <a class="social-btn" href="https://wa.me/50685946741" target="_blank" rel="noopener" aria-label="WhatsApp">
             <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
           </a>
           <a class="social-btn" href="mailto:info@desmosmind.com" aria-label="Email">
@@ -7394,43 +8371,64 @@ img { max-width: 100%; height: auto; }
         </div>
       </div>
       <div>
-        <h4 class="footer-col-title">TIENDA</h4>
+        <h4 class="footer-col-title">Tienda</h4>
         <ul class="footer-links">
           <li><a href="#stock">Stock en Costa Rica</a></li>
           <li><a href="#catalogo">Encargo USA → CR</a></li>
-          <li><a href="#contacto">Próximamente</a></li>
+          <li><a href="#editorial">Editorial</a></li>
         </ul>
       </div>
       <div>
-        <h4 class="footer-col-title">INFO</h4>
+        <h4 class="footer-col-title">Info</h4>
         <ul class="footer-links">
           <li><a href="#faq">Preguntas Frecuentes</a></li>
           <li><a href="#contacto">Contacto</a></li>
-          <li><a href="#faq">Política de Envíos</a></li>
+          <li><a href="/terms.html#envio">Envíos</a></li>
+          <li><a href="/terms.html#cambios-devoluciones">Cambios</a></li>
         </ul>
       </div>
       <div>
-        <h4 class="footer-col-title">NEWSLETTER</h4>
-        <p class="newsletter-desc">Ofertas exclusivas y novedades</p>
-        <div class="newsletter-form">
-          <input class="newsletter-input" type="email" placeholder="tu@email.com" id="nl-input">
-          <button class="newsletter-btn" onclick="subscribeNL()">
+        <h4 class="footer-col-title">Quedate</h4>
+        <p class="newsletter-desc">Drops y restocks antes que nadie. Sin spam.</p>
+        <form class="newsletter-form" onsubmit="event.preventDefault();subscribeNL();" aria-label="Suscribirse al newsletter">
+          <input class="newsletter-input" type="email" placeholder="tu@email.com" id="nl-input" autocomplete="email" required>
+          <button class="newsletter-btn" type="submit" aria-label="Suscribirse">
             <svg width="14" height="14" fill="none" stroke="white" stroke-width="2" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
           </button>
-        </div>
+        </form>
+        <p class="footer-newsletter-fine">Al suscribirte aceptás nuestra <a href="/privacy.html">política de privacidad</a>.</p>
       </div>
     </div>
-    <div class="divider" style="margin-bottom:2rem;"></div>
+
+    <!-- Payment + shipping strip -->
+    <div class="footer-payment-strip" aria-label="Métodos de pago y envío">
+      <span class="footer-payment-label">Pagos &amp; envío</span>
+      <div class="footer-payment-icons">
+        <span class="payment-pill">SINPE</span>
+        <span class="payment-pill">BAC</span>
+        <span class="payment-pill">BCR</span>
+        <span class="payment-pill">BN</span>
+        <span class="payment-pill">Transferencia</span>
+        <span class="payment-divider" aria-hidden="true"></span>
+        <span class="payment-pill ship">Correos CR</span>
+        <span class="payment-pill ship">Cargo Express</span>
+      </div>
+    </div>
+
+    <div class="divider" style="margin:2.5rem 0 2rem;"></div>
+
     <div class="footer-bottom">
-      <p class="footer-copy">© 2026 DESMOS MIND. TODOS LOS DERECHOS RESERVADOS.</p>
+      <p class="footer-copy">© 2026 DESMOS·MIND · Todos los derechos reservados</p>
       <nav class="footer-legal" aria-label="Páginas legales">
         <a href="/terms.html">Términos</a>
         <span aria-hidden="true">·</span>
         <a href="/privacy.html">Privacidad</a>
+        <span aria-hidden="true">·</span>
+        <a href="#contacto">Contacto</a>
       </nav>
       <div class="footer-cr">
-        <svg width="12" height="8" viewBox="0 0 100 60" fill="#DC1111"><path d="M50 38 C44 36 36 32 26 28 C18 25 10 24 2 26 C0 26 0 24 2 22 C8 17 18 14 26 16 C32 17 38 20 44 26 C46 28 48 32 50 38Z"/><path d="M50 38 C56 36 64 32 74 28 C82 25 90 24 98 26 C100 26 100 24 98 22 C92 17 82 14 74 16 C68 17 62 20 56 26 C54 28 52 32 50 38Z"/></svg>
-        COSTA RICA
+        <svg width="12" height="8" viewBox="0 0 100 60" fill="#DC1111" aria-hidden="true"><path d="M50 38 C44 36 36 32 26 28 C18 25 10 24 2 26 C0 26 0 24 2 22 C8 17 18 14 26 16 C32 17 38 20 44 26 C46 28 48 32 50 38Z"/><path d="M50 38 C56 36 64 32 74 28 C82 25 90 24 98 26 C100 26 100 24 98 22 C92 17 82 14 74 16 C68 17 62 20 56 26 C54 28 52 32 50 38Z"/></svg>
+        Hecho en Costa Rica
       </div>
     </div>
   </div>
@@ -9618,10 +10616,69 @@ document.querySelectorAll('.reveal').forEach(el=>revealObserver.observe(el));
 // FAQ
 // ════════════════════════════════════
 function toggleFaq(btn){
-  const item=btn.closest('.faq-item');
-  const isOpen=item.classList.contains('open');
-  document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
-  if(!isOpen)item.classList.add('open');
+  const item = btn.closest('.faq-item');
+  if (!item) return;
+  const isOpen = item.classList.contains('open');
+  const allItems = document.querySelectorAll('.faq-item');
+
+  // Close every other item with animation
+  allItems.forEach(other => {
+    if (other !== item && other.classList.contains('open')) {
+      const ans = other.querySelector('.faq-a');
+      other.classList.remove('open');
+      _faqAnimate(ans, false);
+    }
+  });
+
+  // Toggle the clicked item
+  const ans = item.querySelector('.faq-a');
+  if (isOpen) {
+    item.classList.remove('open');
+    _faqAnimate(ans, false);
+  } else {
+    item.classList.add('open');
+    _faqAnimate(ans, true);
+  }
+}
+
+function _faqAnimate(ans, open){
+  if (!ans) return;
+  const inner = ans.querySelector('.faq-a-inner');
+  if (!inner) return;
+  const targetHeight = inner.scrollHeight;
+  if (window.gsap) {
+    if (open) {
+      window.gsap.fromTo(ans,
+        { height: 0, opacity: 0 },
+        { height: targetHeight, opacity: 1, duration: 0.5, ease: 'expo.out',
+          onComplete: () => { ans.style.height = 'auto'; } }
+      );
+    } else {
+      window.gsap.to(ans,
+        { height: 0, opacity: 0, duration: 0.32, ease: 'expo.in',
+          onStart: () => {
+            // If currently "auto", lock the measured height first so GSAP can animate
+            const h = ans.getBoundingClientRect().height;
+            ans.style.height = h + 'px';
+          }
+        }
+      );
+    }
+  } else {
+    // Vanilla fallback if GSAP hasn't loaded yet
+    if (open) {
+      ans.style.transition = 'height 0.4s cubic-bezier(.16,1,.3,1), opacity 0.3s ease';
+      ans.style.height = targetHeight + 'px';
+      ans.style.opacity = '1';
+      setTimeout(() => { ans.style.height = 'auto'; }, 420);
+    } else {
+      ans.style.height = ans.getBoundingClientRect().height + 'px';
+      void ans.offsetHeight;
+      ans.style.transition = 'height 0.3s cubic-bezier(.4,0,.2,1), opacity 0.25s ease';
+      ans.style.height = '0';
+      ans.style.opacity = '0';
+    }
+  }
 }
 
 // ════════════════════════════════════
