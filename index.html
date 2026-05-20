@@ -8733,6 +8733,121 @@ footer::before {
     -webkit-backdrop-filter: blur(16px) !important;
   }
 }
+
+/* ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+   FEATURE 51 ── PHASE 3 POLISH
+   Micro-interactions, mobile guards, focus rings.
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ */
+
+/* ── 51.1 Universal button press feedback ──
+   Affects every branded button on the page. */
+button, .btn-primary, .btn-ghost, .btn-white,
+.cta-band-btn, .modal-btn-cart, .modal-btn-wa, .cart-wa-btn,
+.qv-add, .cart-empty-cta, .modal-tool, .density-btn,
+.products-clear-btn, .ei-cta, .ei-decline-btn,
+.faq-q, .nav-auth, .nav-wishlist, .nav-search, .mob-btn {
+  transition-property: transform, background, color, border-color,
+                       box-shadow, opacity;
+  transition-duration: 0.22s;
+  transition-timing-function: cubic-bezier(.16,1,.3,1);
+}
+button:active:not(:disabled), .btn-primary:active, .btn-ghost:active,
+.cta-band-btn:active, .modal-btn-cart:active, .cart-wa-btn:active:not(:disabled),
+.qv-add:active, .cart-empty-cta:active, .modal-tool:active {
+  transform: scale(0.96);
+}
+
+/* Subtle red glow halo on hover for primary actions */
+.btn-primary:hover:not(:disabled),
+.modal-btn-cart:hover:not(:disabled),
+.cart-wa-btn:hover:not(:disabled),
+.qv-add:hover:not(:disabled) {
+  box-shadow:
+    0 4px 22px rgba(220,17,17,0.45),
+    0 0 36px rgba(220,17,17,0.25),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+/* ── 51.2 Inputs / selects / textareas — branded focus ── */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+select, textarea {
+  transition: border-color 0.25s ease, box-shadow 0.3s ease,
+              background 0.25s ease, color 0.25s ease;
+}
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):focus,
+select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--red, #DC1111) !important;
+  box-shadow:
+    0 0 0 1px rgba(220,17,17,0.35),
+    0 0 22px rgba(220,17,17,0.22),
+    inset 0 0 14px rgba(220,17,17,0.06) !important;
+  background: rgba(220,17,17,0.03);
+}
+
+/* ── 51.3 WhatsApp floating button — periodic pulse to draw attention ── */
+@keyframes wa-attention-pulse {
+  0%, 92%, 100% { transform: scale(1); box-shadow: 0 8px 24px rgba(0,0,0,0.45); }
+  94% { transform: scale(1.1); box-shadow: 0 12px 36px rgba(37,211,102,0.55), 0 0 28px rgba(37,211,102,0.4); }
+  96% { transform: scale(0.96); }
+  98% { transform: scale(1.05); }
+}
+#wa-float, .wa-float, [class*="whatsapp-float"] {
+  animation: wa-attention-pulse 5s ease-in-out infinite;
+  animation-delay: 8s; /* don't pulse on first load */
+}
+#wa-float:hover, .wa-float:hover { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  #wa-float, .wa-float { animation: none !important; }
+}
+
+/* ── 51.4 Filter chip smooth bg transition ── */
+.filter-btn, .filter-btn .filter-btn-count {
+  transition: color 0.28s cubic-bezier(.16,1,.3,1),
+              background 0.32s cubic-bezier(.16,1,.3,1),
+              box-shadow 0.32s ease;
+}
+
+/* ── 51.5 Add-to-cart shake on success (used by msb already) ── */
+@keyframes add-success-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-3px); }
+  40% { transform: translateX(3px); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+}
+
+/* ── 51.6 Mobile guards (375px target) ── */
+@media (max-width: 380px) {
+  /* Prevent horizontal overflow from any wide element */
+  body { overflow-x: hidden; }
+  .container { padding-left: 1rem; padding-right: 1rem; }
+  /* Tap targets enforced */
+  button, a.btn-primary, a.btn-ghost, .filter-btn, .density-btn,
+  .nav-auth, .nav-wishlist, .nav-search { min-height: 44px; min-width: 44px; }
+  /* Hero stat numbers shrink so they don't break */
+  .hero-stat-num { font-size: 1.3rem !important; }
+  .hero-stat-label { font-size: 0.55rem !important; }
+  /* Drop slide content padding tighter */
+  .drop-slide-content { padding: 1.5rem !important; }
+  .drop-slide-content h3 { font-size: 1.4rem !important; }
+  .drop-slide-content p { font-size: 0.85rem !important; }
+}
+
+/* ── 51.7 Mobile: product modal already fullscreen via earlier media
+   query in luxury modal. Reinforce here. ── */
+@media (max-width: 700px) {
+  #prod-modal.luxury-modal { padding: 0 !important; }
+  #prod-modal.luxury-modal .modal-inner {
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+  /* Featured hero — body padding tighter on phones */
+  .featured-hero .fh-body { padding: 1.4rem 1.2rem !important; }
+  .fh-name { font-size: 1.4rem !important; }
+}
 </style>
 
 <!-- ═══ GSAP + ScrollTrigger ═══ -->
