@@ -8235,6 +8235,9 @@ footer::before {
   gap: 6px;
 }
 .modal-tool {
+  position: static !important; /* override legacy .modal-close position:absolute */
+  top: auto !important;
+  right: auto !important;
   width: 36px; height: 36px;
   display: inline-flex;
   align-items: center;
@@ -8246,6 +8249,7 @@ footer::before {
   transition: all 0.25s ease;
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
+  font-size: 1rem; /* override legacy .modal-close font-size */
 }
 .modal-tool:hover {
   border-color: var(--red);
@@ -12565,6 +12569,10 @@ async function loadReviewsFromSupabase(){
     const rows = await sbFetch('reviews', 'GET', null, '?order=position.asc,id.asc&active=eq.true');
     if (!Array.isArray(rows)) return false;
     _reviewsSupabaseOk = true;
+    // Only overwrite local cache if Supabase actually returned content.
+    // Empty table on a fresh deploy → keep the default samples until the
+    // admin populates real reviews.
+    if (rows.length === 0) return false;
     reviews = rows.map(r => ({
       id: r.id,
       text: r.text || '',
@@ -13211,6 +13219,9 @@ async function loadCategoriesFromSupabase(){
     const rows = await sbFetch('categories', 'GET', null, '?order=position.asc,id.asc&active=eq.true');
     if (!Array.isArray(rows)) return false;
     _categoriesSupabaseOk = true;
+    // Only overwrite local cache if Supabase actually returned rows. Empty
+    // categories table on first deploy → keep defaults until admin adds.
+    if (rows.length === 0) return false;
     categories = rows.map(r => ({
       id: r.id,
       name: r.name,
@@ -16127,21 +16138,11 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    // ── 47.7 Hero text parallax (does NOT touch particles or bat canvas) ──
-    const heroContent = document.querySelector('.hero-content, .hero .hero-content');
-    if (heroContent) {
-      gsap.to(heroContent, {
-        y: -90,
-        opacity: 0.4,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: '.hero',
-          start: 'top top',
-          end: 'bottom top',
-          scrub: 0.6
-        }
-      });
-    }
+    // ── 47.7 Hero text parallax — INTENTIONALLY OMITTED
+    // The existing bat-scroll system already animates .hero-content
+    // opacity + translateY based on scroll. Adding a GSAP parallax on
+    // the same element would race against it and cause jank.
+    // Hero motion stays under the vanilla tick() system. ──
 
     // ── 47.8 Category card 3D tilt-follow on cursor (desktop only) ──
     if (!isTouch) {
