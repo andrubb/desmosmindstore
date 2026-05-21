@@ -10733,6 +10733,13 @@ section + section::before,
 
 <script>
 // ════════════════════════════════════
+// GLOBAL CONSTANTS — declared FIRST to avoid Temporal Dead Zone errors.
+// Any `const` referenced by function declarations later in this block must
+// live up here, because function declarations hoist but `const` does not.
+// ════════════════════════════════════
+const BUCKET = 'product-images';
+
+// ════════════════════════════════════
 // HELPERS DE ALMACENAMIENTO SEGURO
 // (localStorage falla en modo incógnito de Safari, en algunos iOS, y cuando el
 //  usuario tiene cookies bloqueadas. Estos wrappers evitan que el sitio crashee.)
@@ -13466,7 +13473,7 @@ let _dropsSupabaseOk = false; // true if table exists and is reachable
 async function loadDropsFromSupabase(){
   try {
     const data = await sbFetch('drops','GET',null,'?order=position.asc,id.asc&active=neq.false');
-    if(Array.isArray(data) && data.length >= 0){
+    if(Array.isArray(data)){
       _dropsSupabaseOk = true;
       drops = data.map(r => ({
         id: r.id,
@@ -13485,7 +13492,10 @@ async function loadDropsFromSupabase(){
       localStorage.setItem('dm_drops', JSON.stringify(drops));
       return true;
     }
-  } catch(e){ /* table doesn't exist yet */ }
+  } catch(e){
+    // Log loudly — we no longer silently fall back to local-only mode.
+    console.error('[drops] loadDropsFromSupabase failed:', e);
+  }
   return false;
 }
 
@@ -13603,21 +13613,14 @@ function renderAdminDrops(){
   const list = document.getElementById('admin-drops-list');
   if(!list) return;
 
-  // Show Supabase setup banner if table not available
-  const banner = _dropsSupabaseOk ? '' : `
-    <div style="background:rgba(220,17,17,0.08);border:1px solid rgba(220,17,17,0.3);padding:1rem 1.25rem;margin-bottom:1.25rem;font-family:var(--font-body);font-size:0.68rem;letter-spacing:0.06em;color:rgba(255,255,255,0.7);line-height:1.6;">
-      <strong style="color:var(--red);letter-spacing:0.12em;">⚠ MODO LOCAL</strong> — Los drops se guardan solo en este navegador.<br>
-      Para que se vean en todos los dispositivos, crea la tabla en Supabase:<br>
-      <code style="display:block;margin-top:0.5rem;background:rgba(0,0,0,0.4);padding:0.5rem;font-size:0.6rem;color:#aaa;border-left:2px solid var(--red);word-break:break-all;">
-CREATE TABLE drops (id bigserial primary key, tag text, fecha text, titulo text, descripcion text, img text, cta text, cta_link text, position int default 0, active boolean default true, created_at timestamptz default now());<br>ALTER TABLE drops ENABLE ROW LEVEL SECURITY;<br>CREATE POLICY "public read" ON drops FOR SELECT USING (true);<br>CREATE POLICY "anon write" ON drops FOR ALL USING (true) WITH CHECK (true);
-      </code>
-    </div>`;
+  // (MODO LOCAL banner removed — drops are Supabase-only now. If the table
+  //  isn't reachable, errors surface via toast/console instead of a banner.)
 
   if(!drops.length){
-    list.innerHTML = banner + '<p style="color:var(--muted2);text-align:center;padding:2rem;font-family:var(--font-body);font-weight:600;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;">No hay slides. Agrega el primero.</p>';
+    list.innerHTML = '<p style="color:var(--muted2);text-align:center;padding:2rem;font-family:var(--font-body);font-weight:600;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;">No hay slides. Agrega el primero.</p>';
     return;
   }
-  list.innerHTML = banner + drops.map((d,i) => `
+  list.innerHTML = drops.map((d,i) => `
     <div class="drop-admin-card">
       ${d.img ? `<img class="drop-admin-thumb" src="${d.img}" alt="${d.titulo.replace(/<[^>]+>/g,'')}" onerror="this.style.display='none'">` : '<div class="drop-admin-thumb" style="background:rgba(220,17,17,0.1);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">🔥</div>'}
       <div class="drop-admin-info">
@@ -13778,11 +13781,16 @@ async function saveDropForm(){
     let img = '';
     if(_dropImgFile){
       const status = document.getElementById('df-img-status');
-      status.textContent = 'Subiendo imagen...'; status.className = 'drop-img-status';
-      img = await uploadDropImage(_dropImgFile);
-      const isCloud = img.startsWith('http');
-      status.textContent = isCloud ? '✓ Imagen subida a la nube' : '✓ Imagen guardada (local)';
-      status.className = 'drop-img-status ok';
+      if(status){ status.textContent = 'Subiendo imagen...'; status.className = 'drop-img-status'; }
+      try {
+        img = await uploadDropImage(_dropImgFile);
+      } catch(uploadErr){
+        if(status){ status.textContent = '✗ ' + (uploadErr.message || 'Falló la subida'); status.className = 'drop-img-status err'; }
+        showToast('Falló la subida de imagen: ' + (uploadErr.message || 'error desconocido'));
+        console.error('[drops] uploadDropImage failed:', uploadErr);
+        return; // bail — do NOT persist a drop without a usable image url
+      }
+      if(status){ status.textContent = '✓ Imagen subida a la nube'; status.className = 'drop-img-status ok'; }
     } else if(isEdit) {
       img = drops[idx].img || '';
     }
@@ -13793,17 +13801,18 @@ async function saveDropForm(){
       position: isEdit ? (drops[idx].position || idx) : drops.length,
     };
 
-    // ── Save to Supabase if available ──
-    if(_dropsSupabaseOk){
-      try {
-        await saveDropToSupabase(dropData, isEdit);
-        showToast(isEdit ? 'Slide actualizado ✓' : 'Slide agregado ✓');
-      } catch(e){
-        showToast('Guardado local (Supabase no disponible)');
-      }
+    // ── Save to Supabase (mandatory — no local fallback) ──
+    try {
+      await saveDropToSupabase(dropData, isEdit);
+      showToast(isEdit ? 'Slide actualizado ✓' : 'Slide agregado ✓');
+      _dropsSupabaseOk = true;
+    } catch(e){
+      console.error('[drops] saveDropToSupabase failed:', e);
+      showToast('Error guardando en Supabase: ' + (e.message || 'desconocido'));
+      return; // bail — do not pollute local cache with unsaved data
     }
 
-    // ── Update local state ──
+    // ── Update local state (mirror only after Supabase confirmed) ──
     if(isEdit){
       drops[idx] = dropData;
     } else {
@@ -14206,14 +14215,21 @@ async function updateBrandName(id, name){
   } catch(e){ showToast('Error: '+e.message); }
 }
 
-// Close form on backdrop
-document.getElementById('prod-form-modal').addEventListener('click',function(e){if(e.target===this)closeProdForm();});
+// Close form on backdrop (null-guarded — admin DOM might not have loaded yet)
+(function bindAdminFormHandlers(){
+  const prodForm = document.getElementById('prod-form-modal');
+  if (prodForm) prodForm.addEventListener('click', function(e){
+    if (e.target === this) closeProdForm();
+  });
 
-// Drop form modal events
-document.getElementById('drop-form-modal').addEventListener('click', function(e){
-  if(e.target === this) closeDropForm();
-});
-document.getElementById('df-tag').addEventListener('change', updateDropTagCustomVisibility);
+  const dropForm = document.getElementById('drop-form-modal');
+  if (dropForm) dropForm.addEventListener('click', function(e){
+    if (e.target === this) closeDropForm();
+  });
+
+  const dfTag = document.getElementById('df-tag');
+  if (dfTag) dfTag.addEventListener('change', updateDropTagCustomVisibility);
+})();
 
 // Drag and drop for drop image zone
 (function(){
@@ -14786,8 +14802,9 @@ async function useImportedData(){
 
 // ════════════════════════════════════
 // IMAGE UPLOAD TO SUPABASE STORAGE
+// (BUCKET constant is declared at the top of this script block so that
+//  every uploader — including uploadDropImage() above — can reach it.)
 // ════════════════════════════════════
-const BUCKET = 'product-images';
 
 function switchImgTab(field, tab){
   const filePanel = document.getElementById(`${field}-panel-file`);
@@ -16390,8 +16407,28 @@ function setActiveTab(tab){
 function updateBottomTabBadges(){
   const cartBadge = document.getElementById('bt-cart-count');
   const wlBadge   = document.getElementById('bt-wishlist-count');
-  const cartCount = cart.reduce((s, i) => s + (i.qty || 0), 0);
-  const wlCount   = (typeof wishlist !== 'undefined' && wishlist.size) ? wishlist.size : 0;
+  // Read from localStorage — sidesteps any TDZ issue if this function is
+  // called before `let cart`/`let wishlist` initializers run further down
+  // the script. Falls back gracefully to in-memory state when present.
+  let cartArr = [];
+  let wlArr   = [];
+  try {
+    if (typeof cart !== 'undefined' && Array.isArray(cart)) {
+      cartArr = cart;
+    } else {
+      cartArr = JSON.parse(localStorage.getItem('desmos_cart_v1') || '[]');
+    }
+  } catch(e) { cartArr = []; }
+  try {
+    if (typeof wishlist !== 'undefined' && wishlist && typeof wishlist.size === 'number') {
+      // Wishlist is a Set in-memory
+      wlArr = [...wishlist];
+    } else {
+      wlArr = JSON.parse(localStorage.getItem('desmos_wishlist_v1') || '[]');
+    }
+  } catch(e) { wlArr = []; }
+  const cartCount = cartArr.reduce((s, i) => s + (i && i.qty ? i.qty : 0), 0);
+  const wlCount   = Array.isArray(wlArr) ? wlArr.length : 0;
   if (cartBadge) {
     const prev = parseInt(cartBadge.textContent, 10) || 0;
     cartBadge.textContent = cartCount;
