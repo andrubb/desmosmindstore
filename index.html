@@ -10275,7 +10275,7 @@ section + section::before,
         </div>
       </a>
       <a class="editorial-card reveal" href="/articles/streetwear-gotico-cr.html">
-        <div class="ec-image" style="background-image:url('https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=800&fm=webp&q=78&auto=format,compress&fit=crop');">
+        <div class="ec-image" style="background-image:url('https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&fm=webp&q=78&auto=format,compress&fit=crop');">
           <span class="ec-eyebrow">Lookbook</span>
         </div>
         <div class="ec-body">
@@ -10737,7 +10737,9 @@ section + section::before,
 // Any `const` referenced by function declarations later in this block must
 // live up here, because function declarations hoist but `const` does not.
 // ════════════════════════════════════
-const BUCKET = 'product-images';
+const BUCKET            = 'product-images';
+const CART_STORAGE_KEY  = 'desmos_cart_v1';
+const WISHLIST_KEY      = 'desmos_wishlist_v1';
 
 // ════════════════════════════════════
 // HELPERS DE ALMACENAMIENTO SEGURO
@@ -11664,8 +11666,8 @@ function optimizeImg(url, width){
 
 // ════════════════════════════════════════════════════════════
 // WISHLIST (localStorage-backed Set of product IDs)
+// (WISHLIST_KEY is declared at the top of this script block to avoid TDZ.)
 // ════════════════════════════════════════════════════════════
-const WISHLIST_KEY = 'desmos_wishlist_v1';
 let wishlist = new Set();
 try {
   wishlist = new Set(JSON.parse(localStorage.getItem(WISHLIST_KEY) || '[]'));
@@ -13865,7 +13867,7 @@ async function moveDrop(i, dir){
 const DEFAULT_CATEGORIES = [
   {id:1, name:'Ropa', desc:'Tanks, shorts, hoodies y más', filter:'ropa',
    img:'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=800&q=80',
-   img2:'https://images.unsplash.com/photo-1556821840-3a63f15732ce?w=800&q=80'},
+   img2:'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&q=80'},
   {id:2, name:'Suplementos', desc:'Proteína, creatina, pre-entrenos', filter:'suplementos',
    img:'https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=800&q=80',
    img2:'https://images.unsplash.com/photo-1594737625785-a6cbdabd333c?w=800&q=80'},
@@ -14407,7 +14409,7 @@ let cart = []; // [{product, size, color, qty}]
 // the item (offline, deleted from Supabase, etc.). This means: fresh price
 // when the product exists in the current `products` array, stale snapshot
 // when it doesn't — cart is never lost.
-const CART_STORAGE_KEY = 'desmos_cart_v1';
+// (CART_STORAGE_KEY is declared at the top of this script block to avoid TDZ.)
 function saveCart(){
   try {
     const lite = cart.map(i => ({

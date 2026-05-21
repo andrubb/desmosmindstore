@@ -6,7 +6,7 @@
 //   • Supabase API / Plausible / fonts: bypass (always network)
 // Bump CACHE_VERSION whenever you ship a breaking change.
 // ════════════════════════════════════════════════════════════
-const CACHE_VERSION = 'desmos-v3';
+const CACHE_VERSION = 'desmos-v4';
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const STATIC_CACHE  = `${CACHE_VERSION}-static`;
 
@@ -88,12 +88,20 @@ self.addEventListener('fetch', (event) => {
 });
 
 // ─── Strategy implementations ───
+// Golden rule for every strategy below: a Response body can only be read
+// once. Before we hand the response back to the page (which will read it),
+// we ALWAYS take a clone first and stash the clone in the cache. Cloning
+// must happen before either copy is consumed — once `cache.put()` starts
+// reading the body, calling `.clone()` afterwards throws
+// "Response body is already used".
 async function networkFirst(req) {
   try {
     const fresh = await fetch(req);
     if (fresh && fresh.ok) {
-      const cache = await caches.open(RUNTIME_CACHE);
-      cache.put(req, fresh.clone());
+      const clone = fresh.clone();
+      caches.open(RUNTIME_CACHE)
+        .then((cache) => cache.put(req, clone))
+        .catch(() => {});
     }
     return fresh;
   } catch (e) {
@@ -105,10 +113,12 @@ async function networkFirst(req) {
 async function cacheFirst(req) {
   const cached = await caches.match(req);
   if (cached) {
-    // Refresh in background
+    // Refresh in background. `fresh` isn't returned anywhere else, but we
+    // still clone defensively so a future caller can't accidentally read it.
     fetch(req).then((fresh) => {
       if (fresh && fresh.ok) {
-        caches.open(RUNTIME_CACHE).then((c) => c.put(req, fresh));
+        const clone = fresh.clone();
+        caches.open(RUNTIME_CACHE).then((c) => c.put(req, clone)).catch(() => {});
       }
     }).catch(() => {});
     return cached;
@@ -116,8 +126,10 @@ async function cacheFirst(req) {
   try {
     const fresh = await fetch(req);
     if (fresh && fresh.ok) {
-      const cache = await caches.open(RUNTIME_CACHE);
-      cache.put(req, fresh.clone());
+      const clone = fresh.clone();
+      caches.open(RUNTIME_CACHE)
+        .then((cache) => cache.put(req, clone))
+        .catch(() => {});
     }
     return fresh;
   } catch (e) {
@@ -129,7 +141,8 @@ async function staleWhileRevalidate(req) {
   const cached = await caches.match(req);
   const fetchPromise = fetch(req).then((fresh) => {
     if (fresh && fresh.ok) {
-      caches.open(RUNTIME_CACHE).then((c) => c.put(req, fresh.clone()));
+      const clone = fresh.clone();
+      caches.open(RUNTIME_CACHE).then((c) => c.put(req, clone)).catch(() => {});
     }
     return fresh;
   }).catch(() => cached);
