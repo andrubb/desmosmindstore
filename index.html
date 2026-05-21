@@ -321,10 +321,18 @@ p      { font-family:var(--font-body);    font-size:var(--fs-body); line-height:
 }
 @keyframes topglow{0%,100%{opacity:0.4;}50%{opacity:1;}}
 
-/* Bottom fade */
+/* Bottom fade — taller + eased so particles bleed smoothly into the next
+   section instead of cutting off on a hard line. z-index sits above the
+   particle canvas (z:3) but below the noise/grain layer. */
 .hero-bottom-fade{
-  position:absolute;bottom:0;left:0;right:0;height:200px;z-index:4;
-  background:linear-gradient(to bottom,transparent,#050505);
+  position:absolute;bottom:0;left:0;right:0;height:340px;z-index:4;
+  background:linear-gradient(
+    to bottom,
+    rgba(5,5,5,0)   0%,
+    rgba(5,5,5,0.4) 45%,
+    rgba(5,5,5,0.85) 75%,
+    #050505         100%
+  );
   pointer-events:none;
 }
 
@@ -2947,9 +2955,13 @@ input:focus, textarea:focus, select:focus {
 
 /* 22 ── Brands marquee — branded edges */
 .brands-band {
-  border-top: 1px solid rgba(220,17,17,0.22) !important;
-  border-bottom: 1px solid rgba(220,17,17,0.22) !important;
+  /* Top border removed — it was the visible hard line where the hero
+     ended and brands began. Bottom stays faint. Background is forced
+     to the hero's exact tone so the seam disappears completely. */
+  border-top: 0 !important;
+  border-bottom: 1px solid rgba(220,17,17,0.12) !important;
   position: relative;
+  background: #050505 !important;
 }
 .brands-band::before,
 .brands-band::after {
@@ -2960,8 +2972,8 @@ input:focus, textarea:focus, select:focus {
   z-index: 2;
   pointer-events: none;
 }
-.brands-band::before { left: 0;  background: linear-gradient(90deg, var(--bg2), transparent); }
-.brands-band::after  { right: 0; background: linear-gradient(270deg, var(--bg2), transparent); }
+.brands-band::before { left: 0;  background: linear-gradient(90deg, #050505, transparent); }
+.brands-band::after  { right: 0; background: linear-gradient(270deg, #050505, transparent); }
 
 /* 23 ── Flag badges — micro-motion on card hover */
 .flag-sale, .flag-best, .flag-new {
@@ -8915,34 +8927,43 @@ body::after {
   letter-spacing: 0.02em;
 }
 
-/* Hero eyebrow — sharper */
+/* Hero eyebrow — bright with glow, matches title luminance */
 .hero-eyebrow-text {
   font-family: var(--font-condensed);
-  font-weight: 600;
-  letter-spacing: 0.35em;
+  font-weight: 700;
+  letter-spacing: 0.4em;
   font-size: 0.7rem;
-  color: rgba(212,208,200,0.6);
+  color: rgba(255,255,255,0.9);
+  text-shadow:
+    0 0 20px rgba(255,255,255,0.6),
+    0 0 40px rgba(255,255,255,0.3);
 }
 
-/* Hero tagline — refined */
+/* Hero tagline — refined, brightened for legibility over particles */
 .hero-tagline {
   font-family: var(--font-body);
   font-weight: 300;
   font-size: clamp(0.9rem, 1.5vw, 1.05rem);
   line-height: 1.75;
-  color: rgba(212,208,200,0.65);
+  color: rgba(255,255,255,0.95);
   letter-spacing: 0.02em;
   max-width: 42ch;
+  text-shadow:
+    0 0 15px rgba(255,255,255,0.5),
+    0 0 30px rgba(255,255,255,0.2);
 }
 
-/* Hero sub — condensed style */
+/* Hero sub — "FITNESS · STREET · CULTURE", bright + glowing */
 .hero-sub {
   font-family: var(--font-condensed);
-  font-weight: 500;
-  letter-spacing: 0.25em;
+  font-weight: 600;
+  letter-spacing: 0.4em;
   font-size: 0.8rem;
-  color: rgba(220,17,17,0.8);
+  color: rgba(255,255,255,0.95);
   text-transform: uppercase;
+  text-shadow:
+    0 0 15px rgba(255,255,255,0.5),
+    0 0 30px rgba(255,255,255,0.2);
 }
 
 /* Hero stats — editorial */
