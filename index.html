@@ -7721,6 +7721,11 @@ footer::before {
 }
 .drop-banner-body { flex: 1; min-width: 200px; }
 .drop-banner-body .coming-soon-tag {
+  /* The global .coming-soon-tag is a red-bg chip; inside the drop banner
+     it's just an eyebrow line, so reset bg + padding so red text on red
+     bg stops collapsing into an invisible bar. */
+  background: transparent !important;
+  padding: 0 !important;
   font-family: var(--font-body);
   font-size: 0.62rem;
   font-weight: 700;
@@ -9625,6 +9630,62 @@ section + section::before,
 
   /* Editorial / lookbook cards stack cleanly. */
   .editorial-grid { grid-template-columns: 1fr !important; }
+
+  /* ── 375px audit fixes ── */
+
+  /* Products toolbar mobile rebuild:
+     - Outer toolbar wraps so chips/sort/results stack vertically.
+     - The filter chip row is intentionally a horizontal-scroll strip
+       (common shopping-app pattern), but it was stretching its parent
+       to 464px wide. Constrain it to 100% so the inner row scrolls
+       instead of pushing the layout off-canvas.
+     - Result-row (count + clear-filter) gets full width + wrap so the
+       "LIMPIAR FILTRO" pill can't clip on the right edge. */
+  .products-toolbar {
+    flex-wrap: wrap !important;
+    gap: 0.75rem !important;
+  }
+  .products-toolbar-controls {
+    width: 100% !important;
+    min-width: 0 !important;
+    flex-wrap: wrap !important;
+  }
+  .products-filters {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    flex: 0 1 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    /* Edge fade so the user sees there's more to scroll. */
+    mask-image: linear-gradient(90deg, transparent 0, #000 12px, #000 calc(100% - 24px), transparent 100%);
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 12px, #000 calc(100% - 24px), transparent 100%);
+  }
+  .products-toolbar-right { width: 100% !important; }
+  .products-result-row {
+    width: 100% !important;
+    flex-wrap: wrap !important;
+    justify-content: space-between !important;
+    gap: 0.5rem !important;
+    min-width: 0 !important;
+  }
+  .products-result-row > * { min-width: 0 !important; }
+
+  /* WhatsApp float was overlapping the bottom tab bar. Lift it above
+     the 62px tab bar + safe-area inset on mobile only. */
+  #wa-float {
+    bottom: calc(62px + env(safe-area-inset-bottom, 0px) + 14px) !important;
+  }
+
+  /* Deep-link anchors / nav clicks were landing under the ticker+navbar
+     stack, clipping section headings. scroll-margin-top puts each
+     section's start below the fixed top chrome. */
+  section[id] { scroll-margin-top: calc(26px + 56px); }
+
+  /* Section vertical padding: 3.5rem felt empty on phones — Gymshark
+     uses tighter rhythm. Trim to 2.75rem; hero opts out (own layout). */
+  section { padding-top: 2.75rem !important; padding-bottom: 2.75rem !important; }
+  section.hero { padding-top: 0 !important; padding-bottom: 0 !important; }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -17079,21 +17140,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // ── 47.1 Section-header micro reveal ──
     // Eyebrow, title, subtitle stagger up + fade as the header
     // enters the viewport. Skips the hero (separate motion).
+    // Using gsap.fromTo with immediateRender:false so the final state
+    // is explicit — gsap.from was leaving inline opacity:0 stuck on
+    // some elements when ScrollTrigger fired mid-instant-scroll.
     document.querySelectorAll('section:not(.hero) .sec-header').forEach(header => {
       const targets = header.querySelectorAll('.sec-eyebrow, .sec-title, .sec-subtitle');
       if (!targets.length) return;
-      gsap.from(targets, {
-        y: 24 * M,
-        opacity: 0,
-        duration: 0.7 * M,
-        ease: SOFT_EASE,
-        stagger: 0.09 * M,
-        scrollTrigger: {
-          trigger: header,
-          start: 'top 82%',
-          once: true
+      gsap.fromTo(targets,
+        { y: 24 * M, opacity: 0 },
+        {
+          y: 0, opacity: 1,
+          duration: 0.7 * M,
+          ease: SOFT_EASE,
+          stagger: 0.09 * M,
+          immediateRender: false,
+          scrollTrigger: { trigger: header, start: 'top 82%', once: true }
         }
-      });
+      );
     });
 
     // ── 47.2 Card grid stagger entrance ──
@@ -17106,18 +17169,17 @@ document.addEventListener('DOMContentLoaded', () => {
       document.querySelectorAll(sel).forEach(grid => {
         const items = grid.children;
         if (!items.length) return;
-        gsap.from(items, {
-          y: 30 * M,
-          opacity: 0,
-          duration: 0.6 * M,
-          ease: SOFT_EASE,
-          stagger: 0.08 * M,
-          scrollTrigger: {
-            trigger: grid,
-            start: 'top 78%',
-            once: true
+        gsap.fromTo(items,
+          { y: 30 * M, opacity: 0 },
+          {
+            y: 0, opacity: 1,
+            duration: 0.6 * M,
+            ease: SOFT_EASE,
+            stagger: 0.08 * M,
+            immediateRender: false,
+            scrollTrigger: { trigger: grid, start: 'top 85%', once: true }
           }
-        });
+        );
       });
     });
 
