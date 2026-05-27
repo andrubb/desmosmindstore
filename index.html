@@ -8213,10 +8213,55 @@ footer::before {
   overflow: hidden;
 }
 @media (max-width: 900px) {
+  /* ── MOBILE MODAL REBUILD ──
+     The product modal on mobile is one fullscreen, single-column scroll
+     container. Image stacks at the top with a fixed 4:5 crop and scrolls
+     up off-screen as the user reads. Body sits below in normal flow. A
+     sticky bottom bar (.modal-sticky-bar, see feature 7) stays pinned
+     so "Add to cart" is always reachable without thumb gymnastics. */
+  #prod-modal.luxury-modal {
+    padding: 0 !important;
+    align-items: stretch !important;
+    backdrop-filter: none !important;             /* perf: GPU killer on mobile */
+    -webkit-backdrop-filter: none !important;
+    background: rgba(0,0,0,0.96);
+  }
   #prod-modal.luxury-modal .modal-inner {
-    grid-template-columns: 1fr !important;
-    max-height: 100vh !important;
-    height: 100dvh;
+    display: block !important;                    /* one-column flow */
+    grid-template-columns: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    overflow-y: auto !important;                  /* whole modal scrolls */
+    -webkit-overflow-scrolling: touch;
+  }
+  #prod-modal.luxury-modal .modal-gallery {
+    height: auto !important;
+    width: 100% !important;
+    aspect-ratio: 4 / 5;                          /* fixed crop, no fixed pos */
+    flex: 0 0 auto !important;
+    min-height: 0 !important;
+  }
+  #prod-modal.luxury-modal .modal-main-img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+  }
+  #prod-modal.luxury-modal .modal-body {
+    overflow: visible !important;                 /* body no longer scrolls
+                                                     itself — inner handles it,
+                                                     so the image scrolls away */
+    padding: 1.4rem 1.25rem 6rem !important;      /* bottom pad keeps last
+                                                     content above sticky bar */
+  }
+  .modal-sticky-bar {
+    position: sticky !important;
+    bottom: 0 !important;
+    z-index: 12 !important;
   }
 }
 
@@ -9530,6 +9575,79 @@ section + section::before,
   border-radius: 2px;
 }
 
+/* ═══════════════════════════════════════════════════════════
+   MOBILE PERFORMANCE PASS — Gymshark-quality baseline
+   Heavy GPU work (backdrop-filter blur, layered box-shadows, complex
+   easing) tanks scroll perf on phones. The rules below kick in once
+   the viewport is ≤ 767px and tame everything across the site.
+═══════════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  /* 1) Backdrop-filter is the worst GPU offender on mid-range Android.
+        Strip it from EVERY element on mobile in one sweep. */
+  *,
+  *::before,
+  *::after {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* 2) Cap animation/transition duration. Anything longer than 0.3s
+        feels sluggish on touch; under that it reads as instant + crisp. */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.3s !important;
+    transition-duration: 0.3s !important;
+    /* Use the same buttery curve everywhere for consistency. */
+    transition-timing-function: cubic-bezier(.16,1,.3,1) !important;
+  }
+  /* Marquee + particle floats are intentionally long loops — exempt them. */
+  .marquee-track,
+  .hero-bat-svg,
+  .logoBreathe,
+  .hero-logo-img {
+    animation-duration: revert !important;
+  }
+
+  /* 3) Heavy multi-layer box-shadows → flatten to one cheap shadow.
+        Touch any element with multiple shadows by clobbering the
+        property at the highest practical specificity. */
+  .prod-card,
+  .modal-inner,
+  .drop-slide,
+  .category-card,
+  .testimonial-card,
+  .faq-item,
+  .btn-primary,
+  .btn-ghost {
+    box-shadow: 0 4px 14px rgba(0,0,0,0.5) !important;
+  }
+
+  /* 4) Strip will-change after page paint — nothing on mobile should
+        permanently promote a layer once the entrance is done. */
+  .reveal,
+  .reveal.in,
+  .hero-content,
+  .hero-title,
+  .hero-sub,
+  .hero-tagline,
+  .hero-btns,
+  .hero-stats {
+    will-change: auto !important;
+  }
+
+  /* 5) Parallax / transform-on-scroll OFF. No subtle background drift,
+        no 3D tilt on cards — anything that recalculates layout on
+        scroll is banned on mobile. */
+  [data-parallax],
+  .parallax,
+  .tilt-3d,
+  .category-card,
+  .prod-card {
+    transform: none !important;
+    perspective: none !important;
+  }
+}
 
 </style>
 
@@ -15399,6 +15517,19 @@ openProductForm = function(id){
 (function(){
   const canvas = document.getElementById('hero-particles');
   if(!canvas) return;
+
+  // ── PERF GUARD: skip particles on low-end devices ──
+  // hardwareConcurrency < 4 covers most budget Android phones. We also
+  // bail when the user prefers reduced motion. Hiding the canvas lets the
+  // bat SVG breathe through without paying the per-frame fill cost.
+  const lowCores  = (navigator.hardwareConcurrency || 8) < 4;
+  const reduceMotion = window.matchMedia &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (lowCores || reduceMotion) {
+    canvas.style.display = 'none';
+    return;
+  }
+
   const ctx = canvas.getContext('2d');
   let W, H, particles = [], animId;
 
