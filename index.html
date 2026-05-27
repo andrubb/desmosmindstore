@@ -300,7 +300,11 @@ p      { font-family:var(--font-body);    font-size:var(--fs-body); line-height:
    HERO — PREMIUM REDESIGN
 ═══════════════════════════════ */
 .hero{
+  /* 100svh ("small viewport height") accounts for mobile browser toolbars
+     so the hero never bleeds under the iOS Safari address bar. Fallback
+     to 100vh on older browsers. */
   min-height:100vh;
+  min-height:100svh;
   display:flex;align-items:center;justify-content:center;
   position:relative;overflow:hidden;
   background:#050505;
@@ -344,15 +348,15 @@ p      { font-family:var(--font-body);    font-size:var(--fs-body); line-height:
   transform:translate(-50%,-50%);
   pointer-events:none;
   z-index:2;
-  opacity:0;
+  opacity:1;                  /* static — no scroll animation, no fade-in */
   filter:
     drop-shadow(0 0 8px rgba(255,20,20,1))
     drop-shadow(0 0 28px rgba(255,0,0,0.78))
     drop-shadow(0 0 70px rgba(220,17,17,0.42));
   animation:
-    svgFloat 7s 1.6s ease-in-out infinite,
-    svgGlow  5s 1.6s ease-in-out infinite;
-  will-change:transform,opacity,filter;
+    svgFloat 7s ease-in-out infinite,
+    svgGlow  5s ease-in-out infinite;
+  /* will-change removed — bat is static, no scroll work to promote for */
 }
 @keyframes svgAtmoReveal{
   0%  {opacity:0;transform:translate(-50%,-50%) scale(1.06);}
@@ -3470,17 +3474,10 @@ img { transition: opacity 0.4s ease; }
   }
 }
 
-/* Scroll wrapper — gives height for the sticky effect */
-.hero-scroll-stage {
-  position: relative;
-  height: 180vh;
-}
-.hero-sticky {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  overflow: hidden;
-}
+/* Scroll wrapper REMOVED — the hero is now a single in-flow section.
+   These selectors are kept as no-ops so any leftover JS query is harmless. */
+.hero-scroll-stage,
+.hero-sticky { all: unset; display: contents; }
 
 /* ── HERO PARTICLES ── */
 #hero-particles {
@@ -3595,11 +3592,16 @@ img { transition: opacity 0.4s ease; }
 
 /* ── HERO CORNER ORNAMENTS ── */
 .hero-corner {
-  position: absolute;
+  position: absolute;          /* absolute inside .hero (never fixed) */
   width: 60px;
   height: 60px;
   z-index: 3;
   pointer-events: none;
+}
+@media (max-width: 767px){
+  /* Mobile: ornaments removed entirely — they crowd the hero on small
+     viewports and Gymshark-quality minimalism wants the hero to breathe. */
+  .hero-corner { display: none !important; }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -9669,7 +9671,10 @@ section + section::before,
 </div>
 
 <!-- ═══ HERO — PREMIUM ═══ -->
-<div class="hero-scroll-stage"><div class="hero-sticky"><section class="hero" id="inicio">
+<!-- Note: hero-scroll-stage / hero-sticky wrappers REMOVED. The hero is now
+     a normal flow section (position:relative, min-height:100svh) so mobile
+     scroll behaves natively. -->
+<section class="hero" id="inicio">
 
   <!-- Layer 1: Bat image -->
 
@@ -9744,7 +9749,7 @@ section + section::before,
     <span class="scroll-label">Scroll</span>
   </div>
 
-</section></div></div>
+</section>
 
 <!-- ═══ BRANDS MARQUEE ═══ -->
 <div class="brands-band">
@@ -15494,75 +15499,11 @@ openProductForm = function(id){
 </script>
 <script>
 // ════════════════════════════════════
-// BAT SCROLL ANIMATION — GSAP ScrollTrigger
+// BAT SCROLL ANIMATION — REMOVED
+// The bat now stays static (CSS-only float + glow) per the mobile-first
+// redesign. No GSAP ScrollTrigger ties hero motion to scroll position,
+// which means the hero is just a normal section in document flow.
 // ════════════════════════════════════
-(function(){
-  const bat     = document.querySelector('.hero-bat-svg');
-  const stage   = document.querySelector('.hero-scroll-stage');
-  const glow    = document.querySelector('.hero-glow');
-  const content = document.querySelector('.hero-content');
-  if(!bat) return;
-
-  // Entrance: fade in (replaces removed svgAtmoReveal CSS animation)
-  const entranceTween = gsap.to(bat, {
-    opacity: 1, duration: 1.4, delay: 0.2, ease: 'power3.out'
-  });
-
-  if(!stage) return;
-
-  // Hand centering to GSAP and pause CSS float when scroll begins
-  const batTL = gsap.timeline({
-    scrollTrigger: {
-      trigger: stage,
-      start: 'top top',
-      end: 'bottom bottom',
-      scrub: 1,
-      onEnter() {
-        entranceTween.kill();
-        gsap.set(bat, {xPercent:-50, yPercent:-50, opacity:1});
-        bat.style.animationPlayState = 'paused';
-      },
-      onLeaveBack() {
-        bat.style.animationPlayState = 'running';
-        gsap.set(bat, {clearProps:'transform,opacity'});
-      }
-    }
-  });
-
-  // Phase 1 (0–20%): awaken — pulse scale
-  batTL.to(bat, {scale:1.05, duration:0.2, ease:'sine.inOut'});
-
-  // Phase 2 (20–55%): rise with wing-spread
-  batTL.to(bat, {
-    y:-50, scaleX:1.13, scaleY:0.9, skewX:3,
-    filter:'drop-shadow(0 0 16px rgba(255,20,20,1)) drop-shadow(0 0 50px rgba(255,0,0,0.85)) drop-shadow(0 0 100px rgba(220,17,17,0.5))',
-    duration:0.35, ease:'power2.inOut'
-  });
-
-  // Phase 3 (55–100%): fly up and vanish
-  batTL.to(bat, {
-    y:-260, scaleX:0.75, scaleY:0.65, skewX:0, opacity:0,
-    filter:'drop-shadow(0 0 4px rgba(255,20,20,0.4))',
-    duration:0.45, ease:'power3.in'
-  });
-
-  // Glow flare then fade
-  if(glow){
-    gsap.timeline({
-      scrollTrigger:{trigger:stage,start:'top top',end:'bottom bottom',scrub:1}
-    })
-    .to(glow, {opacity:2.2, duration:0.35})
-    .to(glow, {opacity:0,   duration:0.65});
-  }
-
-  // Hero content fades and rises from 25% scroll onward
-  if(content){
-    gsap.timeline({
-      scrollTrigger:{trigger:stage,start:'top top',end:'bottom bottom',scrub:1}
-    })
-    .to(content, {opacity:0, y:-60, duration:0.45, ease:'power2.in'}, 0.25);
-  }
-})();
 
 // ════════════════════════════════════════════════════════════
 // FEATURE 21 ── EN/ES LANGUAGE TOGGLE
