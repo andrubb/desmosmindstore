@@ -1093,7 +1093,7 @@ section{padding:6rem 2.5rem;}
 ═══════════════════════════════ */
 .contact-section{background:var(--bg2);}
 .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;}
-@media(max-width:700px){.contact-grid{grid-column:1fr;}}
+@media(max-width:700px){.contact-grid{grid-template-columns:1fr;}}
 .contact-card{
   background:var(--bg3);border:1px solid var(--border-white);
   padding:1.8rem 2rem;display:flex;align-items:center;
@@ -9576,6 +9576,58 @@ section + section::before,
 }
 
 /* ═══════════════════════════════════════════════════════════
+   MOBILE AUDIT — section-by-section sanity pass
+   Catches edges the dedicated section media queries missed.
+═══════════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  /* iOS zooms on inputs whose computed font-size is < 16px. Bumping all
+     form-input / textarea to 16px stops the zoom + the layout snap. */
+  .form-input,
+  textarea,
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="password"],
+  input[type="search"],
+  input[type="number"] {
+    font-size: 16px !important;
+  }
+
+  /* Cart panel + search overlay should be fullscreen on mobile. */
+  #cart-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Modal toolbar (close/fullscreen) clears the iOS notch. */
+  .modal-toolbar {
+    top: max(10px, env(safe-area-inset-top)) !important;
+  }
+
+  /* Drops slider stage gets full bleed + safer height ratio. */
+  .drop-slide {
+    aspect-ratio: 4 / 5 !important;
+    min-height: 0 !important;
+  }
+
+  /* Footer text sizes + alignment for one-column grid. */
+  .footer-grid > * { text-align: left; }
+  .footer-grid h4 { font-size: 0.78rem !important; letter-spacing: 0.22em; }
+
+  /* Trust grid: stack items so each row has full-width tap area. */
+  .trust-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+
+  /* Category cards: smaller decorative pixels, bigger tap area. */
+  .category-card { min-height: 200px; }
+
+  /* Editorial / lookbook cards stack cleanly. */
+  .editorial-grid { grid-template-columns: 1fr !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════
    MOBILE TYPOGRAPHY + SPACING — Gymshark / Antigravity reference
    Mobile-first numbers: crisp hierarchy, generous whitespace, every
    tap target ≥ 48px (Apple HIG / Material both agree on this).
@@ -10746,6 +10798,8 @@ section + section::before,
         <button class="admin-tab-btn" data-tab="reviews" onclick="showAdminTab('reviews')">⭐ RESEÑAS</button>
         <button class="admin-tab-btn" data-tab="categories" onclick="showAdminTab('categories')">📁 CATEGORÍAS</button>
         <button class="admin-tab-btn" data-tab="content" onclick="showAdminTab('content')">✏️ TEXTOS</button>
+        <button class="admin-tab-btn" data-tab="ticker" onclick="showAdminTab('ticker')">📢 TICKER</button>
+        <button class="admin-tab-btn" data-tab="exitintent" onclick="showAdminTab('exitintent')">🚪 EXIT POPUP</button>
         <button class="admin-tab-btn" data-tab="brands" onclick="showAdminTab('brands')">🏷 MARCAS</button>
       </div>
 
@@ -10789,6 +10843,24 @@ section + section::before,
       <!-- Content tab -->
       <div class="admin-tab-pane" id="tab-content"   style="display:none;">
         <div id="content-editor"></div>
+      </div>
+
+      <!-- Ticker tab -->
+      <div class="admin-tab-pane" id="tab-ticker" style="display:none;">
+        <p style="font-size:0.82rem;color:var(--muted2);margin-bottom:1.25rem;">
+          Mensajes rotativos que aparecen en la barra roja arriba del header.
+          Uno por línea — se rotan automáticamente cada 4 segundos.
+        </p>
+        <div id="ticker-editor"></div>
+      </div>
+
+      <!-- Exit-intent tab -->
+      <div class="admin-tab-pane" id="tab-exitintent" style="display:none;">
+        <p style="font-size:0.82rem;color:var(--muted2);margin-bottom:1.25rem;">
+          Popup que aparece cuando el usuario va a abandonar la página.
+          Personalizá el copy, el descuento y el CTA aquí.
+        </p>
+        <div id="exitintent-editor"></div>
       </div>
 
       <!-- Brands tab -->
@@ -11112,6 +11184,24 @@ function applySiteContent(){
     if(el) el.textContent=siteContent.hero_title.replace(/MIND/i,'').trim();
     if(elMind && /MIND/i.test(siteContent.hero_title)) elMind.textContent='MIND';
   }
+
+  // ── Exit-intent popup overrides ──
+  // ei_text accepts HTML (admin uses <strong>); the others are plain text.
+  const eiPlain = {
+    'ei-eyebrow-text':'ei_eyebrow',
+    'ei-title':'ei_title',
+    'ei-cta-btn':'ei_cta',
+    'ei-decline-btn':'ei_decline'
+  };
+  Object.entries(eiPlain).forEach(([id,key])=>{
+    const el = document.getElementById(id);
+    if(el && siteContent[key] != null) el.textContent = siteContent[key];
+  });
+  const eiTextEl = document.getElementById('ei-text');
+  if(eiTextEl && siteContent.ei_text != null) eiTextEl.innerHTML = siteContent.ei_text;
+
+  // ── Ticker rerender ── (delegated to refreshTicker which now consults siteContent)
+  if(typeof refreshTicker === 'function') refreshTicker();
 }
 
 function renderMarquee(){
@@ -13660,6 +13750,8 @@ function showAdminTab(tab){
   if(tab==='reviews')    renderAdminReviews();
   if(tab==='categories') renderAdminCategories();
   if(tab==='content')    renderContentEditor();
+  if(tab==='ticker')     renderTickerEditor();
+  if(tab==='exitintent') renderExitIntentEditor();
   if(tab==='brands')     renderBrandsEditor();
 }
 
@@ -14373,6 +14465,83 @@ async function saveContent(){
     }
     applySiteContent();
     showToast('Textos actualizados ✓');
+  } catch(e){ showToast('Error: '+e.message); }
+}
+
+// ─── TICKER MESSAGES TAB ───
+// Stored in site_content under key `ticker_messages` as a JSON-stringified
+// array of strings. One row per visible message — admin edits one per line.
+function renderTickerEditor(){
+  const wrap = document.getElementById('ticker-editor');
+  if(!wrap) return;
+  let msgs = [];
+  try { msgs = JSON.parse(siteContent.ticker_messages || '[]'); } catch(e){ msgs = []; }
+  if(!Array.isArray(msgs) || !msgs.length){
+    // Seed with current defaults from i18n so admin sees what's live now
+    msgs = (typeof t === 'function' ? t('tickerMessages') : []) || [];
+  }
+  wrap.innerHTML = `
+    <div class="content-field">
+      <label class="form-label">Mensajes del ticker (uno por línea)</label>
+      <textarea class="form-input" id="ticker-msgs-input"
+        style="min-height:180px;font-family:var(--font-body);line-height:1.6;"
+        placeholder="ENVÍO GRATIS DESDE $80\n10% OFF EN TU PRIMER DROP\nSTOCK LIMITADO">${msgs.map(m=>String(m).replace(/</g,'&lt;')).join('\n')}</textarea>
+    </div>
+    <button class="btn-primary" style="margin-top:1.5rem;width:100%;" onclick="saveTickerMessages()">GUARDAR TICKER</button>`;
+}
+
+async function saveTickerMessages(){
+  const el = document.getElementById('ticker-msgs-input');
+  if(!el) return;
+  const lines = el.value.split('\n').map(s => s.trim()).filter(Boolean);
+  const value = JSON.stringify(lines);
+  try {
+    siteContent.ticker_messages = value;
+    await sbFetch('site_content','POST',{key:'ticker_messages',value,updated_at:new Date().toISOString()},'?on_conflict=key');
+    applySiteContent();
+    if(typeof refreshTicker === 'function') refreshTicker();
+    showToast('Ticker actualizado ✓');
+  } catch(e){ showToast('Error: '+e.message); }
+}
+
+// ─── EXIT-INTENT POPUP TAB ───
+// Each field maps 1:1 to a Supabase site_content row.
+function renderExitIntentEditor(){
+  const wrap = document.getElementById('exitintent-editor');
+  if(!wrap) return;
+  const fields = [
+    {key:'ei_eyebrow',  label:'Eyebrow (línea superior pequeña)',  el:'ei-eyebrow-text', def:'DROP EXCLUSIVO'},
+    {key:'ei_title',    label:'Título principal',                  el:'ei-title',         def:'No te vayas sin tu pieza.'},
+    {key:'ei_text',     label:'Texto del cuerpo (HTML permitido — usá &lt;strong&gt; para resaltar)', el:'ei-text', def:'<strong>10% OFF</strong> en tu primer drop. Solo por unirte a la tribu.'},
+    {key:'ei_cta',      label:'Texto del botón CTA',               el:'ei-cta-btn',       def:'Reclamar'},
+    {key:'ei_decline',  label:'Texto del enlace "no gracias"',     el:'ei-decline-btn',   def:'No me interesa'},
+  ];
+  wrap.innerHTML = fields.map(f => {
+    const v = siteContent[f.key] != null ? siteContent[f.key] : f.def;
+    const isLong = f.key === 'ei_text';
+    return `
+      <div class="content-field">
+        <label class="form-label">${f.label}</label>
+        ${isLong
+          ? `<textarea class="form-input" id="ef-${f.key}" style="min-height:96px;">${String(v).replace(/</g,'&lt;')}</textarea>`
+          : `<input class="form-input" id="ef-${f.key}" value="${String(v).replace(/"/g,'&quot;')}">`}
+      </div>`;
+  }).join('') +
+  `<button class="btn-primary" style="margin-top:1.5rem;width:100%;" onclick="saveExitIntent()">GUARDAR EXIT POPUP</button>`;
+}
+
+async function saveExitIntent(){
+  const keys = ['ei_eyebrow','ei_title','ei_text','ei_cta','ei_decline'];
+  try {
+    for(const key of keys){
+      const el = document.getElementById('ef-'+key);
+      if(!el) continue;
+      const value = el.value;
+      siteContent[key] = value;
+      await sbFetch('site_content','POST',{key,value,updated_at:new Date().toISOString()},'?on_conflict=key');
+    }
+    applySiteContent();
+    showToast('Exit popup actualizado ✓');
   } catch(e){ showToast('Error: '+e.message); }
 }
 
@@ -15786,7 +15955,20 @@ function dismissTicker(){
 function refreshTicker(){
   const track = document.getElementById('ticker-track');
   if (!track) return;
-  const msgs = (typeof t === 'function' ? t('tickerMessages') : null) || [];
+
+  // Source of truth precedence:
+  //   1. siteContent.ticker_messages (admin-edited JSON array) — wins if non-empty
+  //   2. i18n bundle fallback so the ticker is never blank
+  let msgs = [];
+  try {
+    if (typeof siteContent !== 'undefined' && siteContent && siteContent.ticker_messages) {
+      const parsed = JSON.parse(siteContent.ticker_messages);
+      if (Array.isArray(parsed) && parsed.length) msgs = parsed;
+    }
+  } catch(e) { /* fall through to i18n */ }
+  if (!msgs.length) {
+    msgs = (typeof t === 'function' ? t('tickerMessages') : null) || [];
+  }
   if (!Array.isArray(msgs) || !msgs.length) return;
   track.innerHTML = msgs.map((m, i) =>
     `<span class="ticker-msg${i === 0 ? ' active' : ''}">${m}</span>`
