@@ -9576,6 +9576,73 @@ section + section::before,
 }
 
 /* ═══════════════════════════════════════════════════════════
+   MOBILE TYPOGRAPHY + SPACING — Gymshark / Antigravity reference
+   Mobile-first numbers: crisp hierarchy, generous whitespace, every
+   tap target ≥ 48px (Apple HIG / Material both agree on this).
+═══════════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  /* ── Type scale ── */
+  .hero-title {
+    font-size: clamp(2.6rem, 11vw, 3.5rem) !important;
+    line-height: 0.95 !important;
+    letter-spacing: 0 !important;
+  }
+  .hero-sub {
+    font-size: 0.72rem !important;
+    letter-spacing: 0.32em !important;
+  }
+  .hero-tagline {
+    font-size: 0.92rem !important;
+    line-height: 1.65 !important;
+    max-width: 32ch !important;
+  }
+  .sec-title,
+  h2, .h2 {
+    font-size: clamp(1.5rem, 7vw, 2rem) !important;
+    line-height: 1.15 !important;
+    letter-spacing: 0.04em !important;
+  }
+  p, li {
+    line-height: 1.65 !important;
+  }
+
+  /* ── Section spacing — 24px+ horizontal padding everywhere ── */
+  section,
+  .container {
+    padding-left: max(24px, env(safe-area-inset-left)) !important;
+    padding-right: max(24px, env(safe-area-inset-right)) !important;
+  }
+  section {
+    padding-top: 3.5rem !important;
+    padding-bottom: 3.5rem !important;
+  }
+  /* Hero keeps its own min-height + center layout — don't add v-padding. */
+  section.hero {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  /* ── Tap targets ── any interactive element ≥ 48×48px ── */
+  .btn-primary,
+  .btn-ghost,
+  button,
+  .bt-tab,
+  a.btn,
+  .nav-link,
+  .ticker-close,
+  .modal-tool {
+    min-height: 48px !important;
+    min-width: 48px !important;
+  }
+  /* Padding tweak so the increased min-height doesn't make labels float. */
+  .btn-primary,
+  .btn-ghost {
+    padding-top: 0.95rem !important;
+    padding-bottom: 0.95rem !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
    MOBILE PERFORMANCE PASS — Gymshark-quality baseline
    Heavy GPU work (backdrop-filter blur, layered box-shadows, complex
    easing) tanks scroll perf on phones. The rules below kick in once
@@ -16819,6 +16886,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!window.gsap || !window.ScrollTrigger) return;
     gsap.registerPlugin(ScrollTrigger);
 
+    // ── Mobile motion budget ──
+    // Antigravity reference: animations should feel fast and subtle on
+    // phones, not theatrical. Scale entrance distances and durations
+    // down 40% under 768px, and use the same buttery curve everywhere.
+    const isMobile = window.matchMedia('(max-width: 767px)').matches;
+    const M = isMobile ? 0.6 : 1;                  // motion multiplier
+    const SOFT_EASE = 'cubic-bezier(0.16, 1, 0.3, 1)';
+
     // ── 47.1 Section-header micro reveal ──
     // Eyebrow, title, subtitle stagger up + fade as the header
     // enters the viewport. Skips the hero (separate motion).
@@ -16826,11 +16901,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const targets = header.querySelectorAll('.sec-eyebrow, .sec-title, .sec-subtitle');
       if (!targets.length) return;
       gsap.from(targets, {
-        y: 24,
+        y: 24 * M,
         opacity: 0,
-        duration: 0.7,
-        ease: 'power2.out',
-        stagger: 0.09,
+        duration: 0.7 * M,
+        ease: SOFT_EASE,
+        stagger: 0.09 * M,
         scrollTrigger: {
           trigger: header,
           start: 'top 82%',
@@ -16850,11 +16925,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const items = grid.children;
         if (!items.length) return;
         gsap.from(items, {
-          y: 30,
+          y: 30 * M,
           opacity: 0,
-          duration: 0.6,
-          ease: 'power2.out',
-          stagger: 0.08,
+          duration: 0.6 * M,
+          ease: SOFT_EASE,
+          stagger: 0.08 * M,
           scrollTrigger: {
             trigger: grid,
             start: 'top 78%',
