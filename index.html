@@ -8396,9 +8396,25 @@ footer::before {
 }
 .modal-tool:active { transform: scale(0.93); }
 @media (max-width: 700px) {
-  .modal-toolbar { top: 10px; right: 10px; }
-  .modal-tool { width: 40px; height: 40px; }
-  .modal-fullscreen { display: none; } /* mobile is already fullscreen */
+  /* Close button on mobile: 44px circle, sits over the image at top-right.
+     Comeonbrocr-style: floating against the photo with a soft black puck
+     so it reads on light or dark crops. */
+  .modal-toolbar {
+    top: max(12px, env(safe-area-inset-top, 0px));
+    right: 12px;
+  }
+  .modal-tool {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 50% !important;
+    background: rgba(0,0,0,0.7) !important;
+    border: 1px solid rgba(255,255,255,0.16) !important;
+    color: #fff !important;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+    font-size: 1.15rem;
+  }
+  .modal-tool:active { transform: scale(0.92); }
+  .modal-fullscreen { display: none; } /* mobile is always fullscreen */
 }
 
 /* GALLERY */
@@ -9704,7 +9720,7 @@ section + section::before,
   .hero-sub {
     order: -1 !important;
     margin: 0 0 0.1rem !important;
-    font-size: 0.6rem !important;
+    font-size: 0.55rem !important;
     letter-spacing: 0.3em !important;
     font-weight: 700 !important;
     color: var(--red) !important;
@@ -9712,10 +9728,10 @@ section + section::before,
     text-transform: uppercase;
   }
 
-  /* ── DESMOS / MIND title ── */
+  /* ── DESMOS / MIND title — matched weight + size, MIND just red ── */
   .hero-title {
-    font-size: clamp(3.5rem, 12vw, 5rem) !important;
-    line-height: 0.95 !important;
+    font-size: clamp(4rem, 14vw, 6rem) !important;
+    line-height: 0.92 !important;
     letter-spacing: 0 !important;
     margin: 0 !important;
     gap: 0 !important;
@@ -9724,21 +9740,22 @@ section + section::before,
     align-items: center !important;
     max-width: 100%;
     overflow: visible;
-    text-shadow: none !important;     /* mind has its own glow */
+    text-shadow: none !important;
   }
   .hero-title-desmos {
     font-family: 'Bebas Neue', var(--font-display) !important;
     color: #ffffff !important;
     font-weight: 400 !important;
+    font-style: normal !important;
   }
   .hero-title-mind {
     font-family: 'Bebas Neue', var(--font-display) !important;
-    font-style: italic !important;
+    font-style: normal !important;     /* italic OFF on mobile */
+    font-weight: 400 !important;
     color: var(--red) !important;
     text-shadow:
-      0 0 10px rgba(255,255,255,0.65),
-      0 0 24px rgba(255,255,255,0.3),
-      0 0 56px rgba(220,17,17,0.55) !important;
+      0 0 18px rgba(220,17,17,0.55),
+      0 0 44px rgba(220,17,17,0.28) !important;
   }
   /* Remove the inline divider between DESMOS and MIND on mobile —
      the divider lives between MIND and tagline instead. */
@@ -9749,8 +9766,8 @@ section + section::before,
     position: relative;
     padding-top: 1.5rem !important;
     margin: 0 !important;
-    font-size: 0.9rem !important;
-    max-width: 280px !important;
+    font-size: 0.85rem !important;
+    max-width: 260px !important;
     line-height: 1.5 !important;
     color: rgba(255,255,255,0.78) !important;
     text-shadow: none !important;
@@ -9767,20 +9784,56 @@ section + section::before,
     transform-origin: center;
   }
 
-  /* ── Buttons: full-width 260px, stacked ── */
+  /* ── Buttons: stacked, chamfered, 240×52, with shimmer sweep ── */
   .hero-btns {
     flex-direction: column !important;
     width: 100% !important;
-    max-width: 260px !important;
-    gap: 0.7rem !important;
-    margin: 0.35rem 0 0 !important;
+    max-width: 240px !important;
+    gap: 12px !important;
+    margin: 0.5rem 0 0 !important;
     align-items: stretch !important;
   }
-  .hero-btns > * {
+  .hero-btns .btn-primary,
+  .hero-btns .btn-ghost {
+    position: relative;
+    overflow: hidden;
     width: 100% !important;
-    text-align: center !important;
+    min-width: 240px !important;
+    min-height: 52px !important;
+    padding: 0 1.25rem !important;
+    font-family: 'Bebas Neue', var(--font-display) !important;
+    font-size: 0.85rem !important;
+    letter-spacing: 0.2em !important;
+    text-transform: uppercase;
+    display: inline-flex !important;
+    align-items: center !important;
     justify-content: center !important;
+    border-radius: 0 !important;
+    -webkit-clip-path: polygon(8px 0%, 100% 0%, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0% 100%, 0% 8px);
+    clip-path: polygon(8px 0%, 100% 0%, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0% 100%, 0% 8px);
   }
+  .hero-btns .btn-primary {
+    background: var(--red) !important;
+    color: #fff !important;
+    border: none !important;
+    box-shadow: 0 6px 22px rgba(220,17,17,0.32) !important;
+  }
+  .hero-btns .btn-ghost {
+    background: transparent !important;
+    color: #fff !important;
+    border: 1.5px solid var(--red) !important;
+  }
+  /* Shimmer sweep on the primary CTA — fires once on load + on tap. */
+  .hero-btns .btn-primary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(110deg, transparent 0%, transparent 35%, rgba(255,255,255,0.32) 50%, transparent 65%, transparent 100%);
+    transform: translateX(-110%);
+    pointer-events: none;
+    animation: heroBtnShimmer 2.4s cubic-bezier(.16,1,.3,1) 1.4s infinite;
+  }
+  .hero-btns .btn-primary:active { transform: translateY(1px); }
 
   /* ── Stats strip ── */
   .hero-stats {
@@ -9793,13 +9846,13 @@ section + section::before,
   .hero-stat-num { font-size: 1.5rem !important; }
   .hero-stat-label { font-size: 0.55rem !important; letter-spacing: 0.2em !important; }
 
-  /* ── Bat SVG: behind text, slightly lower than center ── */
+  /* ── Bat SVG: wings frame the TITLE block only, never the buttons ── */
   .hero-bat-svg {
-    width: 85vw !important;
-    max-width: 85vw !important;
-    top: 56% !important;
+    width: 90vw !important;
+    max-width: 90vw !important;
+    top: 38% !important;                 /* lifted above buttons */
     z-index: 1 !important;
-    opacity: 0.95 !important;
+    opacity: 0.92 !important;
   }
 
   /* ── ENTRANCE — transition-based, class-toggle on body ──
@@ -9861,6 +9914,13 @@ section + section::before,
 /* (heroMobile* @keyframes removed — replaced by transition-based reveal
    triggered by the body.hero-entered class. See the script in
    <body> end that adds the class on next frame.) */
+
+/* Hero primary CTA shimmer sweep — used by mobile hero-btns. */
+@keyframes heroBtnShimmer {
+  0%   { transform: translateX(-110%); }
+  55%  { transform: translateX(110%); }
+  100% { transform: translateX(110%); }
+}
 
 /* ═══════════════════════════════════════════════════════════
    MOBILE AUDIT — section-by-section sanity pass
