@@ -10177,6 +10177,54 @@ section + section::before,
 }
 
 /* ═══════════════════════════════════════════════════════════
+   MOBILE QUALITY PASS — every section
+   - Generous 24px horizontal padding (already enforced earlier).
+   - Product cards in a tight 2-col grid (3:4 photos).
+   - Section titles capped at 2rem (already enforced).
+   - Kill any transform3d / perspective effects so the GPU isn't
+     building extra layers just for hover affordances no phone gets.
+═══════════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  /* Force 2 columns even at <420px — the previous "1 column on tiny
+     phones" rule made the grid feel like a list. With 24px horizontal
+     padding and a 6px gap, two 154px-wide cards fit at 375px viewport
+     and stay tappable. */
+  .products-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+  .prod-card { min-width: 0; max-width: 100%; }
+  .prod-img-wrap {
+    aspect-ratio: 3 / 4 !important;
+    overflow: hidden;
+  }
+  .prod-card * { max-width: 100%; }
+
+  /* Kill 3D effects sitewide on mobile — perspective + transform3d
+     burn the GPU for hover states that touch can't trigger anyway. */
+  * {
+    perspective: none !important;
+    transform-style: flat !important;
+  }
+  .tilt-3d, [data-tilt], .editorial-card, .prod-card {
+    transform: none !important;
+  }
+
+  /* Trust band + categories + drops + brands + footer: no horizontal
+     overflow allowed. Reaffirm the page-level guard. */
+  html, body { overflow-x: hidden !important; }
+
+  /* Long product names truncate cleanly instead of pushing the card. */
+  .prod-name, .prod-brand {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
    GLOBAL BUTTON REDESIGN — chamfered, Bebas Neue, shimmer
    Applies to every .btn-primary and .btn-ghost on the site,
    desktop and mobile. Hero-specific overrides (240px/52px) sit
@@ -10431,6 +10479,21 @@ section + section::before,
       document.body.offsetHeight;
       setTimeout(() => document.body.classList.add('hero-entered'), 0);
     }
+    // Global image error handler — any <img> that 404s gets swapped to
+    // a branded placeholder, and we set onerror=null so a broken
+    // placeholder can't loop. Uses capture-phase delegation so it
+    // catches both DOM-baked and JS-rendered images, including ones
+    // added long after this script runs. Inline onerror= attributes
+    // (which set fallback URLs of their own) still run first; this is
+    // a safety net for everything they miss.
+    document.addEventListener('error', function (e) {
+      var t = e.target;
+      if (t && t.tagName === 'IMG' && !t.dataset.fallbackApplied) {
+        t.dataset.fallbackApplied = '1';
+        t.onerror = null;
+        t.src = 'https://placehold.co/600x800/0a0a0a/DC1111?text=DESMOS';
+      }
+    }, true);
   </script>
 
   <!-- Layer 5: Content -->
@@ -11621,7 +11684,7 @@ async function loadAllData(){
         category: p.category, type: p.type,
         sizes: p.sizes ? p.sizes.split(',').map(s=>s.trim()).filter(Boolean) : [],
         colors: p.colors ? p.colors.split(',').map(s=>s.trim()).filter(Boolean) : [],
-        img: p.img||'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600',
+        img: p.img||'https://placehold.co/600x800/0a0a0a/DC1111?text=DESMOS',
         imgs: [p.img, p.img2].filter(Boolean),
         // Real stock from Supabase: nullable (null = not tracked).
         // Add a `stock integer` column to the products table to enable.
@@ -12673,7 +12736,7 @@ function renderRecentlyViewed(){
     <a class="recent-card" href="javascript:void(0)" onclick="openProduct(${p.id})" aria-label="${p.name}">
       <img class="recent-card-img" src="${optimizeImg(p.img, 240)}" alt="${(p.brand||'')} ${p.name}"
         width="240" height="240" loading="lazy" decoding="async"
-        onerror="this.src='https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=240&fm=webp&q=78'">
+        onerror="this.src='https://placehold.co/240x320/0a0a0a/DC1111?text=DESMOS'">
       <div class="recent-card-info">
         <p class="recent-card-brand">${p.brand || ''}</p>
         <p class="recent-card-name">${p.name || ''}</p>
@@ -12850,7 +12913,7 @@ function buildFeaturedHeroHtml(p){
       <div class="fh-image">
         <img src="${heroImg}" alt="${altText}" loading="eager" decoding="async"
           width="1200" height="800"
-          onerror="this.src='https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=1200&fm=webp&q=78'">
+          onerror="this.src='https://placehold.co/1200x1600/0a0a0a/DC1111?text=DESMOS'">
         <span class="fh-tag"><span class="fh-tag-dot" aria-hidden="true"></span>FEATURED · BESTSELLER</span>
       </div>
       <div class="fh-body">
@@ -12995,7 +13058,7 @@ function renderProducts(filter='all'){
 
   grid.innerHTML = heroHtml + gridList.map((p,i)=>{
     const imgs = Array.isArray(p.imgs) && p.imgs.length ? p.imgs : [p.img];
-    const rawMain = imgs[0] || 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600';
+    const rawMain = imgs[0] || 'https://placehold.co/600x800/0a0a0a/DC1111?text=DESMOS';
     const rawHover = imgs[1] || rawMain;
     const rawLifestyle = imgs[2] || imgs[1] || rawMain;
     const mainImg      = optimizeImg(rawMain, 600);
@@ -13034,7 +13097,7 @@ function renderProducts(filter='all'){
       <div class="prod-img-wrap" onclick="openProduct(${p.id})">
         <img class="prod-img-main" src="${mainImg}" alt="${altText}"
           width="600" height="800" loading="lazy" decoding="async"
-          onerror="this.src='https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600&fm=webp&q=78'">
+          onerror="this.src='https://placehold.co/600x800/0a0a0a/DC1111?text=DESMOS'">
         <img class="prod-img-hover" src="${hoverImg}" alt="${altText}"
           width="600" height="800" loading="lazy" decoding="async"
           onerror="this.src='${mainImg}'">
@@ -14737,7 +14800,7 @@ function renderCategories(){
     <a class="cat-card reveal" href="#stock" onclick="filterProducts('${cat.filter}',null)"
       style="transition-delay:${i*0.1}s; text-decoration:none; display:block;">
       <img class="cat-img-main" src="${cat.img}" alt="${cat.name}"
-        onerror="this.src='https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600'">
+        onerror="this.src='https://placehold.co/600x800/0a0a0a/DC1111?text=DESMOS'">
       <img class="cat-img-hover" src="${cat.img2||cat.img}" alt="${cat.name}"
         onerror="this.src='${cat.img}'">
       <div class="cat-overlay"></div>
@@ -14809,7 +14872,7 @@ function renderAdminGrid(){
     ? '<p style="color:var(--muted2);text-align:center;padding:2rem;">No hay productos. Agrega uno nuevo.</p>'
     : products.map(p=>`
     <div class="admin-prod-card">
-      <img class="admin-prod-img" src="${p.img}" alt="${p.name}" onerror="this.src='https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=400'">
+      <img class="admin-prod-img" src="${p.img}" alt="${p.name}" onerror="this.src='https://placehold.co/400x500/0a0a0a/DC1111?text=DESMOS'">
       <div class="admin-prod-body">
         <p class="admin-prod-brand">${p.brand}</p>
         <p class="admin-prod-name">${p.name}</p>
@@ -14870,7 +14933,7 @@ async function saveProduct(){
     const el = document.getElementById(id);
     return el ? el.value.trim() : '';
   };
-  const imgVal  = getImgVal('f-img')  || 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600';
+  const imgVal  = getImgVal('f-img')  || 'https://placehold.co/600x800/0a0a0a/DC1111?text=DESMOS';
   const img2val = getImgVal('f-img2') || null;
 
   // Data for Supabase (without img2 until column exists)
@@ -15571,7 +15634,7 @@ function updateCartUI(){
     <div class="cart-item" data-idx="${idx}">
       <img class="cart-item-img" src="${optimizeImg(item.product.img, 140)}" alt="${(item.product.brand||'')} ${item.product.name}"
         width="70" height="70" loading="lazy" decoding="async"
-        onerror="this.src='https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=140&fm=webp&q=78'">
+        onerror="this.src='https://placehold.co/140x180/0a0a0a/DC1111?text=DESMOS'">
       <div class="cart-item-info">
         <p class="cart-item-brand">${item.product.brand}</p>
         <p class="cart-item-name">${item.product.name}</p>
