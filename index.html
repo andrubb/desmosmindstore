@@ -3638,8 +3638,23 @@ img { transition: opacity 0.4s ease; }
 }
 @media (max-width: 767px){
   /* Mobile: ornaments removed entirely — they crowd the hero on small
-     viewports and Gymshark-quality minimalism wants the hero to breathe. */
-  .hero-corner { display: none !important; }
+     viewports and Gymshark-quality minimalism wants the hero to breathe.
+     Multiple selectors at increasing specificity so no later cascade can
+     bring them back, plus visibility:hidden as a second guarantee. */
+  .hero-corner,
+  .hero .hero-corner,
+  .hero .hero-corner.tl,
+  .hero .hero-corner.tr,
+  .hero .hero-corner.bl,
+  .hero .hero-corner.br {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    width: 0 !important;
+    height: 0 !important;
+  }
+  .hero-corner::before,
+  .hero-corner::after { display: none !important; }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -10038,6 +10053,14 @@ section + section::before,
   <div class="hero-corner tr" aria-hidden="true"></div>
   <div class="hero-corner bl" aria-hidden="true"></div>
   <div class="hero-corner br" aria-hidden="true"></div>
+  <script>
+    // Mobile backstop: if CSS cache is stale or a stylesheet failed to
+    // load, kill the corner ornaments at DOM level under 768px so they
+    // can't float on top of the hero.
+    if (window.innerWidth < 768) {
+      document.querySelectorAll('.hero-corner').forEach(el => el.remove());
+    }
+  </script>
 
   <!-- Layer 5: Content -->
   <div class="hero-content">
