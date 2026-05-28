@@ -642,14 +642,21 @@ section{padding:6rem 2.5rem;}
 .marquee-track{
   display:flex;
   align-items:center;
-  animation:marquee 28s linear infinite;
+  animation: marquee-scroll 25s linear infinite;
   white-space:nowrap;
   width:max-content;
+  will-change: transform;
 }
 .marquee-track:hover{animation-play-state:paused;}
-@keyframes marquee{
-  0%{transform:translateX(0);}
-  100%{transform:translateX(-50%);}
+/* Canonical name `marquee-scroll`; the legacy alias `marquee` is kept
+   so any inline style/JS referencing the old keyframe still works. */
+@keyframes marquee-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 /* brand-item and brand-sep defined once below in FINAL POLISH block */
 
@@ -10168,6 +10175,74 @@ section + section::before,
     perspective: none !important;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════
+   GLOBAL BUTTON REDESIGN — chamfered, Bebas Neue, shimmer
+   Applies to every .btn-primary and .btn-ghost on the site,
+   desktop and mobile. Hero-specific overrides (240px/52px) sit
+   on top of these defaults.
+═══════════════════════════════════════════════════════════ */
+.btn-primary,
+.btn-ghost {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  padding: 0 1.6rem;
+  font-family: 'Bebas Neue', var(--font-display);
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  border-radius: 0;
+  -webkit-clip-path: polygon(8px 0%, 100% 0%, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0% 100%, 0% 8px);
+  clip-path: polygon(8px 0%, 100% 0%, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0% 100%, 0% 8px);
+  transition: transform 0.18s ease, box-shadow 0.3s ease, background 0.3s ease, color 0.3s ease;
+}
+.btn-primary {
+  background: var(--red);
+  color: #fff;
+  box-shadow: 0 6px 22px rgba(220,17,17,0.28);
+}
+.btn-primary:hover {
+  background: #ff2222;
+  box-shadow: 0 10px 32px rgba(220,17,17,0.42);
+}
+.btn-primary:active { transform: translateY(1px) scale(0.98); }
+
+.btn-ghost {
+  background: transparent;
+  color: #fff;
+  /* Border drawn via inset box-shadow so it follows the clip-path edges
+     without producing a fat outer ring outside the chamfer. */
+  box-shadow: inset 0 0 0 1.5px var(--red);
+}
+.btn-ghost:hover {
+  background: var(--red);
+  color: #fff;
+  box-shadow: inset 0 0 0 1.5px var(--red), 0 8px 26px rgba(220,17,17,0.32);
+}
+.btn-ghost:active { transform: translateY(1px) scale(0.98); }
+
+/* Shimmer sweep on hover for the primary CTA — soft white diagonal. */
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 0%, transparent 35%, rgba(255,255,255,0.28) 50%, transparent 65%, transparent 100%);
+  transform: translateX(-110%);
+  transition: transform 0.7s cubic-bezier(.16,1,.3,1);
+  pointer-events: none;
+}
+.btn-primary:hover::after { transform: translateX(110%); }
+
+/* Kill the legacy ::before sweep so it doesn't double up. */
+.btn-primary::before { display: none !important; }
 
 </style>
 
