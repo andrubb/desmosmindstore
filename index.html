@@ -3489,6 +3489,36 @@ img { transition: opacity 0.4s ease; }
   pointer-events: none;
 }
 
+/* ── HERO STATIC DOTS (mobile fallback) ──
+   Replaces the canvas particle field on phones where the rAF loop tanks
+   scroll perf. Pure CSS — multiple radial-gradients painted onto the
+   hero ::before pseudo. Zero JS, zero per-frame cost. */
+@media (max-width: 767px) {
+  /* Cut the canvas + the scan-line animation on phones — both are GPU
+     work for zero scroll value. The hero gets static red/white dots
+     painted by .hero::before instead. */
+  #hero-particles { display: none !important; }
+  .hero::before {
+    /* override the desktop scan-line rule above */
+    height: auto !important;
+    inset: 0 !important;
+    animation: none !important;
+    z-index: 1 !important;
+    background:
+      radial-gradient(circle at 12% 18%, rgba(220,17,17,0.65) 0 1.4px, transparent 1.6px),
+      radial-gradient(circle at 78% 22%, rgba(240,236,228,0.55) 0 1.2px, transparent 1.4px),
+      radial-gradient(circle at 32% 84%, rgba(220,17,17,0.55) 0 1.5px, transparent 1.7px),
+      radial-gradient(circle at 88% 72%, rgba(240,236,228,0.45) 0 1px,   transparent 1.2px),
+      radial-gradient(circle at 22% 48%, rgba(240,236,228,0.4)  0 0.9px, transparent 1.1px),
+      radial-gradient(circle at 64% 56%, rgba(220,17,17,0.6)  0 1.3px, transparent 1.5px),
+      radial-gradient(circle at 8% 70%,  rgba(240,236,228,0.5)  0 1.1px, transparent 1.3px),
+      radial-gradient(circle at 94% 38%, rgba(220,17,17,0.5)  0 1.2px, transparent 1.4px),
+      radial-gradient(circle at 48% 12%, rgba(240,236,228,0.55) 0 1px,   transparent 1.2px),
+      radial-gradient(circle at 56% 92%, rgba(220,17,17,0.55) 0 1.3px, transparent 1.5px) !important;
+    opacity: 0.85;
+  }
+}
+
 /* ── HERO TITLE GLITCH ── */
 .hero-title-desmos {
   position: relative;
@@ -15815,14 +15845,16 @@ openProductForm = function(id){
   const canvas = document.getElementById('hero-particles');
   if(!canvas) return;
 
-  // ── PERF GUARD: skip particles on low-end devices ──
-  // hardwareConcurrency < 4 covers most budget Android phones. We also
-  // bail when the user prefers reduced motion. Hiding the canvas lets the
-  // bat SVG breathe through without paying the per-frame fill cost.
+  // ── PERF GUARD: skip canvas entirely on mobile + low-end + reduced-motion ──
+  // The requestAnimationFrame loop drawing ~80 dots with shadow blur is the
+  // single biggest source of scroll jank on phones. On any viewport < 768px
+  // we hide the canvas and let a static CSS .hero-static-dots layer fill in
+  // for the visual texture (see CSS — radial-gradient dot pattern).
+  const isMobile  = window.innerWidth < 768;
   const lowCores  = (navigator.hardwareConcurrency || 8) < 4;
   const reduceMotion = window.matchMedia &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (lowCores || reduceMotion) {
+  if (isMobile || lowCores || reduceMotion) {
     canvas.style.display = 'none';
     return;
   }
