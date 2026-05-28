@@ -3487,6 +3487,28 @@ img { transition: opacity 0.4s ease; }
 .hero-scroll-stage,
 .hero-sticky { all: unset; display: contents; }
 
+/* ── BLOOD PARTICLES (created in JS, missing CSS until now) ──
+   The createParticles() helper appends ~12 .blood-particle <div>s into
+   the hero with inline left/top percentage offsets — those only make
+   sense for an absolutely-positioned element. Without this rule they
+   defaulted to position:static and stacked vertically, ballooning the
+   hero height to 1300px+ on mobile. */
+.blood-particle {
+  position: absolute;
+  width: 1px;
+  background: linear-gradient(180deg, rgba(220,17,17,0.85), transparent);
+  pointer-events: none;
+  z-index: 2;
+  filter: blur(0.4px);
+  animation: bloodDrip 5s ease-in infinite;
+  transform-origin: top;
+}
+@keyframes bloodDrip {
+  0%   { transform: translateY(-40px) scaleY(0.6); opacity: 0; }
+  20%  { opacity: 0.9; }
+  100% { transform: translateY(180px) scaleY(1);   opacity: 0; }
+}
+
 /* ── HERO PARTICLES ── */
 #hero-particles {
   position: absolute;
@@ -5609,9 +5631,8 @@ html.loader-dismissed #page-loader { display: none !important; }
     position: fixed;
     left: 0; right: 0;
     bottom: 0;
-    background: rgba(8, 8, 8, 0.96);
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
+    width: 100%;
+    background: #050505;          /* solid — no see-through to content behind */
     border-top: 1px solid rgba(220,17,17,0.32);
     box-shadow: 0 -8px 32px rgba(0,0,0,0.75);
     z-index: 500;
@@ -9524,19 +9545,19 @@ body::after {
   backdrop-filter: blur(30px) !important;
 }
 
-/* ── 25. WA FLOAT — pulse ring ── */
+/* ── 25. WA FLOAT — pulse ring (subtle, slow) ── */
 #wa-float::before {
   content: '';
   position: absolute;
   inset: -4px;
   border-radius: inherit;
-  border: 2px solid rgba(37,211,102,0.4);
-  animation: wa-ring-pulse 3s ease-out infinite;
+  border: 2px solid rgba(37,211,102,0.28);
+  animation: wa-ring-pulse 4.5s cubic-bezier(.16,1,.3,1) infinite;
 }
 @keyframes wa-ring-pulse {
-  0%   { transform: scale(1);   opacity: 0.6; }
-  70%  { transform: scale(1.3); opacity: 0; }
-  100% { transform: scale(1.3); opacity: 0; }
+  0%   { transform: scale(1);    opacity: 0.45; }
+  60%  { transform: scale(1.22); opacity: 0;    }
+  100% { transform: scale(1.22); opacity: 0;    }
 }
 
 /* ── 26. TICKER BAR ── */
@@ -9632,6 +9653,214 @@ section + section::before,
   outline-offset: 3px;
   border-radius: 2px;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   MOBILE HERO REDESIGN — Gymshark/Antigravity reference
+   Order on mobile: eyebrow (FITNESS·STREET·CULTURE) → DESMOS →
+   MIND → red 60px divider → tagline → CTAs (stacked, 260px) →
+   stats strip. The bat SVG sits behind, slightly below center,
+   85vw wide. Safe-area aware top/bottom padding clears the
+   fixed ticker+navbar above and the bottom tab bar below.
+═══════════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+  /* ── Top/bottom safe-area aware spacing on body ──
+     Pads the document so no in-flow content can ever hide behind the
+     fixed ticker+navbar (top) or the bottom tab bar (bottom). */
+  body {
+    padding-top: calc(26px + 56px + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  /* The hero owns its own clearance (it's the first section), so cancel
+     the body's padding-top on its container by translating up by the
+     same amount. Other sections live inside body's padded area normally. */
+  section.hero { margin-top: calc(-1 * (26px + 56px + env(safe-area-inset-top, 0px))); }
+
+  /* ── Hero shell ── */
+  section.hero {
+    min-height: 100svh;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: calc(80px + env(safe-area-inset-top, 0px)) 24px
+             calc(100px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  .hero-content {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 1.1rem;
+    max-width: 100%;
+    padding: 0 !important;
+    z-index: 5;
+    position: relative;
+  }
+
+  /* ── Hide the legacy red-line eyebrow ("BORN IN DARKNESS" etc).
+        We use .hero-sub instead and move it to the eyebrow slot. ── */
+  .hero-eyebrow { display: none !important; }
+
+  /* ── Eyebrow: promote .hero-sub via flex order ── */
+  .hero-sub {
+    order: -1 !important;
+    margin: 0 0 0.1rem !important;
+    font-size: 0.6rem !important;
+    letter-spacing: 0.3em !important;
+    font-weight: 700 !important;
+    color: var(--red) !important;
+    text-shadow: none !important;
+    text-transform: uppercase;
+  }
+
+  /* ── DESMOS / MIND title ── */
+  .hero-title {
+    font-size: clamp(3.5rem, 12vw, 5rem) !important;
+    line-height: 0.95 !important;
+    letter-spacing: 0 !important;
+    margin: 0 !important;
+    gap: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    max-width: 100%;
+    overflow: visible;
+    text-shadow: none !important;     /* mind has its own glow */
+  }
+  .hero-title-desmos {
+    font-family: 'Bebas Neue', var(--font-display) !important;
+    color: #ffffff !important;
+    font-weight: 400 !important;
+  }
+  .hero-title-mind {
+    font-family: 'Bebas Neue', var(--font-display) !important;
+    font-style: italic !important;
+    color: var(--red) !important;
+    text-shadow:
+      0 0 10px rgba(255,255,255,0.65),
+      0 0 24px rgba(255,255,255,0.3),
+      0 0 56px rgba(220,17,17,0.55) !important;
+  }
+  /* Remove the inline divider between DESMOS and MIND on mobile —
+     the divider lives between MIND and tagline instead. */
+  .hero-title-divider { display: none !important; }
+
+  /* ── 60px red divider before tagline ── */
+  .hero-tagline {
+    position: relative;
+    padding-top: 1.5rem !important;
+    margin: 0 !important;
+    font-size: 0.9rem !important;
+    max-width: 280px !important;
+    line-height: 1.5 !important;
+    color: rgba(255,255,255,0.78) !important;
+    text-shadow: none !important;
+  }
+  .hero-tagline::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 2px;
+    background: var(--red);
+    box-shadow: 0 0 12px rgba(220,17,17,0.55);
+    transform-origin: center;
+  }
+
+  /* ── Buttons: full-width 260px, stacked ── */
+  .hero-btns {
+    flex-direction: column !important;
+    width: 100% !important;
+    max-width: 260px !important;
+    gap: 0.7rem !important;
+    margin: 0.35rem 0 0 !important;
+    align-items: stretch !important;
+  }
+  .hero-btns > * {
+    width: 100% !important;
+    text-align: center !important;
+    justify-content: center !important;
+  }
+
+  /* ── Stats strip ── */
+  .hero-stats {
+    margin-top: 1.25rem !important;
+    padding-top: 1.25rem !important;
+    gap: 1rem !important;
+    flex-wrap: nowrap !important;
+    justify-content: center;
+  }
+  .hero-stat-num { font-size: 1.5rem !important; }
+  .hero-stat-label { font-size: 0.55rem !important; letter-spacing: 0.2em !important; }
+
+  /* ── Bat SVG: behind text, slightly lower than center ── */
+  .hero-bat-svg {
+    width: 85vw !important;
+    max-width: 85vw !important;
+    top: 56% !important;
+    z-index: 1 !important;
+    opacity: 0.95 !important;
+  }
+
+  /* ── ENTRANCE — transition-based, class-toggle on body ──
+     Kill the legacy `.hero-content > * { animation: fade-up }` rule on
+     mobile so it can't fight our transitions, then drive each visible
+     hero element from its initial state to its final state when body
+     gets `.hero-entered`. */
+  .hero-content > * { animation: none !important; }
+
+  .hero-sub,
+  .hero-title-desmos,
+  .hero-title-mind,
+  .hero-tagline,
+  .hero-btns,
+  .hero-stats {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+  }
+  .hero-sub          { transition-delay: 0.20s, 0.20s; }
+  .hero-title-desmos { transition-delay: 0.35s, 0.35s; }
+  .hero-title-mind   { transition-delay: 0.50s, 0.50s; }
+  .hero-tagline      { transition-delay: 0.75s, 0.75s; }
+  .hero-btns         { transition-delay: 0.90s, 0.90s; }
+  .hero-stats        { transition-delay: 1.10s, 1.10s; }
+  .hero-tagline::before {
+    transform: translateX(-50%) scaleX(0);
+    transition: transform 0.5s cubic-bezier(0.16,1,0.3,1) 0.65s;
+  }
+
+  body.hero-entered .hero-sub,
+  body.hero-entered .hero-title-desmos,
+  body.hero-entered .hero-title-mind,
+  body.hero-entered .hero-tagline,
+  body.hero-entered .hero-btns,
+  body.hero-entered .hero-stats { opacity: 1 !important; transform: translateY(0) !important; }
+  body.hero-entered .hero-tagline::before { transform: translateX(-50%) scaleX(1); }
+
+  /* Cancel the legacy desktop entrance animations on the h1 wrapper. */
+  .hero-title { animation: none !important; opacity: 1 !important; transform: none !important; }
+
+  /* prefers-reduced-motion: snap everything visible, no motion. */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-sub,
+    .hero-title-desmos,
+    .hero-title-mind,
+    .hero-tagline,
+    .hero-btns,
+    .hero-stats {
+      transition: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+    }
+    .hero-tagline::before { transition: none !important; transform: translateX(-50%) scaleX(1) !important; }
+  }
+}
+/* (heroMobile* @keyframes removed — replaced by transition-based reveal
+   triggered by the body.hero-entered class. See the script in
+   <body> end that adds the class on next frame.) */
 
 /* ═══════════════════════════════════════════════════════════
    MOBILE AUDIT — section-by-section sanity pass
@@ -9736,9 +9965,9 @@ section + section::before,
   section[id] { scroll-margin-top: calc(26px + 56px); }
 
   /* Section vertical padding: 3.5rem felt empty on phones — Gymshark
-     uses tighter rhythm. Trim to 2.75rem; hero opts out (own layout). */
+     uses tighter rhythm. Trim to 2.75rem; hero gets its own padding from
+     the mobile-hero-redesign block at the bottom of the stylesheet. */
   section { padding-top: 2.75rem !important; padding-bottom: 2.75rem !important; }
-  section.hero { padding-top: 0 !important; padding-bottom: 0 !important; }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -9782,11 +10011,9 @@ section + section::before,
     padding-top: 3.5rem !important;
     padding-bottom: 3.5rem !important;
   }
-  /* Hero keeps its own min-height + center layout — don't add v-padding. */
-  section.hero {
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-  }
+  /* (Hero padding handled by the mobile-hero-redesign block at the very
+     bottom of the stylesheet — it needs top/bottom clearance for the
+     fixed navbar and tab bar, so this old `padding: 0` override is gone.) */
 
   /* ── Tap targets ── any interactive element ≥ 48×48px ── */
   .btn-primary,
@@ -10059,6 +10286,15 @@ section + section::before,
     // can't float on top of the hero.
     if (window.innerWidth < 768) {
       document.querySelectorAll('.hero-corner').forEach(el => el.remove());
+    }
+    // Trigger the mobile hero entrance. We toggle the class twice with
+    // a force-reflow in between so the browser sees the "from" state,
+    // then transitions to the "to" state. setTimeout(0) is more reliable
+    // than rAF in some throttled environments.
+    if (window.innerWidth < 768 && document.body) {
+      // Force a reflow to settle the FROM state.
+      document.body.offsetHeight;
+      setTimeout(() => document.body.classList.add('hero-entered'), 0);
     }
   </script>
 
