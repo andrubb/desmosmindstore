@@ -306,7 +306,15 @@ p      { font-family:var(--font-body);    font-size:var(--fs-body); line-height:
   min-height:100vh;
   min-height:100svh;
   display:flex;align-items:center;justify-content:center;
-  position:relative;overflow:hidden;
+  position:relative;
+  overflow:hidden;                /* clip every absolute child */
+  isolation:isolate;              /* create a stacking context so
+                                     descendant z-index can't punch
+                                     above sibling sections */
+  contain:layout paint;           /* browser-level isolation —
+                                     prevents the bat SVG, particles,
+                                     and noise layers from painting
+                                     outside the hero box during scroll */
   background:#050505;
 }
 
