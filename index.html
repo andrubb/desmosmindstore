@@ -8351,18 +8351,18 @@ footer::before {
   overflow: hidden;
 }
 @media (max-width: 900px) {
-  /* ── MOBILE MODAL REBUILD ──
-     The product modal on mobile is one fullscreen, single-column scroll
-     container. Image stacks at the top with a fixed 4:5 crop and scrolls
-     up off-screen as the user reads. Body sits below in normal flow. A
-     sticky bottom bar (.modal-sticky-bar, see feature 7) stays pinned
-     so "Add to cart" is always reachable without thumb gymnastics. */
+  /* ── MOBILE PRODUCT MODAL — IMAGE-FIRST / INSTAGRAM-STYLE ──
+     One fullscreen single-column scroll container. The product photo is
+     the hero: full-bleed, 4:5, ~58% of the screen on first paint, no
+     margins. It scrolls up off-screen as the user reads brand → name →
+     price → sizes → description below. A sticky bottom bar keeps price +
+     AGREGAR reachable. Close button floats over the image top-right. */
   #prod-modal.luxury-modal {
     padding: 0 !important;
     align-items: stretch !important;
     backdrop-filter: none !important;             /* perf: GPU killer on mobile */
     -webkit-backdrop-filter: none !important;
-    background: rgba(0,0,0,0.96);
+    background: #050505 !important;
   }
   #prod-modal.luxury-modal .modal-inner {
     display: block !important;                    /* one-column flow */
@@ -8377,29 +8377,56 @@ footer::before {
     overflow-y: auto !important;                  /* whole modal scrolls */
     -webkit-overflow-scrolling: touch;
   }
+  /* Hero image block: full width, 4:5, big + immersive (clamped 56–62vh
+     so it dominates the first view but never the whole screen). */
   #prod-modal.luxury-modal .modal-gallery {
+    position: relative !important;
+    display: block !important;
+    width: 100vw !important;
+    margin: 0 !important;
+    aspect-ratio: 4 / 5 !important;
     height: auto !important;
-    width: 100% !important;
-    aspect-ratio: 4 / 5;                          /* fixed crop, no fixed pos */
+    min-height: 56vh !important;
+    max-height: 62vh !important;
     flex: 0 0 auto !important;
-    min-height: 0 !important;
+    background: #060606 !important;
+  }
+  #prod-modal.luxury-modal .modal-gallery-stage {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
   }
   #prod-modal.luxury-modal .modal-main-img {
     width: 100% !important;
     height: 100% !important;
     object-fit: cover !important;
+    display: block !important;
   }
+  /* Thumbnails strip is redundant in the immersive view — hide on mobile */
+  #prod-modal.luxury-modal .modal-thumbnails { display: none !important; }
   #prod-modal.luxury-modal .modal-body {
-    overflow: visible !important;                 /* body no longer scrolls
-                                                     itself — inner handles it,
-                                                     so the image scrolls away */
-    padding: 1.4rem 1.25rem 6rem !important;      /* bottom pad keeps last
-                                                     content above sticky bar */
+    overflow: visible !important;                 /* inner scrolls, image leaves */
+    padding: 1.5rem 1.25rem 7rem !important;       /* bottom pad clears fixed bar */
   }
-  .modal-sticky-bar {
-    position: sticky !important;
-    bottom: 0 !important;
-    z-index: 12 !important;
+  /* Close button: FIXED to the viewport top-right so it always floats over
+     the image and stays reachable no matter the scroll position (the old
+     absolute positioning was resolving against the scroll container and
+     landing mid-screen). */
+  #prod-modal.luxury-modal .modal-toolbar {
+    position: fixed !important;
+    top: max(12px, env(safe-area-inset-top, 0px)) !important;
+    right: 12px !important;
+    z-index: 30 !important;
+  }
+  /* Sticky add-to-cart bar: FIXED to the viewport bottom — bulletproof
+     pin (sticky inside the scroll container was measuring off-screen on
+     some layouts). */
+  #prod-modal.luxury-modal .modal-sticky-bar {
+    position: fixed !important;
+    left: 0 !important; right: 0 !important; bottom: 0 !important;
+    z-index: 25 !important;
+    padding-bottom: calc(0.65rem + env(safe-area-inset-bottom, 0px)) !important;
   }
 }
 
@@ -8732,10 +8759,9 @@ footer::before {
 }
 
 @media (max-width: 900px) {
-  #prod-modal.luxury-modal .modal-gallery {
-    aspect-ratio: 1;
-    flex: none;
-  }
+  /* (Gallery aspect-ratio is defined in the IMAGE-FIRST rebuild block
+     above — the old `aspect-ratio: 1` here was overriding it to a square
+     and is intentionally removed.) */
   #prod-modal.luxury-modal .modal-thumbnails {
     overflow-x: auto;
     flex-wrap: nowrap;
@@ -9919,8 +9945,18 @@ section + section::before,
      mobile so it can't fight our transitions, then drive each visible
      hero element from its initial state to its final state when body
      gets `.hero-entered`. */
-  .hero-content > * { animation: none !important; }
-
+  /* ── PURE-CSS hero entrance (NO JS dependency) ──
+     Auto-playing keyframe animations with fill-mode:both reveal each
+     element on a stagger. Critically: if ALL other JS dies, the hero
+     STILL appears — the reveal is driven entirely by CSS. (The previous
+     opacity:0 + body.hero-entered approach left the hero permanently
+     blank whenever that class failed to get added — the mobile "broken
+     site" symptom.)
+     `!important` here overrides the legacy desktop `.hero-content > * {
+     animation: fade-up }` rule (equal specificity) so these win on
+     mobile — and we do NOT use `animation:none` to cancel the legacy
+     one, because that was suppressing this reveal and leaving the
+     eyebrow/tagline/buttons/stats invisible. */
   .hero-sub,
   .hero-title-desmos,
   .hero-title-mind,
@@ -9928,29 +9964,17 @@ section + section::before,
   .hero-btns,
   .hero-stats {
     opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-                transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-    will-change: opacity, transform;
+    animation: heroRise 0.55s cubic-bezier(0.16, 1, 0.3, 1) both !important;
   }
-  .hero-sub          { transition-delay: 0.20s, 0.20s; }
-  .hero-title-desmos { transition-delay: 0.35s, 0.35s; }
-  .hero-title-mind   { transition-delay: 0.50s, 0.50s; }
-  .hero-tagline      { transition-delay: 0.75s, 0.75s; }
-  .hero-btns         { transition-delay: 0.90s, 0.90s; }
-  .hero-stats        { transition-delay: 1.10s, 1.10s; }
+  .hero-sub          { animation-delay: 0.15s !important; }
+  .hero-title-desmos { animation-delay: 0.28s !important; }
+  .hero-title-mind   { animation-delay: 0.42s !important; }
+  .hero-tagline      { animation-delay: 0.62s !important; }
+  .hero-btns         { animation-delay: 0.78s !important; }
+  .hero-stats        { animation-delay: 0.95s !important; }
   .hero-tagline::before {
-    transform: translateX(-50%) scaleX(0);
-    transition: transform 0.5s cubic-bezier(0.16,1,0.3,1) 0.65s;
+    animation: heroLine 0.5s cubic-bezier(0.16,1,0.3,1) 0.55s both !important;
   }
-
-  body.hero-entered .hero-sub,
-  body.hero-entered .hero-title-desmos,
-  body.hero-entered .hero-title-mind,
-  body.hero-entered .hero-tagline,
-  body.hero-entered .hero-btns,
-  body.hero-entered .hero-stats { opacity: 1 !important; transform: translateY(0) !important; }
-  body.hero-entered .hero-tagline::before { transform: translateX(-50%) scaleX(1); }
 
   /* Cancel the legacy desktop entrance animations on the h1 wrapper. */
   .hero-title { animation: none !important; opacity: 1 !important; transform: none !important; }
@@ -9963,12 +9987,20 @@ section + section::before,
     .hero-tagline,
     .hero-btns,
     .hero-stats {
-      transition: none !important;
+      animation: none !important;
       opacity: 1 !important;
       transform: none !important;
     }
-    .hero-tagline::before { transition: none !important; transform: translateX(-50%) scaleX(1) !important; }
+    .hero-tagline::before { animation: none !important; transform: translateX(-50%) scaleX(1) !important; }
   }
+}
+@keyframes heroRise {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes heroLine {
+  from { transform: translateX(-50%) scaleX(0); }
+  to   { transform: translateX(-50%) scaleX(1); }
 }
 /* (heroMobile* @keyframes removed — replaced by transition-based reveal
    triggered by the body.hero-entered class. See the script in
@@ -10626,19 +10658,18 @@ section + section::before,
   <script>
     // Mobile backstop: if CSS cache is stale or a stylesheet failed to
     // load, kill the corner ornaments at DOM level under 768px so they
-    // can't float on top of the hero.
-    if (window.innerWidth < 768) {
-      document.querySelectorAll('.hero-corner').forEach(el => el.remove());
-    }
-    // Trigger the mobile hero entrance. We toggle the class twice with
-    // a force-reflow in between so the browser sees the "from" state,
-    // then transitions to the "to" state. setTimeout(0) is more reliable
-    // than rAF in some throttled environments.
-    if (window.innerWidth < 768 && document.body) {
-      // Force a reflow to settle the FROM state.
-      document.body.offsetHeight;
-      setTimeout(() => document.body.classList.add('hero-entered'), 0);
-    }
+    // can't float on top of the hero. Wrapped in try/catch so it can
+    // never block the rest of this inline script.
+    try {
+      if (window.innerWidth < 768) {
+        document.querySelectorAll('.hero-corner').forEach(el => el.remove());
+      }
+    } catch (e) {}
+    // NOTE: the mobile hero entrance is now 100% pure CSS (auto-playing
+    // keyframes with fill-mode:both) — no JS class toggle. This means the
+    // hero text ALWAYS appears even if scripts fail. The old
+    // body.hero-entered mechanism was removed because a failure to add the
+    // class left the hero permanently blank on mobile.
     // Global image error handler — any <img> that 404s gets swapped to
     // a branded placeholder, and we set onerror=null so a broken
     // placeholder can't loop. Uses capture-phase delegation so it
@@ -13603,6 +13634,20 @@ function openProduct(id){
   const mWrap = document.getElementById('prod-modal');
   if (mWrap && mWrap.classList.contains('is-fullscreen')) {
     mWrap.classList.remove('is-fullscreen');
+  }
+  // Reset any leftover swipe transform/opacity on the inner panel before
+  // opening. The swipe-to-dismiss gesture sets an inline translateY; if a
+  // previous close didn't clear it, the modal would open off-screen and
+  // also break fixed/sticky children (a transformed ancestor becomes their
+  // containing block). Clearing here guarantees a clean, on-screen open.
+  if (mWrap) {
+    const innerEl = mWrap.querySelector('.modal-inner');
+    if (innerEl) {
+      innerEl.style.transform = '';
+      innerEl.style.opacity = '';
+      innerEl.classList.remove('swipe-snap', 'swipe-dismiss');
+      innerEl.scrollTop = 0;
+    }
   }
 
   document.getElementById('prod-modal').classList.add('open');
@@ -18153,6 +18198,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // fade are handled by the existing systems — not duplicated here.
 // ════════════════════════════════════════════════════════════
 (function(){
+ try {
   const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // ── 7a Scroll-progress line ──
@@ -18210,6 +18256,15 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.divider').forEach(el => el.classList.add('drawn'));
     document.querySelectorAll('.trust-item').forEach(el => el.classList.add('slid'));
   }
+ } catch (err) {
+   // Never let a mobile-details glitch take down the page — fail safe by
+   // revealing anything that was waiting on a class toggle.
+   console.warn('[DM] mobile-details module skipped:', err && err.message);
+   try {
+     document.querySelectorAll('.divider').forEach(el => el.classList.add('drawn'));
+     document.querySelectorAll('.trust-item').forEach(el => el.classList.add('slid'));
+   } catch(e){}
+ }
 })();
 </script>
 </body>
