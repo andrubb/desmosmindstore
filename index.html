@@ -1271,13 +1271,17 @@ footer{background:#030303;border-top:1px solid rgba(220,17,17,0.1);padding:5rem 
 .admin-add-btn:hover{background:var(--red-bright);}
 
 /* Product form modal */
-#prod-form-modal{
+#prod-form-modal,
+#cat-form-modal,
+#review-form-modal{
   display:none;position:fixed;inset:0;z-index:900;
   background:rgba(0,0,0,0.92);
   align-items:center;justify-content:center;
   padding:2rem;
 }
-#prod-form-modal.open{display:flex;}
+#prod-form-modal.open,
+#cat-form-modal.open,
+#review-form-modal.open{display:flex;}
 .prod-form-inner{
   background:var(--bg2);border:1px solid var(--border);
   width:100%;max-width:600px;padding:2.5rem;
@@ -1565,6 +1569,12 @@ footer{background:#030303;border-top:1px solid rgba(220,17,17,0.1);padding:5rem 
   0%,100%{box-shadow:0 4px 20px rgba(37,211,102,0.4);}
   50%{box-shadow:0 4px 30px rgba(37,211,102,0.7),0 0 0 8px rgba(37,211,102,0.1);}
 }
+/* Single canonical WA pulse: box-shadow ONLY, no transform/opacity, so the
+   button can't blink or jump. 3s. GPU-stabilized via translateZ. */
+@keyframes waPulseGlow{
+  0%,100%{ box-shadow:0 4px 18px rgba(37,211,102,0.4); }
+  50%    { box-shadow:0 4px 30px rgba(37,211,102,0.7), 0 0 0 8px rgba(37,211,102,0.10); }
+}
 
 /* ══════════════════════════════════
    FLOATING WHATSAPP BUTTON
@@ -1576,8 +1586,13 @@ footer{background:#030303;border-top:1px solid rgba(220,17,17,0.1);padding:5rem 
   display:flex;align-items:center;justify-content:center;
   box-shadow:0 4px 20px rgba(37,211,102,0.4);
   text-decoration:none;
-  animation:waPulse 2.5s ease-in-out infinite;
+  animation:waPulseGlow 3s ease-in-out infinite;
   transition:transform 0.3s ease, box-shadow 0.3s ease;
+  /* GPU-stabilize so the box-shadow pulse can't trigger subpixel flicker */
+  -webkit-transform:translateZ(0);
+  transform:translateZ(0);
+  backface-visibility:hidden;
+  will-change:box-shadow;
 }
 #wa-float:hover{
   transform:scale(1.08);
@@ -1869,6 +1884,35 @@ footer{background:#030303;border-top:1px solid rgba(220,17,17,0.1);padding:5rem 
 }
 .cat-admin-desc { font-size: 0.78rem; color: var(--muted2); margin-bottom: 0.75rem; }
 .cat-admin-img { width: 100%; aspect-ratio: 16/9; object-fit: cover; margin-bottom: 0.5rem; }
+/* New category card thumbnail (image or emoji fallback) */
+.cat-admin-thumb {
+  width: 100%; aspect-ratio: 16/9; margin-bottom: 0.6rem;
+  background: rgba(220,17,17,0.07); border: 1px solid rgba(220,17,17,0.12);
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+}
+.cat-admin-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.cat-admin-emoji { font-size: 2rem; }
+
+/* ── Admin review card (matches product card system) ── */
+.admin-review-card {
+  display: flex; align-items: flex-start; gap: 0.85rem;
+  background: rgba(220,17,17,0.04);
+  border: 1px solid rgba(220,17,17,0.15);
+  padding: 1rem 1.1rem; margin-bottom: 0.6rem;
+}
+.admin-review-avatar {
+  flex-shrink: 0; width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--red); color: #fff;
+  font-family: var(--font-display); font-size: 0.95rem; letter-spacing: 0.04em;
+}
+.admin-review-body { flex: 1; min-width: 0; }
+.admin-review-top { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.admin-review-name { font-family: var(--font-body); font-weight: 700; font-size: 0.78rem; letter-spacing: 0.06em; color: var(--text); }
+.admin-review-stars { color: #e8b339; font-size: 0.72rem; letter-spacing: 0.05em; flex-shrink: 0; }
+.admin-review-loc { font-family: var(--font-body); font-size: 0.62rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted2); margin: 0.15rem 0 0.4rem; }
+.admin-review-text { font-size: 0.84rem; color: var(--muted2); font-style: italic; line-height: 1.5; margin: 0; }
+.admin-review-actions { display: flex; flex-direction: column; gap: 0.4rem; flex-shrink: 0; }
 
 @media(max-width: 768px){
   .modal-inner { grid-template-columns: 1fr; }
@@ -8950,18 +8994,19 @@ select:focus, textarea:focus {
   background: rgba(220,17,17,0.03);
 }
 
-/* ── 51.3 WhatsApp floating button — periodic pulse to draw attention ── */
-@keyframes wa-attention-pulse {
-  0%, 92%, 100% { transform: scale(1); box-shadow: 0 8px 24px rgba(0,0,0,0.45); }
-  94% { transform: scale(1.1); box-shadow: 0 12px 36px rgba(37,211,102,0.55), 0 0 28px rgba(37,211,102,0.4); }
-  96% { transform: scale(0.96); }
-  98% { transform: scale(1.05); }
-}
+/* ── 51.3 WhatsApp floating button ──
+   The old transform-scale "attention pulse" was overriding the box-shadow
+   pulse and causing a visible jump/blink every 5s. Consolidated to the
+   single box-shadow-only waPulseGlow (defined up top, 3s). Keep the
+   translateZ stabilizer here too so this later rule can't drop it. */
 #wa-float, .wa-float, [class*="whatsapp-float"] {
-  animation: wa-attention-pulse 5s ease-in-out infinite;
-  animation-delay: 8s; /* don't pulse on first load */
+  animation: waPulseGlow 3s ease-in-out infinite;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: box-shadow;
 }
-#wa-float:hover, .wa-float:hover { animation: none; }
+#wa-float:hover, .wa-float:hover { animation: none; transform: translateZ(0) scale(1.08); }
 @media (prefers-reduced-motion: reduce) {
   #wa-float, .wa-float { animation: none !important; }
 }
@@ -9568,20 +9613,11 @@ body::after {
   backdrop-filter: blur(30px) !important;
 }
 
-/* ── 25. WA FLOAT — pulse ring (subtle, slow) ── */
-#wa-float::before {
-  content: '';
-  position: absolute;
-  inset: -4px;
-  border-radius: inherit;
-  border: 2px solid rgba(37,211,102,0.28);
-  animation: wa-ring-pulse 4.5s cubic-bezier(.16,1,.3,1) infinite;
-}
-@keyframes wa-ring-pulse {
-  0%   { transform: scale(1);    opacity: 0.45; }
-  60%  { transform: scale(1.22); opacity: 0;    }
-  100% { transform: scale(1.22); opacity: 0;    }
-}
+/* ── 25. WA FLOAT — expanding ring REMOVED ──
+   The opacity-animated ::before ring was the source of the WhatsApp
+   button flicker on mobile. The box-shadow pulse (waPulseGlow) already
+   provides the "alive" feel without any opacity animation. */
+#wa-float::before { display: none !important; }
 
 /* ── 26. TICKER BAR ── */
 .ticker-bar {
@@ -9816,6 +9852,11 @@ section + section::before,
     align-items: center !important;
     justify-content: center !important;
     border-radius: 0 !important;
+    /* GPU-stabilize: a fixed compositor layer stops the clip-path edges
+       from shimmering/repainting during the sweep (the "flash" bug). */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    backface-visibility: hidden;
     -webkit-clip-path: polygon(8px 0%, 100% 0%, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0% 100%, 0% 8px);
     clip-path: polygon(8px 0%, 100% 0%, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0% 100%, 0% 8px);
   }
@@ -9830,17 +9871,20 @@ section + section::before,
     color: #fff !important;
     border: 1.5px solid var(--red) !important;
   }
-  /* Shimmer sweep on the primary CTA — fires once on load + on tap. */
+  /* Shimmer sweep — opacity STAYS at 1, only translateX moves (no fade =
+     no flicker). Runs 3 times on load then stops, so there's no perpetual
+     repaint loop sitting under the user's thumb. */
   .hero-btns .btn-primary::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(110deg, transparent 0%, transparent 35%, rgba(255,255,255,0.32) 50%, transparent 65%, transparent 100%);
-    transform: translateX(-110%);
+    opacity: 1;
+    background: linear-gradient(110deg, transparent 0%, transparent 38%, rgba(255,255,255,0.30) 50%, transparent 62%, transparent 100%);
+    transform: translateX(-120%);
     pointer-events: none;
-    animation: heroBtnShimmer 2.4s cubic-bezier(.16,1,.3,1) 1.4s infinite;
+    animation: heroBtnShimmer 2.6s cubic-bezier(.16,1,.3,1) 1.2s 3;
   }
-  .hero-btns .btn-primary:active { transform: translateY(1px); }
+  .hero-btns .btn-primary:active { transform: translateZ(0) translateY(1px); }
 
   /* ── Stats strip ── */
   .hero-stats {
@@ -9924,9 +9968,10 @@ section + section::before,
 
 /* Hero primary CTA shimmer sweep — used by mobile hero-btns. */
 @keyframes heroBtnShimmer {
-  0%   { transform: translateX(-110%); }
-  55%  { transform: translateX(110%); }
-  100% { transform: translateX(110%); }
+  /* opacity untouched — pure horizontal sweep, parks off-screen right */
+  0%   { transform: translateX(-120%); }
+  45%  { transform: translateX(120%); }
+  100% { transform: translateX(120%); }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -10128,13 +10173,17 @@ section + section::before,
     /* Use the same buttery curve everywhere for consistency. */
     transition-timing-function: cubic-bezier(.16,1,.3,1) !important;
   }
-  /* Marquee + particle floats are intentionally long loops — exempt them. */
-  .marquee-track,
-  .hero-bat-svg,
-  .logoBreathe,
-  .hero-logo-img {
-    animation-duration: revert !important;
-  }
+  /* Marquee + particle floats are intentionally long loops — exempt them.
+     NOTE: must restate explicit durations, NOT `revert` — revert drops to
+     the UA value (0s) and freezes the loop. This was the mobile marquee
+     "not animating" bug. */
+  .marquee-track { animation-duration: 25s !important; }
+  .hero-bat-svg  { animation-duration: 7s, 5s !important; }
+  .hero-logo-img { animation-duration: 5s !important; }
+  #wa-float, .wa-float { animation-duration: 3s !important; }
+  /* Hero CTA shimmer keeps its own 2.6s timing (perf cap would make it
+     strobe). */
+  .hero-btns .btn-primary::after { animation-duration: 2.6s !important; }
 
   /* 3) Heavy multi-layer box-shadows → flatten to one cheap shadow.
         Touch any element with multiple shadows by clobbering the
@@ -11570,6 +11619,88 @@ section + section::before,
   </div>
 </div>
 
+<!-- CATEGORY FORM MODAL (matches product form style) -->
+<div id="cat-form-modal">
+  <div class="prod-form-inner">
+    <h2 class="form-title" id="cat-form-title">Nueva Categoría</h2>
+    <input type="hidden" id="cat-form-idx">
+    <div class="form-grid">
+      <div>
+        <label class="form-label">NOMBRE *</label>
+        <input class="form-input" type="text" id="cf-name" placeholder="Ej: Ropa">
+      </div>
+      <div>
+        <label class="form-label">ICONO (emoji)</label>
+        <input class="form-input" type="text" id="cf-icon" placeholder="👕" maxlength="4">
+      </div>
+      <div class="form-full">
+        <label class="form-label">DESCRIPCIÓN</label>
+        <input class="form-input" type="text" id="cf-desc" placeholder="Tanks, shorts, hoodies y más">
+      </div>
+      <div>
+        <label class="form-label">FILTRO INTERNO</label>
+        <input class="form-input" type="text" id="cf-filter" placeholder="ropa">
+      </div>
+      <div>
+        <label class="form-label">COUNT (texto)</label>
+        <input class="form-input" type="text" id="cf-count" placeholder="24 productos">
+      </div>
+      <div class="form-full">
+        <label class="form-label">IMAGEN PRINCIPAL (URL)</label>
+        <input class="form-input" type="text" id="cf-img" placeholder="https://...">
+      </div>
+      <div class="form-full">
+        <label class="form-label">IMAGEN HOVER (URL, opcional)</label>
+        <input class="form-input" type="text" id="cf-img2" placeholder="https://... (diferente al pasar el mouse)">
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-primary" onclick="saveCategoryForm()">Guardar Categoría</button>
+      <button class="btn-ghost" style="background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--muted2);" onclick="closeCatForm()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- REVIEW FORM MODAL (matches product form style) -->
+<div id="review-form-modal">
+  <div class="prod-form-inner">
+    <h2 class="form-title" id="review-form-title">Nueva Reseña</h2>
+    <input type="hidden" id="review-form-idx">
+    <div class="form-grid">
+      <div>
+        <label class="form-label">NOMBRE *</label>
+        <input class="form-input" type="text" id="rf-name" placeholder="Ej: Diego M.">
+      </div>
+      <div>
+        <label class="form-label">UBICACIÓN</label>
+        <input class="form-input" type="text" id="rf-loc" placeholder="San José, CR">
+      </div>
+      <div>
+        <label class="form-label">ESTRELLAS</label>
+        <select class="form-select" id="rf-stars">
+          <option value="5">★★★★★ (5)</option>
+          <option value="4">★★★★ (4)</option>
+          <option value="3">★★★ (3)</option>
+          <option value="2">★★ (2)</option>
+          <option value="1">★ (1)</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label">PRODUCTO (opcional)</label>
+        <input class="form-input" type="text" id="rf-product" placeholder="Tank Immortal">
+      </div>
+      <div class="form-full">
+        <label class="form-label">TEXTO DE LA RESEÑA *</label>
+        <textarea class="form-textarea" id="rf-text" placeholder="La calidad es increíble..."></textarea>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-primary" onclick="saveReviewForm()">Guardar Reseña</button>
+      <button class="btn-ghost" style="background:transparent;border:1px solid rgba(255,255,255,0.1);color:var(--muted2);" onclick="closeReviewForm()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ════════════════════════════════════
 // GLOBAL CONSTANTS — declared FIRST to avoid Temporal Dead Zone errors.
@@ -11634,6 +11765,14 @@ async function sbFetch(table, method='GET', body=null, filter=''){
   if(method==='GET') headers['Prefer']='';
   else if(method==='DELETE') headers['Prefer']='return=representation';
   else headers['Prefer']='return=representation';
+  // UPSERT support: when the caller passes ?on_conflict=<col>, PostgREST
+  // needs `resolution=merge-duplicates` in the Prefer header or it treats
+  // the POST as a plain INSERT and 409s on an existing key. This makes
+  // every on_conflict POST a true upsert (fixes admin TEXTOS / TICKER /
+  // EXIT POPUP saves that kept failing with HTTP 409 duplicate key).
+  if(method==='POST' && /[?&]on_conflict=/.test(filter)){
+    headers['Prefer'] = 'return=representation,resolution=merge-duplicates';
+  }
   const opts = { method, headers };
   if(body) opts.body = JSON.stringify(body);
   try {
@@ -14175,43 +14314,75 @@ function renderAdminReviews(){
   const list = document.getElementById('admin-reviews-list');
   if(!list) return;
   if(!reviews.length){
-    list.innerHTML='<p style="color:var(--muted2);text-align:center;padding:2rem;">No hay reseñas. Agrega la primera.</p>';
+    list.innerHTML='<p style="color:var(--muted2);text-align:center;padding:2rem;font-family:var(--font-body);font-weight:600;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;">No hay reseñas. Agrega la primera.</p>';
     return;
   }
   list.innerHTML = reviews.map((r,i)=>`
-    <div class="admin-prod-card" style="flex-direction:column;align-items:flex-start;gap:0.5rem;padding:1.25rem;">
-      <p style="color:var(--gold);font-family:var(--font-body);font-size:0.6rem;letter-spacing:0.1em;">${'★'.repeat(r.stars||5)} · ${r.name} — ${r.loc}</p>
-      <p style="color:var(--muted2);font-size:0.85rem;font-style:italic;">"${r.text.substring(0,100)}${r.text.length>100?'...':''}"</p>
-      <div class="admin-prod-actions">
+    <div class="admin-review-card">
+      <div class="admin-review-avatar">${getInitials(r.name)}</div>
+      <div class="admin-review-body">
+        <div class="admin-review-top">
+          <span class="admin-review-name">${(r.name||'').replace(/</g,'&lt;')}</span>
+          <span class="admin-review-stars">${'★'.repeat(r.stars||5)}${'☆'.repeat(5-(r.stars||5))}</span>
+        </div>
+        <div class="admin-review-loc">${(r.loc||'').replace(/</g,'&lt;')}${r.product?` · ${String(r.product).replace(/</g,'&lt;')}`:''}</div>
+        <p class="admin-review-text">"${(r.text||'').replace(/</g,'&lt;').substring(0,140)}${(r.text||'').length>140?'…':''}"</p>
+      </div>
+      <div class="admin-review-actions">
         <button class="admin-edit-btn" onclick="editReview(${i})">EDITAR</button>
         <button class="admin-del-btn" onclick="deleteReview(${i})">🗑</button>
       </div>
     </div>`).join('');
 }
 
-async function addReview(){
-  const text = prompt('Texto de la reseña:'); if(!text) return;
-  const name = prompt('Nombre (ej: DIEGO M.):'); if(!name) return;
-  const loc  = prompt('Ubicación (ej: San José, CR):') || 'Costa Rica';
-  const stars= parseInt(prompt('Estrellas (1-5):') || '5') || 5;
-  const r = { id: Date.now(), text, name, loc, stars };
-  await persistReviewRemote(r, false);
-  reviews.push(r);
-  saveReviews(); renderReviews(); renderAdminReviews();
-  showToast('Reseña agregada ✓');
+function openReviewForm(i){
+  const isEdit = (i !== null && i !== undefined);
+  document.getElementById('review-form-idx').value = isEdit ? i : '';
+  document.getElementById('review-form-title').textContent = isEdit ? 'Editar Reseña' : 'Nueva Reseña';
+  const r = isEdit ? reviews[i] : { name:'', loc:'', stars:5, text:'', product:'' };
+  document.getElementById('rf-name').value    = r.name || '';
+  document.getElementById('rf-loc').value     = r.loc || '';
+  document.getElementById('rf-stars').value   = String(r.stars || 5);
+  document.getElementById('rf-product').value = r.product || '';
+  document.getElementById('rf-text').value    = r.text || '';
+  document.getElementById('review-form-modal').classList.add('open');
 }
-async function editReview(i){
-  const r = reviews[i];
-  const text  = prompt('Texto:', r.text); if(text===null) return;
-  const name  = prompt('Nombre:', r.name); if(name===null) return;
-  const loc   = prompt('Ubicación:', r.loc); if(loc===null) return;
-  const stars = parseInt(prompt('Estrellas (1-5):', r.stars||5)) || 5;
-  const updated = {...r, text, name, loc, stars};
-  await persistReviewRemote(updated, true);
-  reviews[i] = updated;
-  saveReviews(); renderReviews(); renderAdminReviews();
-  showToast('Reseña actualizada ✓');
+function closeReviewForm(){ document.getElementById('review-form-modal').classList.remove('open'); }
+
+async function saveReviewForm(){
+  const idxRaw = document.getElementById('review-form-idx').value;
+  const isEdit = idxRaw !== '';
+  const name = document.getElementById('rf-name').value.trim();
+  const text = document.getElementById('rf-text').value.trim();
+  if(!name){ showToast('El nombre es obligatorio'); document.getElementById('rf-name').focus(); return; }
+  if(!text){ showToast('El texto es obligatorio'); document.getElementById('rf-text').focus(); return; }
+  const data = {
+    name,
+    loc:   document.getElementById('rf-loc').value.trim() || 'Costa Rica',
+    stars: parseInt(document.getElementById('rf-stars').value) || 5,
+    product: document.getElementById('rf-product').value.trim(),
+    text
+  };
+  try {
+    if(isEdit){
+      const r = reviews[parseInt(idxRaw)];
+      const updated = {...r, ...data};
+      await persistReviewRemote(updated, true);
+      reviews[parseInt(idxRaw)] = updated;
+      showToast('Reseña actualizada ✓');
+    } else {
+      const r = { id: Date.now(), ...data };
+      await persistReviewRemote(r, false);
+      reviews.push(r);
+      showToast('Reseña agregada ✓');
+    }
+    saveReviews(); renderReviews(); renderAdminReviews();
+    closeReviewForm();
+  } catch(e){ showToast('Error: ' + (e.message || 'desconocido')); }
 }
+
+function addReview(){ openReviewForm(null); }
+function editReview(i){ openReviewForm(i); }
 async function deleteReview(i){
   if(!confirm(t('confirmDelReview'))) return;
   const r = reviews[i];
@@ -14818,12 +14989,19 @@ function renderCategories(){
 function renderAdminCategories(){
   const grid = document.getElementById('admin-cat-grid');
   if(!grid) return;
+  if(!categories.length){
+    grid.innerHTML='<p style="color:var(--muted2);text-align:center;padding:2rem;grid-column:1/-1;font-family:var(--font-body);font-weight:600;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;">No hay categorías. Agrega la primera.</p>';
+    return;
+  }
   grid.innerHTML = categories.map((cat,i)=>`
     <div class="cat-admin-card">
-      <img class="cat-admin-img" src="${cat.img}" alt="${cat.name}"
-        onerror="this.style.display='none'">
-      <div class="cat-admin-name">${cat.name}</div>
-      <div class="cat-admin-desc">${cat.desc}</div>
+      <div class="cat-admin-thumb">
+        ${cat.img
+          ? `<img src="${cat.img}" alt="${(cat.name||'').replace(/</g,'&lt;')}" onerror="this.parentElement.innerHTML='<span class=&quot;cat-admin-emoji&quot;>'+(${JSON.stringify(cat.icon||'📁')})+'</span>'">`
+          : `<span class="cat-admin-emoji">${cat.icon||'📁'}</span>`}
+      </div>
+      <div class="cat-admin-name">${cat.icon?cat.icon+' ':''}${(cat.name||'').replace(/</g,'&lt;')}</div>
+      <div class="cat-admin-desc">${(cat.desc||'').replace(/</g,'&lt;')}</div>
       <div class="admin-prod-actions">
         <button class="admin-edit-btn" onclick="editCategory(${i})">EDITAR</button>
         <button class="admin-del-btn" onclick="deleteCategory(${i})">🗑</button>
@@ -14831,31 +15009,58 @@ function renderAdminCategories(){
     </div>`).join('');
 }
 
-async function addCategory(){
-  const name = prompt('Nombre de la categoría (ej: Ropa):'); if(!name) return;
-  const desc = prompt('Descripción corta:') || '';
-  const filter = prompt('Filtro interno (ej: ropa, accesorios, suplementos):') || name.toLowerCase();
-  const img  = prompt('URL imagen principal:') || '';
-  const img2 = prompt('URL imagen hover (opcional — diferente al pasar el mouse):') || img;
-  const cat = { id: Date.now(), name, desc, filter, img, img2 };
-  await persistCategoryRemote(cat, false);
-  categories.push(cat);
-  saveCategories(); renderCategories(); renderAdminCategories();
-  showToast('Categoría agregada ✓');
+function openCatForm(i){
+  const isEdit = (i !== null && i !== undefined);
+  document.getElementById('cat-form-idx').value = isEdit ? i : '';
+  document.getElementById('cat-form-title').textContent = isEdit ? 'Editar Categoría' : 'Nueva Categoría';
+  const c = isEdit ? categories[i] : { name:'', icon:'', desc:'', filter:'', count:'', img:'', img2:'' };
+  document.getElementById('cf-name').value   = c.name || '';
+  document.getElementById('cf-icon').value   = c.icon || '';
+  document.getElementById('cf-desc').value   = c.desc || '';
+  document.getElementById('cf-filter').value = c.filter || '';
+  document.getElementById('cf-count').value  = c.count || '';
+  document.getElementById('cf-img').value    = c.img || '';
+  document.getElementById('cf-img2').value   = c.img2 || '';
+  document.getElementById('cat-form-modal').classList.add('open');
 }
-async function editCategory(i){
-  const cat = categories[i];
-  const name  = prompt('Nombre:', cat.name); if(name===null) return;
-  const desc  = prompt('Descripción:', cat.desc); if(desc===null) return;
-  const filter= prompt('Filtro:', cat.filter); if(filter===null) return;
-  const img   = prompt('URL imagen principal:', cat.img); if(img===null) return;
-  const img2  = prompt('URL imagen hover:', cat.img2||cat.img); if(img2===null) return;
-  const updated = {...cat, name, desc, filter, img, img2};
-  await persistCategoryRemote(updated, true);
-  categories[i] = updated;
-  saveCategories(); renderCategories(); renderAdminCategories();
-  showToast('Categoría actualizada ✓');
+function closeCatForm(){ document.getElementById('cat-form-modal').classList.remove('open'); }
+
+async function saveCategoryForm(){
+  const idxRaw = document.getElementById('cat-form-idx').value;
+  const isEdit = idxRaw !== '';
+  const name = document.getElementById('cf-name').value.trim();
+  if(!name){ showToast('El nombre es obligatorio'); document.getElementById('cf-name').focus(); return; }
+  const filter = document.getElementById('cf-filter').value.trim() || name.toLowerCase();
+  const img = document.getElementById('cf-img').value.trim();
+  const data = {
+    name,
+    icon:  document.getElementById('cf-icon').value.trim(),
+    desc:  document.getElementById('cf-desc').value.trim(),
+    filter,
+    count: document.getElementById('cf-count').value.trim(),
+    img,
+    img2:  document.getElementById('cf-img2').value.trim() || img
+  };
+  try {
+    if(isEdit){
+      const cat = categories[parseInt(idxRaw)];
+      const updated = {...cat, ...data};
+      await persistCategoryRemote(updated, true);
+      categories[parseInt(idxRaw)] = updated;
+      showToast('Categoría actualizada ✓');
+    } else {
+      const cat = { id: Date.now(), ...data };
+      await persistCategoryRemote(cat, false);
+      categories.push(cat);
+      showToast('Categoría agregada ✓');
+    }
+    saveCategories(); renderCategories(); renderAdminCategories();
+    closeCatForm();
+  } catch(e){ showToast('Error: ' + (e.message || 'desconocido')); }
 }
+
+function addCategory(){ openCatForm(null); }
+function editCategory(i){ openCatForm(i); }
 async function deleteCategory(i){
   if(!confirm(t('confirmDelCategory', categories[i].name))) return;
   const cat = categories[i];
@@ -15167,6 +15372,16 @@ async function updateBrandName(id, name){
 
   const dfTag = document.getElementById('df-tag');
   if (dfTag) dfTag.addEventListener('change', updateDropTagCustomVisibility);
+
+  const catForm = document.getElementById('cat-form-modal');
+  if (catForm) catForm.addEventListener('click', function(e){
+    if (e.target === this) closeCatForm();
+  });
+
+  const reviewForm = document.getElementById('review-form-modal');
+  if (reviewForm) reviewForm.addEventListener('click', function(e){
+    if (e.target === this) closeReviewForm();
+  });
 })();
 
 // Drag and drop for drop image zone
