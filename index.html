@@ -9775,7 +9775,7 @@ section + section::before,
     flex-direction: column !important;
     justify-content: center !important;
     align-items: center !important;
-    padding: calc(80px + env(safe-area-inset-top, 0px)) 24px
+    padding: calc(env(safe-area-inset-top, 0px) + 70px) 24px
              calc(100px + env(safe-area-inset-bottom, 0px)) !important;
   }
   .hero-content {
@@ -9785,7 +9785,7 @@ section + section::before,
     gap: 1.1rem;
     max-width: 100%;
     padding: 0 !important;
-    z-index: 5;
+    z-index: 3;                 /* above the bat (z-index 1) */
     position: relative;
   }
 
@@ -9793,15 +9793,17 @@ section + section::before,
         We use .hero-sub instead and move it to the eyebrow slot. ── */
   .hero-eyebrow { display: none !important; }
 
-  /* ── Eyebrow: promote .hero-sub via flex order ── */
+  /* ── Eyebrow "FITNESS · STREET · CULTURE": promote .hero-sub to the
+     top slot, bright white so it's clearly legible (was a dim red that
+     read as invisible against the bat glow). ── */
   .hero-sub {
     order: -1 !important;
-    margin: 0 0 0.1rem !important;
-    font-size: 0.55rem !important;
-    letter-spacing: 0.3em !important;
+    margin: 0 0 0.2rem !important;
+    font-size: 0.6rem !important;
+    letter-spacing: 0.25em !important;
     font-weight: 700 !important;
-    color: var(--red) !important;
-    text-shadow: none !important;
+    color: rgba(255,255,255,0.7) !important;
+    text-shadow: 0 1px 8px rgba(0,0,0,0.6) !important;
     text-transform: uppercase;
   }
 
@@ -9931,13 +9933,19 @@ section + section::before,
   .hero-stat-num { font-size: 1.5rem !important; }
   .hero-stat-label { font-size: 0.55rem !important; letter-spacing: 0.2em !important; }
 
-  /* ── Bat SVG: wings frame the TITLE block only, never the buttons ── */
+  /* ── Bat SVG: STATIC on mobile (no float/glow), sits behind all content ──
+     Lowered to 52% so its wings no longer overlap the MIND text. Animation
+     fully disabled per spec — zero movement on phones. */
   .hero-bat-svg {
     width: 90vw !important;
     max-width: 90vw !important;
-    top: 38% !important;                 /* lifted above buttons */
+    top: 52% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
     z-index: 1 !important;
-    opacity: 0.92 !important;
+    opacity: 0.9 !important;
+    animation: none !important;          /* completely static */
+    will-change: auto !important;
   }
 
   /* ── ENTRANCE — transition-based, class-toggle on body ──
@@ -10135,8 +10143,8 @@ section + section::before,
     letter-spacing: 0 !important;
   }
   .hero-sub {
-    font-size: 0.72rem !important;
-    letter-spacing: 0.32em !important;
+    font-size: 0.6rem !important;
+    letter-spacing: 0.25em !important;
   }
   .hero-tagline {
     font-size: 0.92rem !important;
@@ -10481,6 +10489,72 @@ section + section::before,
     font-variant-numeric: tabular-nums;
     font-feature-settings: "tnum";
   }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   MOBILE SIZE PASS — authoritative final word (items 2, 3, 6)
+   Loaded last so it wins. Tightens products + testimonials and
+   enforces consistent 16px gutters with no horizontal overflow.
+═══════════════════════════════════════════════════════════ */
+@media (max-width: 767px) {
+
+  /* ── No horizontal scroll, 16px gutters everywhere ── */
+  html, body { overflow-x: hidden !important; max-width: 100%; }
+  .container { padding-left: 16px !important; padding-right: 16px !important; }
+  section:not(.hero) { padding-left: 16px !important; padding-right: 16px !important; }
+
+  /* ── 2. PRODUCTS / CATALOG ── */
+  .products-grid {
+    grid-template-columns: repeat(2, minmax(0,1fr)) !important;
+    gap: 8px !important;
+  }
+  /* Section titles capped 1.8rem on mobile */
+  .sec-title, h2, .h2 { font-size: clamp(1.45rem, 5vw, 1.8rem) !important; }
+  /* Filter chips: smaller, horizontal-scroll strip */
+  .products-filters {
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    gap: 0.4rem !important;
+  }
+  .products-filters > * {
+    flex: 0 0 auto !important;
+    padding: 0.3rem 0.8rem !important;
+    font-size: 0.6rem !important;
+    white-space: nowrap !important;
+  }
+  /* Product card text */
+  .prod-name {
+    font-size: 0.9rem !important;
+    line-height: 1.15 !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+  }
+  .prod-brand { font-size: 0.58rem !important; }
+  .prod-price, .prod-card .price { font-size: 1rem !important; }
+
+  /* ── 3. TESTIMONIALS ── single column, compact ── */
+  .test-grid { grid-template-columns: 1fr !important; gap: 1rem !important; }
+  .test-card { padding: 1.2rem !important; }
+  .test-card::before { font-size: 3rem !important; top: 6px; right: 14px; }
+  .test-avatar { width: 36px !important; height: 36px !important; font-size: 0.82rem !important; }
+  .test-name-new { font-size: 0.9rem !important; }
+  .test-loc-new { font-size: 0.68rem !important; }
+  .test-stars, .test-header .test-stars { font-size: 0.8rem !important; letter-spacing: 0.16em !important; }
+  .test-text {
+    font-size: 0.82rem !important;
+    line-height: 1.55 !important;
+    display: -webkit-box;
+    -webkit-line-clamp: 6;        /* generous clamp so reviews aren't cut mid-thought */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* ── 6. Tap targets ≥ 44px for interactive elements ── */
+  .products-filters > *,
+  .bt-tab, .nav-link, button.icon-btn { min-height: 44px; }
 }
 
 </style>
