@@ -11337,7 +11337,7 @@ section + section::before,
     </div>
     <div class="editorial-grid">
       <a class="editorial-card reveal" href="/articles/guia-tallas-importadas.html">
-        <div class="ec-image" style="background-image:url('https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=800&fm=webp&q=78&auto=format,compress&fit=crop');">
+        <div class="ec-image" id="ec-image-1" style="background-image:url('https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=800&fm=webp&q=78&auto=format,compress&fit=crop');">
           <span class="ec-eyebrow">Guía</span>
         </div>
         <div class="ec-body">
@@ -11348,7 +11348,7 @@ section + section::before,
         </div>
       </a>
       <a class="editorial-card reveal" href="/articles/stack-suplementos-cr.html">
-        <div class="ec-image" style="background-image:url('https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=800&fm=webp&q=78&auto=format,compress&fit=crop');">
+        <div class="ec-image" id="ec-image-2" style="background-image:url('https://images.unsplash.com/photo-1593095948071-474c5cc2989d?w=800&fm=webp&q=78&auto=format,compress&fit=crop');">
           <span class="ec-eyebrow">Stack</span>
         </div>
         <div class="ec-body">
@@ -11359,7 +11359,7 @@ section + section::before,
         </div>
       </a>
       <a class="editorial-card reveal" href="/articles/streetwear-gotico-cr.html">
-        <div class="ec-image" style="background-image:url('https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&fm=webp&q=78&auto=format,compress&fit=crop');">
+        <div class="ec-image" id="ec-image-3" style="background-image:url('https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&fm=webp&q=78&auto=format,compress&fit=crop');">
           <span class="ec-eyebrow">Lookbook</span>
         </div>
         <div class="ec-body">
@@ -11621,6 +11621,7 @@ section + section::before,
         <button class="admin-tab-btn" data-tab="content" onclick="showAdminTab('content')">✏️ TEXTOS</button>
         <button class="admin-tab-btn" data-tab="ticker" onclick="showAdminTab('ticker')">📢 TICKER</button>
         <button class="admin-tab-btn" data-tab="exitintent" onclick="showAdminTab('exitintent')">🚪 EXIT POPUP</button>
+        <button class="admin-tab-btn" data-tab="editorial" onclick="showAdminTab('editorial')">📰 EDITORIAL</button>
         <button class="admin-tab-btn" data-tab="brands" onclick="showAdminTab('brands')">🏷 MARCAS</button>
       </div>
 
@@ -11682,6 +11683,15 @@ section + section::before,
           Personalizá el copy, el descuento y el CTA aquí.
         </p>
         <div id="exitintent-editor"></div>
+      </div>
+
+      <!-- Editorial tab -->
+      <div class="admin-tab-pane" id="tab-editorial" style="display:none;">
+        <p style="font-size:0.82rem;color:var(--muted2);margin-bottom:1.25rem;">
+          Las 3 imágenes de la sección Editorial. Subí un archivo o pegá una URL.
+          Se guardan en Supabase (site_content) y se ven en todos los dispositivos.
+        </p>
+        <div id="editorial-editor"></div>
       </div>
 
       <!-- Brands tab -->
@@ -12095,6 +12105,13 @@ function applySiteContent(){
     if(el) el.textContent=siteContent.hero_title.replace(/MIND/i,'').trim();
     if(elMind && /MIND/i.test(siteContent.hero_title)) elMind.textContent='MIND';
   }
+
+  // ── Editorial card images (admin-editable, stored in site_content) ──
+  ['editorial_img_1','editorial_img_2','editorial_img_3'].forEach((key,i)=>{
+    const url = siteContent[key];
+    const el  = document.getElementById('ec-image-'+(i+1));
+    if(el && url) el.style.backgroundImage = `url('${String(url).replace(/'/g,"%27")}')`;
+  });
 
   // ── Exit-intent popup overrides ──
   // ei_text accepts HTML (admin uses <strong>); the others are plain text.
@@ -14733,6 +14750,7 @@ function showAdminTab(tab){
   if(tab==='content')    renderContentEditor();
   if(tab==='ticker')     renderTickerEditor();
   if(tab==='exitintent') renderExitIntentEditor();
+  if(tab==='editorial')  renderEditorialEditor();
   if(tab==='brands')     renderBrandsEditor();
 }
 
@@ -15202,10 +15220,11 @@ async function loadCategoriesFromSupabase(){
     categories = rows.map(r => ({
       id: r.id,
       name: r.name,
+      icon: r.icon || '',
       desc: r.count_text || '',
       filter: r.filter || (r.slug || '').toLowerCase(),
       img:  r.img || '',
-      img2: r.img || ''
+      img2: r.img2 || r.img || ''   // real hover column, fall back to main
     }));
     localStorage.setItem('dm_categories', JSON.stringify(categories));
     return true;
@@ -15222,6 +15241,8 @@ async function persistCategoryRemote(cat, isUpdate){
     slug: (cat.filter || cat.name || '').toLowerCase().replace(/\s+/g, '-'),
     name: cat.name,
     img: cat.img || '',
+    img2: cat.img2 || cat.img || '',   // hover image (own column now)
+    icon: cat.icon || '',              // emoji shown on the card
     count_text: cat.desc || '',
     filter: cat.filter || cat.name.toLowerCase(),
     position: cat.position || 0,
@@ -15421,7 +15442,8 @@ async function saveProduct(){
   const imgVal  = getImgVal('f-img')  || 'https://placehold.co/600x800/0a0a0a/DC1111?text=DESMOS';
   const img2val = getImgVal('f-img2') || null;
 
-  // Data for Supabase (without img2 until column exists)
+  // Data for Supabase — img2 (hover image) IS persisted now that the
+  // products.img2 column exists.
   const data={
     name: document.getElementById('f-name').value,
     description: document.getElementById('f-desc').value,
@@ -15433,6 +15455,7 @@ async function saveProduct(){
     sizes: document.getElementById('f-sizes').value,
     colors: document.getElementById('f-colors').value,
     img: imgVal,
+    img2: img2val,
     active: true
   };
 
@@ -15449,7 +15472,7 @@ async function saveProduct(){
         category:s.category,type:s.type,
         sizes:s.sizes?s.sizes.split(',').map(x=>x.trim()).filter(Boolean):[],
         colors:s.colors?s.colors.split(',').map(x=>x.trim()).filter(Boolean):[],
-        img:s.img
+        img:s.img, imgs:[s.img, s.img2].filter(Boolean)
       }:p);
       showToast('Producto actualizado ✓');
     } else {
@@ -15462,7 +15485,7 @@ async function saveProduct(){
         category:s.category,type:s.type,
         sizes:s.sizes?s.sizes.split(',').map(x=>x.trim()).filter(Boolean):[],
         colors:s.colors?s.colors.split(',').map(x=>x.trim()).filter(Boolean):[],
-        img:s.img
+        img:s.img, imgs:[s.img, s.img2].filter(Boolean)
       });
       showToast('Producto creado ✓');
     }
@@ -15583,6 +15606,108 @@ async function saveExitIntent(){
     }
     applySiteContent();
     showToast('Exit popup actualizado ✓');
+  } catch(e){ showToast('Error: '+e.message); }
+}
+
+// ─── EDITORIAL TAB ───
+// Three editorial card images, persisted to site_content as
+// editorial_img_1 / _2 / _3. Each slot supports URL paste OR file upload
+// to the product-images bucket. applySiteContent() pushes them onto the
+// #ec-image-N background on every load (all devices).
+const EDITORIAL_KEYS = ['editorial_img_1','editorial_img_2','editorial_img_3'];
+const EDITORIAL_LABELS = ['Imagen 1 — Guía', 'Imagen 2 — Stack', 'Imagen 3 — Lookbook'];
+
+function renderEditorialEditor(){
+  const wrap = document.getElementById('editorial-editor');
+  if(!wrap) return;
+  wrap.innerHTML = EDITORIAL_KEYS.map((key,i)=>{
+    const cur = (siteContent && siteContent[key]) || '';
+    return `
+    <div class="content-field" style="margin-bottom:1.6rem;">
+      <label class="form-label">${EDITORIAL_LABELS[i]}</label>
+      <div style="display:flex;gap:0.6rem;align-items:flex-start;flex-wrap:wrap;">
+        <img id="ed-preview-${i}" src="${cur}" alt=""
+          style="width:84px;height:60px;object-fit:cover;border:1px solid var(--border-white);background:rgba(220,17,17,0.06);${cur?'':'display:none;'}">
+        <div style="flex:1;min-width:180px;">
+          <input class="form-input" type="text" id="ed-url-${i}" value="${cur.replace(/"/g,'&quot;')}"
+            placeholder="https://... (URL de imagen)" oninput="onEditorialUrlInput(${i})">
+          <div style="display:flex;align-items:center;gap:0.6rem;margin-top:0.45rem;">
+            <label class="upload-use-btn" style="cursor:pointer;display:inline-block;">
+              📁 Subir desde PC
+              <input type="file" accept="image/*" style="display:none;" onchange="uploadEditorialFile(${i}, this)">
+            </label>
+            <span id="ed-status-${i}" style="font-size:0.62rem;letter-spacing:0.04em;color:var(--muted2);"></span>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('') +
+  `<button class="btn-primary" style="margin-top:0.5rem;width:100%;" onclick="saveEditorial()">GUARDAR EDITORIAL</button>`;
+}
+
+function onEditorialUrlInput(i){
+  const url = document.getElementById('ed-url-'+i).value.trim();
+  const prev = document.getElementById('ed-preview-'+i);
+  if(prev){
+    if(url){ prev.src = url; prev.style.display = ''; }
+    else { prev.style.display = 'none'; prev.src=''; }
+  }
+}
+
+async function uploadEditorialFile(i, input){
+  const file = input.files && input.files[0];
+  if(!file) return;
+  const status = document.getElementById('ed-status-'+i);
+  if(status){ status.textContent = 'Subiendo...'; status.style.color = 'var(--muted2)'; }
+  // Compress to keep the bucket lean.
+  let blob = file;
+  try {
+    const compressed = await compressImageBlob(file, 1400, 0.82);
+    if(compressed && compressed.size < file.size) blob = compressed;
+  } catch(e){ /* upload original */ }
+  try {
+    const ext = ((file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')) || 'jpg';
+    const safeExt = (ext === 'jpeg' ? 'jpg' : ext);
+    const fileName = `editorial/${Date.now()}-${Math.random().toString(36).substr(2,5)}.${safeExt}`;
+    const res = await fetch(`${SB_URL}/storage/v1/object/${BUCKET}/${fileName}`, {
+      method: 'POST',
+      headers: {
+        'apikey': SB_KEY,
+        'Authorization': `Bearer ${SB_KEY}`,
+        'Content-Type': blob.type || file.type || 'image/jpeg',
+        'x-upsert': 'true',
+      },
+      body: blob,
+    });
+    if(res.ok){
+      const publicUrl = `${SB_URL}/storage/v1/object/public/${BUCKET}/${fileName}`;
+      document.getElementById('ed-url-'+i).value = publicUrl;
+      onEditorialUrlInput(i);
+      if(status){ status.textContent = '✓ Subida'; status.style.color = 'var(--red)'; }
+      showToast('Imagen subida ✓');
+    } else {
+      const errTxt = await res.text();
+      if(status){ status.textContent = '✗ Error ' + res.status; status.style.color = 'var(--red)'; }
+      showToast(res.status === 404
+        ? `Bucket "${BUCKET}" no existe`
+        : `Error ${res.status}: ${errTxt.slice(0,120)}`);
+    }
+  } catch(e){
+    if(status){ status.textContent = '✗ ' + (e.message||'error'); status.style.color = 'var(--red)'; }
+    showToast('No se pudo subir: ' + (e.message||'error'));
+  }
+}
+
+async function saveEditorial(){
+  try {
+    for(let i=0;i<EDITORIAL_KEYS.length;i++){
+      const key = EDITORIAL_KEYS[i];
+      const value = document.getElementById('ed-url-'+i).value.trim();
+      siteContent[key] = value;
+      await sbFetch('site_content','POST',{key,value,updated_at:new Date().toISOString()},'?on_conflict=key');
+    }
+    applySiteContent();
+    showToast('Editorial actualizado ✓');
   } catch(e){ showToast('Error: '+e.message); }
 }
 
