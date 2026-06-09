@@ -17891,22 +17891,42 @@ else document.addEventListener('DOMContentLoaded', attemptHashRoute);
   // Skip on dev / file:// or any non-https origin (sw needs secure context)
   if (location.protocol !== 'https:' && location.hostname !== 'localhost') return;
 
+  // Reload exactly once, the moment a freshly-activated worker takes
+  // control of the page. The guard prevents any reload loop. We reload on
+  // `controllerchange` (not inline in statechange) so the refresh happens
+  // AFTER the new SW is actually in control — reloading earlier can race
+  // and still be served by the old worker, which is exactly the "stuck
+  // cache on mobile" symptom we're fixing.
+  let _swReloaded = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (_swReloaded) return;
+    _swReloaded = true;
+    window.location.reload();
+  });
+
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js', { scope: '/' })
       .then((reg) => {
-        // Listen for new versions
+        // If an updated worker is already waiting at registration time,
+        // tell it to take over immediately.
+        if (reg.waiting && navigator.serviceWorker.controller) {
+          reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+        }
+        // When a new version is found, skip waiting as soon as it's
+        // installed so it activates without the usual "wait for all tabs
+        // to close" delay. controllerchange (above) then reloads once.
         reg.addEventListener('updatefound', () => {
-          const sw = reg.installing;
-          if (!sw) return;
-          sw.addEventListener('statechange', () => {
-            if (sw.state === 'installed' && navigator.serviceWorker.controller) {
-              // A new SW is waiting — toast the user with a refresh CTA
-              if (typeof showToast === 'function') {
-                showToast('Nueva versión disponible. Recargá para actualizar.');
-              }
+          const newWorker = reg.installing;
+          if (!newWorker) return;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              newWorker.postMessage({ type: 'SKIP_WAITING' });
             }
           });
         });
+        // Proactively check for an update on each load (mobile Safari can
+        // otherwise sit on a stale worker for a long time).
+        reg.update().catch(() => {});
       })
       .catch((e) => console.warn('[PWA] SW registration failed:', e));
   });
