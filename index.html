@@ -1878,6 +1878,16 @@ footer{background:#030303;border-top:1px solid rgba(220,17,17,0.1);padding:5rem 
 .cat-img-hover { opacity: 0; transform: scale(1.05); }
 .cat-card:hover .cat-img-main { opacity: 0; transform: scale(1.05); }
 .cat-card:hover .cat-img-hover { opacity: 1; transform: scale(1); }
+/* Emoji fallback when a category has no image set */
+.cat-img-fallback {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: clamp(3rem, 9vw, 5rem);
+  background: linear-gradient(160deg, #0b0b0b 0%, #160404 60%, #1c0606 100%);
+  filter: drop-shadow(0 0 16px rgba(220,17,17,0.4));
+  transition: transform 0.65s cubic-bezier(.4,0,.2,1);
+}
+.cat-card:hover .cat-img-fallback { transform: scale(1.06); }
 
 /* admin categories */
 .cat-admin-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 0.75rem; margin-bottom: 1rem; }
@@ -2024,16 +2034,22 @@ footer{background:#030303;border-top:1px solid rgba(220,17,17,0.1);padding:5rem 
 ══════════════════════════════════ */
 .drops-section {
   position: relative;
-  height: 85vh; min-height: 520px;
+  /* Controlled height — caps on tall desktops, sensible floor everywhere.
+     overflow:hidden clips the absolutely-stacked slides cleanly. */
+  height: clamp(520px, 80vh, 760px);
   overflow: hidden;
   background: var(--bg);
 }
 .drops-slides-wrap { position: absolute; inset: 0; }
+@media (max-width: 767px){
+  .drops-section { height: clamp(460px, 72vh, 600px); }
+}
 
 .drop-slide {
   position: absolute; inset: 0;
-  display: flex; opacity: 0;
-  transition: opacity 1s ease;
+  display: flex; align-items: center;   /* vertically center slide content */
+  opacity: 0;
+  transition: opacity 0.8s ease;
   pointer-events: none;
 }
 .drop-slide.active {
@@ -8856,9 +8872,10 @@ footer::before {
 .drop-slide {
   background-size: cover !important;
   background-position: center !important;
-  position: relative;
+  /* Slides stay absolutely stacked (inset:0 from the base rule). The old
+     position:relative + min-height here broke the stack and pushed slides
+     into document flow — the cause of the overlap/cut-off bug. */
   overflow: hidden;
-  min-height: clamp(380px, 60vh, 600px);
 }
 .drop-slide::before {
   content: '';
@@ -9474,7 +9491,11 @@ body::after {
 
 /* ── 12. DROPS SLIDER ── */
 .drop-slide {
-  position: relative;
+  /* Must stay absolutely stacked — this is the LAST .drop-slide rule in
+     source, so it's the authoritative position. A previous position:relative
+     here was the real cause of the slides escaping into document flow. */
+  position: absolute;
+  inset: 0;
 }
 .drop-slide::after {
   content: '';
@@ -10051,9 +10072,10 @@ section + section::before,
     top: max(10px, env(safe-area-inset-top)) !important;
   }
 
-  /* Drops slider stage gets full bleed + safer height ratio. */
+  /* Drops slides stay absolutely stacked on mobile too (the section gives
+     the height). aspect-ratio here previously fought the absolute stack. */
   .drop-slide {
-    aspect-ratio: 4 / 5 !important;
+    aspect-ratio: auto !important;
     min-height: 0 !important;
   }
 
@@ -11622,6 +11644,7 @@ section + section::before,
         <button class="admin-tab-btn" data-tab="ticker" onclick="showAdminTab('ticker')">📢 TICKER</button>
         <button class="admin-tab-btn" data-tab="exitintent" onclick="showAdminTab('exitintent')">🚪 EXIT POPUP</button>
         <button class="admin-tab-btn" data-tab="editorial" onclick="showAdminTab('editorial')">📰 EDITORIAL</button>
+        <button class="admin-tab-btn" data-tab="leads" onclick="showAdminTab('leads')">📧 EMAIL LEADS</button>
         <button class="admin-tab-btn" data-tab="brands" onclick="showAdminTab('brands')">🏷 MARCAS</button>
       </div>
 
@@ -11692,6 +11715,21 @@ section + section::before,
           Se guardan en Supabase (site_content) y se ven en todos los dispositivos.
         </p>
         <div id="editorial-editor"></div>
+      </div>
+
+      <!-- Email leads tab -->
+      <div class="admin-tab-pane" id="tab-leads" style="display:none;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;">
+          <p style="font-size:0.82rem;color:var(--muted2);margin:0;">
+            Emails capturados por el popup de descuento.
+            <span id="leads-count" style="color:var(--red);font-weight:700;"></span>
+          </p>
+          <div style="display:flex;gap:0.5rem;">
+            <button class="admin-edit-btn" onclick="renderEmailLeads()">↻ ACTUALIZAR</button>
+            <button class="btn-primary" style="padding:0.5rem 1rem;font-size:0.7rem;" onclick="exportEmailLeadsCSV()">⬇ EXPORTAR CSV</button>
+          </div>
+        </div>
+        <div id="leads-editor"></div>
       </div>
 
       <!-- Brands tab -->
@@ -11872,12 +11910,28 @@ section + section::before,
         <input class="form-input" type="text" id="cf-count" placeholder="24 productos">
       </div>
       <div class="form-full">
-        <label class="form-label">IMAGEN PRINCIPAL (URL)</label>
-        <input class="form-input" type="text" id="cf-img" placeholder="https://...">
+        <label class="form-label">IMAGEN PRINCIPAL</label>
+        <div style="display:flex;gap:0.6rem;align-items:center;flex-wrap:wrap;">
+          <img id="cf-preview-img" src="" alt="" style="width:64px;height:48px;object-fit:cover;border:1px solid var(--border-white);background:rgba(220,17,17,0.06);display:none;">
+          <input class="form-input" type="text" id="cf-img" placeholder="https://... o subí un archivo" style="flex:1;min-width:160px;" oninput="onCatImgUrl('img')">
+          <label class="upload-use-btn" style="cursor:pointer;white-space:nowrap;">
+            📁 Subir
+            <input type="file" accept="image/*" style="display:none;" onchange="uploadCategoryFile('img', this)">
+          </label>
+        </div>
+        <div id="cf-status-img" style="font-size:0.6rem;letter-spacing:0.04em;color:var(--muted2);margin-top:0.3rem;"></div>
       </div>
       <div class="form-full">
-        <label class="form-label">IMAGEN HOVER (URL, opcional)</label>
-        <input class="form-input" type="text" id="cf-img2" placeholder="https://... (diferente al pasar el mouse)">
+        <label class="form-label">IMAGEN HOVER (opcional)</label>
+        <div style="display:flex;gap:0.6rem;align-items:center;flex-wrap:wrap;">
+          <img id="cf-preview-img2" src="" alt="" style="width:64px;height:48px;object-fit:cover;border:1px solid var(--border-white);background:rgba(220,17,17,0.06);display:none;">
+          <input class="form-input" type="text" id="cf-img2" placeholder="https://... (diferente al pasar el mouse)" style="flex:1;min-width:160px;" oninput="onCatImgUrl('img2')">
+          <label class="upload-use-btn" style="cursor:pointer;white-space:nowrap;">
+            📁 Subir
+            <input type="file" accept="image/*" style="display:none;" onchange="uploadCategoryFile('img2', this)">
+          </label>
+        </div>
+        <div id="cf-status-img2" style="font-size:0.6rem;letter-spacing:0.04em;color:var(--muted2);margin-top:0.3rem;"></div>
       </div>
     </div>
     <div class="form-actions">
@@ -14751,6 +14805,7 @@ function showAdminTab(tab){
   if(tab==='ticker')     renderTickerEditor();
   if(tab==='exitintent') renderExitIntentEditor();
   if(tab==='editorial')  renderEditorialEditor();
+  if(tab==='leads')      renderEmailLeads();
   if(tab==='brands')     renderBrandsEditor();
 }
 
@@ -14758,7 +14813,7 @@ function showAdminTab(tab){
 // ════════════════════════════════════
 // DROPS SLIDER
 // ════════════════════════════════════
-const EV_DUR = 6000;
+const EV_DUR = 5000;   // drops auto-advance every 5s (fade handled by CSS)
 let dropIdx = 0;
 let dropTimer = null;
 
@@ -15268,13 +15323,20 @@ async function deleteCategoryRemote(cat){
 function renderCategories(){
   const grid = document.getElementById('cat-grid');
   if(!grid) return;
-  grid.innerHTML = categories.map((cat,i)=>`
+  grid.innerHTML = categories.map((cat,i)=>{
+    // Image when set, otherwise a centered emoji on a gothic gradient.
+    const visual = cat.img
+      ? `<img class="cat-img-main" src="${cat.img}" alt="${cat.name}"
+           loading="lazy" decoding="async" width="600" height="800"
+           onerror="this.src='https://placehold.co/600x800/0a0a0a/DC1111?text=DESMOS'">
+         <img class="cat-img-hover" src="${cat.img2||cat.img}" alt="${cat.name}"
+           loading="lazy" decoding="async" width="600" height="800"
+           onerror="this.src='${cat.img}'">`
+      : `<div class="cat-img-fallback">${cat.icon||'🔥'}</div>`;
+    return `
     <a class="cat-card reveal" href="#stock" onclick="filterProducts('${cat.filter}',null)"
       style="transition-delay:${i*0.1}s; text-decoration:none; display:block;">
-      <img class="cat-img-main" src="${cat.img}" alt="${cat.name}"
-        onerror="this.src='https://placehold.co/600x800/0a0a0a/DC1111?text=DESMOS'">
-      <img class="cat-img-hover" src="${cat.img2||cat.img}" alt="${cat.name}"
-        onerror="this.src='${cat.img}'">
+      ${visual}
       <div class="cat-overlay"></div>
       <div class="cat-border"></div>
       <div class="cat-content">
@@ -15283,7 +15345,7 @@ function renderCategories(){
         <p class="cat-desc">${cat.desc}</p>
         <span class="cat-cta">Explorar →</span>
       </div>
-    </a>`).join('');
+    </a>`;}).join('');
   grid.querySelectorAll('.reveal').forEach(el=>revealObserver.observe(el));
 }
 
@@ -15322,9 +15384,67 @@ function openCatForm(i){
   document.getElementById('cf-count').value  = c.count || '';
   document.getElementById('cf-img').value    = c.img || '';
   document.getElementById('cf-img2').value   = c.img2 || '';
+  // Reset previews + statuses, then reflect any existing images.
+  ['img','img2'].forEach(f=>{
+    const st = document.getElementById('cf-status-'+f); if(st){ st.textContent=''; st.style.color='var(--muted2)'; }
+    onCatImgUrl(f);
+  });
   document.getElementById('cat-form-modal').classList.add('open');
 }
 function closeCatForm(){ document.getElementById('cat-form-modal').classList.remove('open'); }
+
+// Live preview when a category image URL changes (typed or after upload).
+function onCatImgUrl(field){
+  const url = (document.getElementById('cf-'+field).value || '').trim();
+  const prev = document.getElementById('cf-preview-'+field);
+  if(prev){
+    if(url){ prev.src = url; prev.style.display = ''; }
+    else { prev.style.display = 'none'; prev.src = ''; }
+  }
+}
+
+// Upload a category image to product-images/categories/ and drop the
+// public URL into the matching field (cf-img or cf-img2).
+async function uploadCategoryFile(field, input){
+  const file = input.files && input.files[0];
+  if(!file) return;
+  const status = document.getElementById('cf-status-'+field);
+  if(status){ status.textContent = 'Subiendo...'; status.style.color = 'var(--muted2)'; }
+  let blob = file;
+  try {
+    const compressed = await compressImageBlob(file, 1400, 0.82);
+    if(compressed && compressed.size < file.size) blob = compressed;
+  } catch(e){ /* upload original */ }
+  try {
+    const ext = ((file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')) || 'jpg';
+    const safeExt = (ext === 'jpeg' ? 'jpg' : ext);
+    const fileName = `categories/${Date.now()}-${Math.random().toString(36).substr(2,5)}.${safeExt}`;
+    const res = await fetch(`${SB_URL}/storage/v1/object/${BUCKET}/${fileName}`, {
+      method: 'POST',
+      headers: {
+        'apikey': SB_KEY,
+        'Authorization': `Bearer ${SB_KEY}`,
+        'Content-Type': blob.type || file.type || 'image/jpeg',
+        'x-upsert': 'true',
+      },
+      body: blob,
+    });
+    if(res.ok){
+      const publicUrl = `${SB_URL}/storage/v1/object/public/${BUCKET}/${fileName}`;
+      document.getElementById('cf-'+field).value = publicUrl;
+      onCatImgUrl(field);
+      if(status){ status.textContent = '✓ Subida'; status.style.color = 'var(--red)'; }
+      showToast('Imagen subida ✓');
+    } else {
+      const errTxt = await res.text();
+      if(status){ status.textContent = '✗ Error ' + res.status; status.style.color = 'var(--red)'; }
+      showToast(res.status === 404 ? `Bucket "${BUCKET}" no existe` : `Error ${res.status}: ${errTxt.slice(0,120)}`);
+    }
+  } catch(e){
+    if(status){ status.textContent = '✗ ' + (e.message||'error'); status.style.color = 'var(--red)'; }
+    showToast('No se pudo subir: ' + (e.message||'error'));
+  }
+}
 
 async function saveCategoryForm(){
   const idxRaw = document.getElementById('cat-form-idx').value;
@@ -15709,6 +15829,75 @@ async function saveEditorial(){
     applySiteContent();
     showToast('Editorial actualizado ✓');
   } catch(e){ showToast('Error: '+e.message); }
+}
+
+// ─── EMAIL LEADS TAB ───
+let _emailLeads = [];
+async function renderEmailLeads(){
+  const wrap = document.getElementById('leads-editor');
+  const countEl = document.getElementById('leads-count');
+  if(!wrap) return;
+  wrap.innerHTML = '<p style="color:var(--muted2);padding:1.5rem;text-align:center;font-size:0.8rem;">Cargando…</p>';
+  try {
+    const rows = await sbFetch('email_leads','GET',null,'?order=claimed_at.desc');
+    _emailLeads = Array.isArray(rows) ? rows : [];
+  } catch(e){
+    _emailLeads = [];
+    wrap.innerHTML = `<p style="color:var(--red);padding:1.5rem;text-align:center;font-size:0.78rem;line-height:1.6;">No se pudo cargar email_leads.<br><span style="color:var(--muted2);">Corré el SQL de la tabla email_leads en Supabase y volvé a intentar.</span></p>`;
+    if(countEl) countEl.textContent = '';
+    return;
+  }
+  if(countEl) countEl.textContent = `(${_emailLeads.length})`;
+  if(!_emailLeads.length){
+    wrap.innerHTML = '<p style="color:var(--muted2);padding:2rem;text-align:center;font-family:var(--font-body);font-weight:600;font-size:0.7rem;letter-spacing:0.12em;text-transform:uppercase;">Todavía no hay emails capturados.</p>';
+    return;
+  }
+  const rowsHtml = _emailLeads.map(l=>{
+    const date = l.claimed_at ? new Date(l.claimed_at).toLocaleDateString('es-CR',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+    const claimed = l.discount_claimed ? '<span style="color:#2ecc71;">✓</span>' : '—';
+    const linked = l.user_id ? '<span style="color:var(--red);font-size:0.6rem;">CUENTA</span>' : '<span style="color:var(--muted2);font-size:0.6rem;">—</span>';
+    return `<tr>
+      <td style="padding:0.6rem 0.5rem;border-bottom:1px solid rgba(255,255,255,0.06);">${(l.email||'').replace(/</g,'&lt;')}</td>
+      <td style="padding:0.6rem 0.5rem;border-bottom:1px solid rgba(255,255,255,0.06);text-align:center;">${claimed}</td>
+      <td style="padding:0.6rem 0.5rem;border-bottom:1px solid rgba(255,255,255,0.06);color:var(--muted2);font-size:0.72rem;white-space:nowrap;">${date}</td>
+      <td style="padding:0.6rem 0.5rem;border-bottom:1px solid rgba(255,255,255,0.06);color:var(--muted2);font-size:0.68rem;">${(l.source||'').replace(/</g,'&lt;')}</td>
+      <td style="padding:0.6rem 0.5rem;border-bottom:1px solid rgba(255,255,255,0.06);text-align:center;">${linked}</td>
+    </tr>`;
+  }).join('');
+  wrap.innerHTML = `
+    <div style="overflow-x:auto;border:1px solid rgba(220,17,17,0.15);">
+      <table style="width:100%;border-collapse:collapse;font-family:var(--font-body);font-size:0.8rem;color:var(--text);">
+        <thead><tr style="background:rgba(220,17,17,0.08);">
+          <th style="padding:0.7rem 0.5rem;text-align:left;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted2);">Email</th>
+          <th style="padding:0.7rem 0.5rem;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted2);">Reclamó</th>
+          <th style="padding:0.7rem 0.5rem;text-align:left;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted2);">Fecha</th>
+          <th style="padding:0.7rem 0.5rem;text-align:left;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted2);">Origen</th>
+          <th style="padding:0.7rem 0.5rem;font-size:0.6rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted2);">Cuenta</th>
+        </tr></thead>
+        <tbody>${rowsHtml}</tbody>
+      </table>
+    </div>`;
+}
+
+function exportEmailLeadsCSV(){
+  if(!_emailLeads.length){ showToast('No hay leads para exportar'); return; }
+  const header = ['email','discount_claimed','claimed_at','source','user_id'];
+  const esc = (v) => {
+    const s = (v == null ? '' : String(v));
+    return /[",\n]/.test(s) ? '"' + s.replace(/"/g,'""') + '"' : s;
+  };
+  const lines = [header.join(',')].concat(
+    _emailLeads.map(l => header.map(k => esc(l[k])).join(','))
+  );
+  const csv = '﻿' + lines.join('\r\n'); // BOM so Excel reads UTF-8
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `desmos-email-leads-${new Date().toISOString().slice(0,10)}.csv`;
+  document.body.appendChild(a); a.click();
+  setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+  showToast(`${_emailLeads.length} leads exportados ✓`);
 }
 
 // ─── BRANDS TAB ───
@@ -17192,11 +17381,15 @@ function refreshTicker(){
 // ════════════════════════════════════════════════════════════
 const EI_SESSION_KEY = 'desmos_exit_intent_shown';
 const EI_SUBSCRIBED_KEY = 'desmos_exit_intent_subscribed';
+const EI_SHOWN_EVER_KEY = 'desmos_exit_intent_shown_ever'; // once-per-user-EVER gate
 
 (function initExitIntent(){
   try {
-    if (sessionStorage.getItem(EI_SESSION_KEY)) return;
+    // MAX ONCE PER USER EVER — if the popup has ever been shown OR the
+    // user already claimed the discount, never show again.
+    if (localStorage.getItem(EI_SHOWN_EVER_KEY)) return;
     if (localStorage.getItem(EI_SUBSCRIBED_KEY)) return;
+    if (sessionStorage.getItem(EI_SESSION_KEY)) return;
   } catch(e) { /* storage disabled */ }
 
   // Sync modal text from i18n registry (if available)
@@ -17260,7 +17453,12 @@ const EI_SUBSCRIBED_KEY = 'desmos_exit_intent_subscribed';
 })();
 
 function showExitIntent(){
-  try { sessionStorage.setItem(EI_SESSION_KEY, '1'); } catch(e) {}
+  // Mark shown-ever the moment it appears, so even a dismissal means it
+  // never returns for this user.
+  try {
+    sessionStorage.setItem(EI_SESSION_KEY, '1');
+    localStorage.setItem(EI_SHOWN_EVER_KEY, '1');
+  } catch(e) {}
   const modal = document.getElementById('exit-intent-modal');
   if (!modal) return;
   modal.classList.add('open');
@@ -17288,7 +17486,7 @@ function exitIntentEscHandler(e){
   if (e.key === 'Escape') dismissExitIntent();
 }
 
-function submitExitIntent(e){
+async function submitExitIntent(e){
   e.preventDefault();
   const input = document.getElementById('ei-email');
   const email = (input && input.value || '').trim();
@@ -17301,12 +17499,38 @@ function submitExitIntent(e){
     }
     return;
   }
-  try { localStorage.setItem(EI_SUBSCRIBED_KEY, email); } catch(e) {}
-  // Link email to current cart session for abandoned-cart reminders
+  // Persist the claim in localStorage immediately (never show again).
+  try {
+    localStorage.setItem(EI_SUBSCRIBED_KEY, email);
+    localStorage.setItem(EI_SHOWN_EVER_KEY, '1');
+  } catch(e) {}
+  // Link email to current cart session for abandoned-cart reminders.
   if (typeof setCartEmail === 'function') setCartEmail(email);
-  // TODO: POST to Supabase newsletter_subs table
+  // Save the lead to Supabase email_leads (upsert on email so a repeat
+  // submission doesn't 409). Includes the logged-in user's id if available.
+  saveEmailLead(email, 'exit_popup').catch(()=>{});
   showToast(t('newsletterOK'));
   dismissExitIntent();
+}
+
+// Persist an email capture to the email_leads table. Upsert on lower(email)
+// so repeats are harmless. Best-effort — the localStorage flag already
+// guarantees the popup won't reappear even if this network call fails.
+async function saveEmailLead(email, source){
+  if (typeof sbFetch !== 'function') return;
+  const row = {
+    email: email.toLowerCase(),
+    discount_claimed: true,
+    claimed_at: new Date().toISOString(),
+    source: source || 'exit_popup'
+  };
+  // Attach the authenticated user id if the magic-link session exists.
+  try { if (typeof _currentUser !== 'undefined' && _currentUser && _currentUser.id) row.user_id = _currentUser.id; } catch(e) {}
+  try {
+    await sbFetch('email_leads', 'POST', row, '?on_conflict=email');
+  } catch(e) {
+    console.warn('[email_leads] save failed (table may not exist yet):', e.message || e);
+  }
 }
 
 // ════════════════════════════════════════════════════════════
