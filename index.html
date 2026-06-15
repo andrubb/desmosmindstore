@@ -2237,6 +2237,27 @@ footer{background:#030303;border-top:1px solid rgba(220,17,17,0.1);padding:5rem 
   overflow: hidden;
   background: var(--bg3);
 }
+/* Red scan-line sweep on hover — a thin glowing line passes top→bottom */
+.prod-img-wrap::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: -10%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--red) 30%, #ff3b3b 50%, var(--red) 70%, transparent);
+  box-shadow: 0 0 14px rgba(220,17,17,0.8);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 4;
+}
+.prod-card:hover .prod-img-wrap::after {
+  animation: prodScan 0.9s cubic-bezier(.4,0,.2,1);
+}
+@keyframes prodScan {
+  0%   { top: -10%; opacity: 0; }
+  15%  { opacity: 1; }
+  85%  { opacity: 1; }
+  100% { top: 110%; opacity: 0; }
+}
 
 .prod-img-main,
 .prod-img-hover {
@@ -4321,6 +4342,62 @@ html.is-authenticated .nav-auth svg { fill: var(--red); }
   box-shadow: 0 0 6px rgba(220,17,17,0.7);
 }
 html.is-authenticated .nav-auth-dot { display: block; }
+/* When logged in, swap the person icon for an initials avatar */
+.nav-auth-avatar { display: none; }
+html.is-authenticated .nav-auth-icon { display: none; }
+html.is-authenticated .nav-auth-avatar {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 100%; height: 100%;
+  font-family: var(--font-display); font-size: 0.92rem; letter-spacing: 0.03em;
+  color: var(--red);
+}
+html.is-authenticated .nav-auth-dot { display: none; } /* avatar replaces the dot */
+
+/* Account dropdown */
+.nav-account-wrap { position: relative; display: inline-flex; }
+.account-dropdown {
+  position: absolute; top: calc(100% + 10px); right: 0;
+  min-width: 220px;
+  background: linear-gradient(180deg, var(--bg2), var(--bg3));
+  border: 1px solid rgba(220,17,17,0.28);
+  box-shadow: 0 24px 50px rgba(0,0,0,0.7), 0 0 30px rgba(220,17,17,0.08);
+  padding: 0.5rem;
+  z-index: 620;
+  opacity: 0; transform: translateY(-8px) scale(0.98);
+  pointer-events: none;
+  transition: opacity 0.25s cubic-bezier(.16,1,.3,1), transform 0.25s cubic-bezier(.16,1,.3,1);
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+}
+.account-dropdown.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+.account-dd-head {
+  display: flex; align-items: center; gap: 0.6rem;
+  padding: 0.6rem 0.7rem 0.8rem;
+  border-bottom: 1px solid rgba(220,17,17,0.14);
+  margin-bottom: 0.4rem;
+}
+.account-dd-avatar {
+  flex-shrink: 0; width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--red); color: #fff;
+  font-family: var(--font-display); font-size: 0.85rem;
+}
+.account-dd-email {
+  font-family: var(--font-body); font-size: 0.68rem;
+  color: var(--text); word-break: break-all; line-height: 1.3;
+}
+.account-dd-item {
+  display: flex; align-items: center; gap: 0.7rem;
+  width: 100%; text-align: left;
+  background: transparent; border: none; cursor: pointer;
+  padding: 0.7rem 0.7rem;
+  font-family: var(--font-body); font-size: 0.78rem; font-weight: 600;
+  letter-spacing: 0.04em; color: var(--text);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+.account-dd-item svg { color: var(--red); flex-shrink: 0; }
+.account-dd-item:hover { background: rgba(220,17,17,0.1); color: var(--white); }
+.account-dd-item.danger:hover { background: rgba(220,17,17,0.18); }
+
 @media (max-width: 900px) {
   .nav-auth { margin-right: 0.5rem; width: 36px; height: 36px; }
 }
@@ -10719,13 +10796,34 @@ section + section::before,
       </svg>
       <kbd class="nav-search-kbd">/</kbd>
     </button>
-    <button class="nav-auth" onclick="openAuthModal()" aria-label="Iniciar sesión" type="button" title="Iniciar sesión / Mi cuenta">
-      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-        <circle cx="12" cy="7" r="4"/>
-      </svg>
-      <span class="nav-auth-dot" id="nav-auth-dot" aria-hidden="true"></span>
-    </button>
+    <div class="nav-account-wrap">
+      <button class="nav-auth" onclick="onAccountClick()" aria-label="Iniciar sesión" type="button" title="Iniciar sesión / Mi cuenta">
+        <svg class="nav-auth-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+        <span class="nav-auth-avatar" id="nav-auth-avatar" aria-hidden="true"></span>
+        <span class="nav-auth-dot" id="nav-auth-dot" aria-hidden="true"></span>
+      </button>
+      <div class="account-dropdown" id="account-dropdown" role="menu" aria-hidden="true">
+        <div class="account-dd-head">
+          <span class="account-dd-avatar" id="account-dd-avatar"></span>
+          <span class="account-dd-email" id="account-dd-email"></span>
+        </div>
+        <button class="account-dd-item" role="menuitem" onclick="closeAccountDropdown();openWishlist()">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+          Mis Favoritos
+        </button>
+        <button class="account-dd-item" role="menuitem" onclick="openMyOrders()">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+          Mis Pedidos
+        </button>
+        <button class="account-dd-item danger" role="menuitem" onclick="closeAccountDropdown();signOut()">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Cerrar sesión
+        </button>
+      </div>
+    </div>
     <button class="nav-wishlist" onclick="openWishlist()" aria-label="Mi lista de deseos" type="button">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
         <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/>
@@ -12622,6 +12720,8 @@ async function afterSignIn(user){
   await mergeRemoteProfile();
   // Push the merged state up so other devices see it
   schedulePushUserProfile();
+  // Link any pre-account email_leads discount capture to this user
+  linkEmailLeadToUser();
   // Close modal if open
   dismissAuthModal();
   if (typeof showToast === 'function') showToast('Sesión iniciada · sincronizando');
@@ -12715,6 +12815,15 @@ async function doPushUserProfile(){
   }
 }
 
+function emailInitials(email){
+  if(!email) return '·';
+  const local = String(email).split('@')[0].replace(/[^a-zA-Z0-9]/g,' ').trim();
+  const parts = local.split(/\s+/).filter(Boolean);
+  if(!parts.length) return email[0].toUpperCase();
+  if(parts.length === 1) return parts[0].slice(0,2).toUpperCase();
+  return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
+}
+
 function updateAuthUI(){
   const isAuth = !!_currentUser;
   document.documentElement.classList.toggle('is-authenticated', isAuth);
@@ -12722,9 +12831,78 @@ function updateAuthUI(){
   if (mobLink) mobLink.textContent = isAuth ? `Cerrar sesión (${_currentUser.email})` : 'Iniciar sesión';
   const navAuth = document.querySelector('.nav-auth');
   if (navAuth) {
-    navAuth.title = isAuth ? `Sesión: ${_currentUser.email} — clic para salir` : 'Iniciar sesión';
+    navAuth.title = isAuth ? `Mi cuenta: ${_currentUser.email}` : 'Iniciar sesión';
     navAuth.setAttribute('aria-label', navAuth.title);
   }
+  if (isAuth) {
+    const ini = emailInitials(_currentUser.email);
+    const av = document.getElementById('nav-auth-avatar');
+    if (av) av.textContent = ini;
+    const ddAv = document.getElementById('account-dd-avatar');
+    if (ddAv) ddAv.textContent = ini;
+    const ddEm = document.getElementById('account-dd-email');
+    if (ddEm) ddEm.textContent = _currentUser.email;
+  } else {
+    closeAccountDropdown();
+  }
+}
+
+// Account button: toggle the dropdown when logged in, else open the
+// magic-link modal.
+function onAccountClick(){
+  if (_currentUser) { toggleAccountDropdown(); }
+  else { openAuthModal(); }
+}
+function toggleAccountDropdown(){
+  const dd = document.getElementById('account-dropdown');
+  if (!dd) return;
+  const open = dd.classList.toggle('open');
+  dd.setAttribute('aria-hidden', open ? 'false' : 'true');
+  if (open) {
+    setTimeout(() => document.addEventListener('click', _accountDdOutside), 0);
+  }
+}
+function closeAccountDropdown(){
+  const dd = document.getElementById('account-dropdown');
+  if (dd) { dd.classList.remove('open'); dd.setAttribute('aria-hidden','true'); }
+  document.removeEventListener('click', _accountDdOutside);
+}
+function _accountDdOutside(e){
+  if (!e.target.closest('.nav-account-wrap')) closeAccountDropdown();
+}
+
+// Mis Pedidos — for this WhatsApp-commerce store the order record lives in
+// cart_sessions (completed conversions are tied to the user's email).
+async function openMyOrders(){
+  closeAccountDropdown();
+  if (!_currentUser) { openAuthModal(); return; }
+  showToast('Cargando tus pedidos…');
+  try {
+    const rows = await sbFetch('cart_sessions', 'GET', null,
+      `?email=eq.${encodeURIComponent(_currentUser.email)}&status=eq.completed&order=last_active_at.desc`);
+    const orders = Array.isArray(rows) ? rows : [];
+    if (!orders.length) {
+      showToast('Todavía no tenés pedidos completados. Tu próximo drop te espera 🦇');
+      return;
+    }
+    const total = orders.reduce((s,o)=> s + (Number(o.cart_total)||0), 0);
+    showToast(`Tenés ${orders.length} pedido${orders.length>1?'s':''} · ₡${total.toLocaleString('es-CR')}. Te enviamos el detalle por WhatsApp.`);
+    // Open WhatsApp with a prefilled query so support can pull the history.
+    const msg = encodeURIComponent(`Hola! Soy ${_currentUser.email}. Quiero ver el historial de mis pedidos en Desmos Mind.`);
+    setTimeout(() => window.open(`https://wa.me/50685946741?text=${msg}`, '_blank'), 600);
+  } catch(e){
+    showToast('No se pudieron cargar los pedidos. Escribinos por WhatsApp.');
+  }
+}
+
+// If this user captured the exit-popup discount before creating an
+// account, link that email_leads row to their user id now.
+async function linkEmailLeadToUser(){
+  if (!_currentUser || typeof sbFetch !== 'function') return;
+  try {
+    await sbFetch('email_leads', 'PATCH', { user_id: _currentUser.id },
+      `?email=eq.${encodeURIComponent((_currentUser.email||'').toLowerCase())}&user_id=is.null`);
+  } catch(e) { /* table may not exist yet — non-fatal */ }
 }
 
 // Init: kick off session detection on idle (magic-link callback uses
