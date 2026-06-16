@@ -624,12 +624,30 @@ section{padding:6rem 2.5rem;}
   color:var(--muted2);font-size:var(--fs-small);margin-top:0.6rem;letter-spacing:0.02em;
 }
 
-/* Reveal animation */
-.reveal{opacity:0;transform:translateY(28px);}
-.reveal.up{transform:translateY(28px);}
-.reveal.left{transform:translateX(-30px);}
-.reveal.right{transform:translateX(30px);}
-.reveal.scale{transform:scale(0.95);}
+/* Reveal animation — Emil Kowalski timing: subtle 8px rise, ~320ms,
+   strong ease-out, transform+opacity ONLY (GPU, 60fps). Driven by a
+   vanilla IntersectionObserver (no GSAP gating → no blank space while
+   scrolling). Failsafe below reveals everything if JS/IO never runs. */
+.reveal{
+  opacity:0;
+  transform:translateY(8px);
+  transition:
+    opacity 0.32s cubic-bezier(0.16,1,0.3,1),
+    transform 0.32s cubic-bezier(0.16,1,0.3,1);
+  will-change:opacity, transform;
+}
+.reveal.up{transform:translateY(8px);}
+.reveal.left{transform:translateX(-12px);}
+.reveal.right{transform:translateX(12px);}
+.reveal.scale{transform:scale(0.97);}
+.reveal.in-view{
+  opacity:1;
+  transform:none;
+  will-change:auto;   /* drop the compositor hint once settled */
+}
+@media (prefers-reduced-motion: reduce){
+  .reveal{ opacity:1 !important; transform:none !important; transition:none !important; }
+}
 
 /* Divider */
 .divider{
@@ -10695,9 +10713,21 @@ section + section::before,
 </style>
 
 <!-- ═══ GSAP + ScrollTrigger ═══ -->
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
-<script>if(window.gsap && window.ScrollTrigger) gsap.registerPlugin(ScrollTrigger);</script>
+<!-- GSAP deferred so it never blocks first paint. Parse-time consumers
+     (magnetic buttons, initScrollReveal) gate themselves on gsapReady(). -->
+<script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script>
+// Run a callback once GSAP + ScrollTrigger are present. Deferred scripts
+// finish before DOMContentLoaded, so that event is our ready signal; if
+// GSAP is somehow already there (cache), fire immediately.
+window.gsapReady = function(cb){
+  if (window.gsap && window.ScrollTrigger){ gsap.registerPlugin(ScrollTrigger); cb(); return; }
+  window.addEventListener('DOMContentLoaded', function once(){
+    if (window.gsap && window.ScrollTrigger){ gsap.registerPlugin(ScrollTrigger); cb(); }
+  }, { once: true });
+};
+</script>
 
 <!-- ═══ PLAUSIBLE ANALYTICS (privacy-friendly, no cookies) ═══ -->
 <script defer data-domain="desmosmind.netlify.app" src="https://plausible.io/js/script.tagged-events.js"></script>
@@ -14379,24 +14409,51 @@ function toggleDrawer(){
 // ════════════════════════════════════
 // GSAP-powered reveal shim — exposes .observe() so dynamic render
 // functions (renderProducts, renderReviews, etc.) continue to work.
+// Vanilla IntersectionObserver reveal — replaces the GSAP-gated version so
+// content never waits on GSAP to load (the "blank space while scrolling"
+// bug). Triggers EARLY via rootMargin, animates with the CSS transition
+// above (transform+opacity only), and staggers ONLY related grid children
+// (capped at 6) so we don't stagger-spam every element.
 const revealObserver = (function(){
   const seen = new Set();
-  function observe(el){
-    if(seen.has(el)) return;
-    seen.add(el);
-    const dir = el.classList.contains('left')  ? {x:-30,y:0}
-              : el.classList.contains('right') ? {x:30, y:0}
-              : el.classList.contains('scale') ? {scale:0.95,y:0}
-              : {y:28};
-    gsap.fromTo(el,
-      {opacity:0,...dir},
-      {opacity:1,x:0,y:0,scale:1,duration:0.8,ease:'power3.out',
-       scrollTrigger:{trigger:el,start:'top 92%',once:true}}
-    );
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const GRID_SEL = '.products-grid,.cat-grid,.test-grid,.how-grid,.editorial-grid,.trust-grid,.faq-list';
+
+  let io = null;
+  if (!reduce && 'IntersectionObserver' in window) {
+    io = new IntersectionObserver((entries) => {
+      entries.forEach(en => {
+        if (!en.isIntersecting) return;
+        const el = en.target;
+        const grid = el.parentElement && el.parentElement.matches && el.parentElement.matches(GRID_SEL)
+          ? el.parentElement : null;
+        if (grid) {
+          const idx = Array.prototype.indexOf.call(grid.children, el);
+          el.style.transitionDelay = Math.min(idx, 6) * 0.055 + 's';
+        }
+        el.classList.add('in-view');
+        io.unobserve(el);
+      });
+    }, { root: null, rootMargin: '0px 0px -4% 0px', threshold: 0.01 });
   }
-  return {observe, unobserve:()=>{}};
+
+  function observe(el){
+    if (seen.has(el)) return;
+    seen.add(el);
+    if (io) io.observe(el);
+    else el.classList.add('in-view'); // no IO / reduced motion → show now
+  }
+  return { observe, unobserve: (el) => { if (io) io.unobserve(el); } };
 })();
 document.querySelectorAll('.reveal').forEach(el=>revealObserver.observe(el));
+
+// FAILSAFE — if anything is still hidden 1.4s after load, reveal it so the
+// user never stares at blank space.
+(function revealFailsafe(){
+  const run = () => document.querySelectorAll('.reveal:not(.in-view)').forEach(el => el.classList.add('in-view'));
+  if (document.readyState === 'complete') setTimeout(run, 1400);
+  else window.addEventListener('load', () => setTimeout(run, 1400), { once: true });
+})();
 
 // ════════════════════════════════════
 // FAQ
@@ -17050,19 +17107,22 @@ openProductForm = function(id){
       if (!isExcluded(btn)) attach(btn);
     });
   }
-  rescan();
+  // GSAP is deferred — wait until it's ready before wiring magnetic pull.
+  (window.gsapReady || function(cb){cb();})(function(){
+    rescan();
 
-  let scanTimer = null;
-  const mo = new MutationObserver((mutations) => {
-    let added = false;
-    for (const m of mutations) {
-      if (m.addedNodes.length) { added = true; break; }
-    }
-    if (!added) return;
-    clearTimeout(scanTimer);
-    scanTimer = setTimeout(rescan, 200);
+    let scanTimer = null;
+    const mo = new MutationObserver((mutations) => {
+      let added = false;
+      for (const m of mutations) {
+        if (m.addedNodes.length) { added = true; break; }
+      }
+      if (!added) return;
+      clearTimeout(scanTimer);
+      scanTimer = setTimeout(rescan, 200);
+    });
+    mo.observe(document.body, { childList: true, subtree: true });
   });
-  mo.observe(document.body, { childList: true, subtree: true });
 })();
 
 // ════════════════════════════════════════════════════════════
@@ -17074,39 +17134,44 @@ openProductForm = function(id){
 // ════════════════════════════════════════════════════════════
 (function initScrollReveal(){
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  // GSAP is deferred — run once it's ready (this is the single source of
+  // truth for section / grid / product-card reveals).
+  (window.gsapReady || function(cb){cb();})(function(){
 
   const STAGGER_GRIDS = [
-    '.trust-grid', '.cat-grid', '.how-grid', '.test-grid', '.faq-list'
+    '.trust-grid', '.cat-grid', '.how-grid', '.test-grid', '.faq-list', '.editorial-grid'
   ];
 
   // Sections fade up
   document.querySelectorAll('section:not(.hero)').forEach(section => {
     section.classList.add('reveal-section');
     gsap.fromTo(section,
-      {opacity:0, y:40},
-      {opacity:1, y:0, duration:0.9, ease:'power3.out',
-       scrollTrigger:{trigger:section, start:'top 88%', once:true}}
+      {opacity:0, y:16},
+      {opacity:1, y:0, duration:0.42, ease:'power3.out',
+       scrollTrigger:{trigger:section, start:'top 94%', once:true}}
     );
   });
 
-  // Grid item stagger
+  // Grid item stagger — Emil timing: fast, low travel, capped stagger so
+  // long grids don't trickle in (max ~6 steps before they all share a beat).
   function animateGrid(grid){
     if(grid.dataset.gsapReveal) return;
     grid.dataset.gsapReveal = '1';
     gsap.fromTo(Array.from(grid.children),
-      {opacity:0, y:24},
-      {opacity:1, y:0, duration:0.6, stagger:0.07, ease:'power3.out',
-       scrollTrigger:{trigger:grid, start:'top 88%', once:true}}
+      {opacity:0, y:14},
+      {opacity:1, y:0, duration:0.38, ease:'power3.out',
+       stagger:{each:0.05, from:'start', amount:Math.min(grid.children.length, 7) * 0.05},
+       scrollTrigger:{trigger:grid, start:'top 92%', once:true}}
     );
   }
   document.querySelectorAll(STAGGER_GRIDS.join(',')).forEach(animateGrid);
 
-  // Product cards — batch stagger entrance
-  ScrollTrigger.batch('.prod-card', {
-    start: 'top 90%',
+  // Product cards (+ featured hero) — batch stagger entrance
+  ScrollTrigger.batch('.prod-card, .featured-hero', {
+    start: 'top 95%',
     onEnter: batch => gsap.fromTo(batch,
-      {opacity:0, y:40},
-      {opacity:1, y:0, duration:0.7, stagger:0.07, ease:'power3.out'}
+      {opacity:0, y:16},
+      {opacity:1, y:0, duration:0.42, stagger:0.05, ease:'power3.out'}
     ),
     once: true,
   });
@@ -17122,6 +17187,7 @@ openProductForm = function(id){
   document.querySelectorAll(STAGGER_GRIDS.join(',')).forEach(g =>
     gridMO.observe(g, {childList:true})
   );
+  }); // end gsapReady
 })();
 
 </script>
@@ -18738,18 +18804,9 @@ document.addEventListener('DOMContentLoaded', () => {
   function load(){
     if (loaded) return;
     loaded = true;
-    // GSAP core + ScrollTrigger from official CDN
-    const core = document.createElement('script');
-    core.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js';
-    core.async = true;
-    core.onload = () => {
-      const st = document.createElement('script');
-      st.src = 'https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js';
-      st.async = true;
-      st.onload = () => bootEnhancements();
-      document.head.appendChild(st);
-    };
-    document.head.appendChild(core);
+    // GSAP is already loaded by the deferred tags in <head> — reuse it
+    // instead of re-downloading a second copy from another CDN.
+    (window.gsapReady || function(cb){ if(window.gsap&&window.ScrollTrigger){gsap.registerPlugin(ScrollTrigger);cb();} })(bootEnhancements);
   }
 
   function bootEnhancements(){
@@ -18764,51 +18821,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const M = isMobile ? 0.6 : 1;                  // motion multiplier
     const SOFT_EASE = 'cubic-bezier(0.16, 1, 0.3, 1)';
 
-    // ── 47.1 Section-header micro reveal ──
-    // Eyebrow, title, subtitle stagger up + fade as the header
-    // enters the viewport. Skips the hero (separate motion).
-    // Using gsap.fromTo with immediateRender:false so the final state
-    // is explicit — gsap.from was leaving inline opacity:0 stuck on
-    // some elements when ScrollTrigger fired mid-instant-scroll.
-    document.querySelectorAll('section:not(.hero) .sec-header').forEach(header => {
-      const targets = header.querySelectorAll('.sec-eyebrow, .sec-title, .sec-subtitle');
-      if (!targets.length) return;
-      gsap.fromTo(targets,
-        { y: 24 * M, opacity: 0 },
-        {
-          y: 0, opacity: 1,
-          duration: 0.7 * M,
-          ease: SOFT_EASE,
-          stagger: 0.09 * M,
-          immediateRender: false,
-          scrollTrigger: { trigger: header, start: 'top 82%', once: true }
-        }
-      );
-    });
-
-    // ── 47.2 Card grid stagger entrance ──
-    // Cards in non-product grids stream in from below in a small wave.
-    const gridSelectors = [
-      '.how-grid', '.test-grid', '.cat-grid',
-      '.faq-list', '.editorial-grid', '.trust-grid'
-    ];
-    gridSelectors.forEach(sel => {
-      document.querySelectorAll(sel).forEach(grid => {
-        const items = grid.children;
-        if (!items.length) return;
-        gsap.fromTo(items,
-          { y: 30 * M, opacity: 0 },
-          {
-            y: 0, opacity: 1,
-            duration: 0.6 * M,
-            ease: SOFT_EASE,
-            stagger: 0.08 * M,
-            immediateRender: false,
-            scrollTrigger: { trigger: grid, start: 'top 85%', once: true }
-          }
-        );
-      });
-    });
+    // ── 47.1 / 47.2 Section-header + grid reveals — REMOVED ──
+    // These duplicated initScrollReveal's section + grid stagger (which now
+    // owns every reveal, editorial-grid included). Running both re-blinked
+    // already-visible cards to opacity:0 and double-staggered. Reveals live
+    // in one system; this block keeps only the additive hover/scrub polish.
 
     // ── 47.3 Editorial card hover tilt (desktop) ──
     if (!isTouch) {
@@ -18901,25 +18918,10 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // ── 47.9 Products grid stagger on enter ──
-    const productsGrid = document.getElementById('products-grid');
-    if (productsGrid) {
-      ScrollTrigger.create({
-        trigger: productsGrid,
-        start: 'top 82%',
-        once: true,
-        onEnter: () => {
-          const cards = productsGrid.querySelectorAll('.prod-card, .featured-hero');
-          if (cards.length) {
-            gsap.from(cards, {
-              y: 28, opacity: 0,
-              duration: 0.55, ease: 'power2.out',
-              stagger: 0.05
-            });
-          }
-        }
-      });
-    }
+    // ── 47.9 Products grid stagger — REMOVED ──
+    // initScrollReveal's ScrollTrigger.batch('.prod-card, .featured-hero')
+    // already owns product-card entrance. This duplicated it on a second,
+    // slower curve and re-blinked cards on warm.
 
     // Telemetry — confirm enhancements booted
     if (typeof track === 'function') track('GSAP Boot');
