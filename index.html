@@ -2248,26 +2248,30 @@ footer{background:#030303;border-top:1px solid rgba(220,17,17,0.1);padding:5rem 
   overflow: hidden;
   background: var(--bg3);
 }
-/* Red scan-line sweep on hover — a thin glowing line passes top→bottom */
+/* Red scan-line sweep on hover — a thin glowing line passes top→bottom.
+   The layer is full-height with the 2px line painted at its top edge, so the
+   sweep runs on `transform: translateY` (compositor) instead of animating
+   `top` (layout) — important since this fires on the most-hovered element. */
 .prod-img-wrap::after {
   content: '';
   position: absolute;
-  left: 0; right: 0; top: -10%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--red) 30%, #ff3b3b 50%, var(--red) 70%, transparent);
-  box-shadow: 0 0 14px rgba(220,17,17,0.8);
+  left: 0; right: 0; top: 0;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, var(--red) 30%, #ff3b3b 50%, var(--red) 70%, transparent) top/100% 2px no-repeat;
+  filter: drop-shadow(0 0 14px rgba(220,17,17,0.8));
   opacity: 0;
   pointer-events: none;
   z-index: 4;
+  transform: translateY(-10%);
 }
 .prod-card:hover .prod-img-wrap::after {
   animation: prodScan 0.9s cubic-bezier(.4,0,.2,1);
 }
 @keyframes prodScan {
-  0%   { top: -10%; opacity: 0; }
+  0%   { transform: translateY(-10%); opacity: 0; }
   15%  { opacity: 1; }
   85%  { opacity: 1; }
-  100% { top: 110%; opacity: 0; }
+  100% { transform: translateY(110%); opacity: 0; }
 }
 
 .prod-img-main,
