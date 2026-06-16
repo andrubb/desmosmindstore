@@ -17765,8 +17765,9 @@ async function submitExitIntent(e){
 // guarantees the popup won't reappear even if this network call fails.
 async function saveEmailLead(email, source){
   if (typeof sbFetch !== 'function') return;
+  const clean = email.toLowerCase();
   const row = {
-    email: email.toLowerCase(),
+    email: clean,
     discount_claimed: true,
     claimed_at: new Date().toISOString(),
     source: source || 'exit_popup'
@@ -17774,9 +17775,17 @@ async function saveEmailLead(email, source){
   // Attach the authenticated user id if the magic-link session exists.
   try { if (typeof _currentUser !== 'undefined' && _currentUser && _currentUser.id) row.user_id = _currentUser.id; } catch(e) {}
   try {
-    await sbFetch('email_leads', 'POST', row, '?on_conflict=email');
+    // Check-then-insert instead of upsert: the anon RLS only grants INSERT
+    // + SELECT, so a true upsert (which fires an UPDATE on conflict) is
+    // rejected by the UPDATE policy. A plain INSERT for a duplicate email
+    // would 409 on the unique index. So we look first, and skip if the
+    // email is already captured — the original claim is what matters.
+    const existing = await sbFetch('email_leads', 'GET', null,
+      `?email=eq.${encodeURIComponent(clean)}&select=id&limit=1`);
+    if (Array.isArray(existing) && existing.length) return; // already captured
+    await sbFetch('email_leads', 'POST', row, '');
   } catch(e) {
-    console.warn('[email_leads] save failed (table may not exist yet):', e.message || e);
+    console.warn('[email_leads] save skipped:', e.message || e);
   }
 }
 
