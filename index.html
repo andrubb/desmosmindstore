@@ -483,12 +483,10 @@ p      { font-family:var(--font-body);    font-size:var(--fs-body); line-height:
   height:auto;
   display:block;
   filter:drop-shadow(0 0 14px rgba(220,17,17,0.55));
-  animation:logoBreathe 5s ease-in-out infinite;
 }
-@keyframes logoBreathe{
-  0%,100%{filter:drop-shadow(0 0 10px rgba(220,17,17,0.45));}
-  50%{filter:drop-shadow(0 0 22px rgba(220,17,17,0.8));}
-}
+/* logoBreathe removed — a breathing logo is a classic slop tell and the
+   perpetual filter repaint cost nothing useful. Static red glow holds the
+   gothic mood without the throb. */
 
 .hero-sub{
   font-family:var(--font-body);
@@ -1633,16 +1631,9 @@ footer{background:#030303;border-top:1px solid rgba(220,17,17,0.1);padding:5rem 
   border-radius:50%;
   z-index:2;
 }
-.wa-online-dot::after{
-  content:'';position:absolute;inset:-1px;
-  border-radius:50%;
-  background:#22c55e;
-  animation:dotPulse 1.8s ease-out infinite;
-}
-@keyframes dotPulse{
-  0%{transform:scale(1);opacity:0.7;}
-  100%{transform:scale(2.4);opacity:0;}
-}
+/* Online ping ring removed — a perpetually pulsing "online" dot is the
+   textbook AI-slop indicator (and the green was off-brand). The solid dot
+   reads on its own. */
 .wa-tooltip{
   position:absolute;
   right:calc(100% + 12px);
@@ -2705,18 +2696,8 @@ footer { background: #030303; border-top: 1px solid rgba(220,17,17,0.08); paddin
   position:relative;
   box-shadow:0 0 12px var(--red-glow);
 }
-.coming-soon-pulse::before,
-.coming-soon-pulse::after{
-  content:'';position:absolute;inset:0;
-  border-radius:50%;
-  background:var(--red);
-  animation:csPulse 2.4s ease-out infinite;
-}
-.coming-soon-pulse::after{animation-delay:1.2s;}
-@keyframes csPulse{
-  0%{transform:scale(1);opacity:0.7;}
-  100%{transform:scale(3.5);opacity:0;}
-}
+/* Double ping-ring removed — the solid red glow dot already signals
+   "coming soon" without a perpetual radar pulse. */
 .coming-soon-tag {
   background: var(--red); color: var(--white);
   font-family: var(--font-body); font-size: 0.6rem;
@@ -2964,25 +2945,10 @@ body::before {
   box-shadow: inset 0 0 22px rgba(220,17,17,0.08), 0 0 16px rgba(220,17,17,0.18);
 }
 
-/* 12 ── Eyebrow lines — sweeping shimmer */
-.eyebrow-line,
-.hero-eyebrow-line {
-  position: relative;
-  overflow: hidden;
-}
-.eyebrow-line::after,
-.hero-eyebrow-line::after {
-  content: '';
-  position: absolute;
-  top: 0; left: -100%;
-  width: 100%; height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,30,30,0.95), transparent);
-  animation: eyebrow-shimmer 3.4s ease-in-out infinite;
-}
-@keyframes eyebrow-shimmer {
-  0%       { left: -100%; }
-  60%, 100%{ left: 100%; }
-}
+/* 12 ── Eyebrow lines — static red line.
+   The infinite left:-100%→100% shimmer sweep was removed: it animated a
+   layout property (left) forever AND was decorative motion on static text —
+   slop on both the taste and performance axes. The line reads on its own. */
 
 /* 13 ── Nav links — glow underline + micro shadow */
 .nav-links a::after {
@@ -3165,12 +3131,9 @@ input:focus, textarea:focus, select:focus {
 }
 .toast-dot {
   box-shadow: 0 0 10px var(--red), 0 0 20px rgba(220,17,17,0.6);
-  animation: toast-pulse 1.4s ease-in-out infinite;
 }
-@keyframes toast-pulse {
-  0%,100% { transform: scale(1); opacity: 1; }
-  50%     { transform: scale(1.4); opacity: 0.7; }
-}
+/* toast-pulse removed — a toast is a transient confirmation; a throbbing
+   dot on it is noise, not signal. */
 
 /* 32 ── Cart panel — branded left edge + interior glow */
 #cart-panel {
@@ -4216,20 +4179,8 @@ img { transition: opacity 0.4s ease; }
   box-shadow: 0 0 8px rgba(220,17,17,0.8), 0 0 14px rgba(220,17,17,0.4);
   position: relative;
 }
-.psp-dot::after {
-  content: '';
-  position: absolute;
-  inset: -3px;
-  border-radius: 50%;
-  border: 1px solid var(--red);
-  opacity: 0.7;
-  animation: psp-ping 1.6s cubic-bezier(.4,0,.6,1) infinite;
-}
-@keyframes psp-ping {
-  0%   { transform: scale(1);   opacity: 0.7; }
-  80%  { transform: scale(2.2); opacity: 0; }
-  100% { transform: scale(2.2); opacity: 0; }
-}
+/* psp-ping radar ring removed — the solid glowing red dot is enough of a
+   live cue for social proof; the expanding ring was pure attention-grab. */
 .psp-num { color: var(--red-bright); font-weight: 800; }
 @keyframes psp-rise {
   to { opacity: 1; transform: translateY(0); }
@@ -5929,12 +5880,9 @@ html.loader-dismissed #page-loader { display: none !important; }
   color: white;
   border: 1px solid rgba(255,255,255,0.18);
   box-shadow: 0 2px 12px rgba(220,17,17,0.55);
-  animation: badge-low-pulse 1.8s ease-in-out infinite;
 }
-@keyframes badge-low-pulse {
-  0%,100% { box-shadow: 0 2px 12px rgba(220,17,17,0.55); }
-  50%     { box-shadow: 0 4px 22px rgba(220,17,17,0.85); }
-}
+/* badge-low-pulse removed — red badge + "pocas unidades" copy already
+   conveys urgency; a perpetual glow throb is slop. */
 .prod-badge.badge-soldout {
   background: rgba(0,0,0,0.85);
   color: var(--muted2);
@@ -5989,7 +5937,6 @@ html.loader-dismissed #page-loader { display: none !important; }
 }
 .modal-stock.urgent {
   color: var(--red-bright);
-  animation: stock-urgent-pulse 1.8s ease-in-out infinite;
 }
 .modal-stock.urgent strong { color: white; font-weight: 800; }
 .modal-stock.out {
@@ -6002,20 +5949,13 @@ html.loader-dismissed #page-loader { display: none !important; }
   border-radius: 50%;
   box-shadow: 0 0 8px rgba(220,17,17,0.7);
   flex-shrink: 0;
-  animation: ms-dot-pulse 1.4s ease-in-out infinite;
 }
 .modal-stock .ms-icon {
   color: var(--red);
   font-weight: 700;
 }
-@keyframes ms-dot-pulse {
-  0%,100% { transform: scale(1); opacity: 1; }
-  50%     { transform: scale(1.35); opacity: 0.7; }
-}
-@keyframes stock-urgent-pulse {
-  0%,100% { opacity: 1; }
-  50%     { opacity: 0.78; }
-}
+/* ms-dot-pulse + stock-urgent-pulse removed — static red dot + red-bright
+   text carry the urgency; perpetual throb was indicator slop. */
 
 /* Disabled add-to-cart when out of stock */
 .modal-btn-cart:disabled,
@@ -7333,12 +7273,8 @@ img { max-width: 100%; height: auto; }
   background: #4ade80;        /* "online" green dot */
   border-radius: 50%;
   box-shadow: 0 0 8px rgba(74,222,128,0.7);
-  animation: contact-pulse 1.6s ease-in-out infinite;
 }
-@keyframes contact-pulse {
-  0%,100% { opacity: 1; transform: scale(1); }
-  50%     { opacity: 0.6; transform: scale(1.3); }
-}
+/* contact-pulse removed — static "online" dot is enough. */
 .contact-arrow {
   position: absolute;
   top: 1.4rem;
@@ -7827,12 +7763,8 @@ footer::before {
   background: #4ade80;
   border-radius: 50%;
   box-shadow: 0 0 8px rgba(74,222,128,0.8);
-  animation: cta-trust-pulse 1.6s ease-in-out infinite;
 }
-@keyframes cta-trust-pulse {
-  0%,100% { opacity: 1; transform: scale(1); }
-  50%     { opacity: 0.7; transform: scale(1.3); }
-}
+/* cta-trust-pulse removed — static dot, no throb. */
 
 @media (max-width: 600px) {
   .cta-corner { width: 20px; height: 20px; }
@@ -8275,12 +8207,8 @@ footer::before {
   width: 6px; height: 6px;
   background: white;
   border-radius: 50%;
-  animation: fh-pulse 1.5s ease-in-out infinite;
 }
-@keyframes fh-pulse {
-  0%,100% { opacity: 1; transform: scale(1); }
-  50%     { opacity: 0.6; transform: scale(1.4); }
-}
+/* fh-pulse removed — featured tag dot stays static. */
 .fh-body {
   padding: clamp(1.6rem, 3vw, 2.6rem);
   display: flex;
