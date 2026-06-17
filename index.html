@@ -15528,10 +15528,11 @@ async function loadCategoriesFromSupabase(){
 
 function saveCategories(){ localStorage.setItem('dm_categories', JSON.stringify(categories)); }
 
-async function persistCategoryRemote(cat, isUpdate){
+async function persistCategoryRemote(cat){
   if (typeof sbFetch !== 'function') return;
+  const slug = (cat.filter || cat.name || '').toLowerCase().replace(/\s+/g, '-');
   const row = {
-    slug: (cat.filter || cat.name || '').toLowerCase().replace(/\s+/g, '-'),
+    slug,
     name: cat.name,
     img: cat.img || '',
     img2: cat.img2 || cat.img || '',   // hover image (own column now)
@@ -15542,14 +15543,25 @@ async function persistCategoryRemote(cat, isUpdate){
     active: true
   };
   try {
-    if (isUpdate && typeof cat.id === 'number' && cat.id < 1e12) {
-      await sbFetch('categories', 'PATCH', row, `?id=eq.${cat.id}`);
+    // Collision-free upsert keyed on the STABLE slug — never on a client-side
+    // id. DEFAULT_CATEGORIES seeds (1/2/3) collide with DB serial ids, which
+    // previously made one category's PATCH overwrite another's freshly
+    // inserted row. Look the row up by slug: PATCH if it exists, else INSERT.
+    // Either way reassign the real DB id back onto the object.
+    const q = `?slug=eq.${encodeURIComponent(slug)}`;
+    const existing = await sbFetch('categories', 'GET', null, q + '&select=id');
+    if (Array.isArray(existing) && existing.length > 0) {
+      const updated = await sbFetch('categories', 'PATCH', row, q);
+      if (Array.isArray(updated) && updated[0]) cat.id = updated[0].id;
     } else {
       const saved = await sbFetch('categories', 'POST', row, '');
       if (Array.isArray(saved) && saved[0]) cat.id = saved[0].id;
     }
   } catch (e) {
+    // Re-throw so saveCategoryForm surfaces a real error instead of a false
+    // "saved ✓" — silent failure here is exactly what hid the original bug.
     console.warn('Category remote persist failed:', e.message || e);
+    throw e;
   }
 }
 async function deleteCategoryRemote(cat){
@@ -15702,20 +15714,24 @@ async function saveCategoryForm(){
   };
   try {
     if(isEdit){
-      const cat = categories[parseInt(idxRaw)];
-      const updated = {...cat, ...data};
-      await persistCategoryRemote(updated, true);
-      categories[parseInt(idxRaw)] = updated;
-      showToast('Categoría actualizada ✓');
+      categories[parseInt(idxRaw)] = { ...categories[parseInt(idxRaw)], ...data };
     } else {
-      const cat = { id: Date.now(), ...data };
-      await persistCategoryRemote(cat, false);
-      categories.push(cat);
-      showToast('Categoría agregada ✓');
+      categories.push({ id: Date.now(), ...data });
+    }
+    // Mirror the FULL category set to Supabase so the table always equals
+    // what the admin sees. persistCategoryRemote is idempotent — it PATCHes
+    // an existing row, or INSERTs when the id is a client-only default seed
+    // (1/2/3) that was never persisted. This both fixes cross-device sync
+    // AND stops an edit to one default from making the untouched defaults
+    // disappear on other devices. position = index keeps order stable.
+    for (let i = 0; i < categories.length; i++) {
+      categories[i].position = i;
+      await persistCategoryRemote(categories[i]);
     }
     saveCategories(); renderCategories(); renderAdminCategories();
     closeCatForm();
-  } catch(e){ showToast('Error: ' + (e.message || 'desconocido')); }
+    showToast(isEdit ? 'Categoría actualizada ✓' : 'Categoría agregada ✓');
+  } catch(e){ showToast('Error al guardar: ' + (e.message || 'desconocido')); }
 }
 
 function addCategory(){ openCatForm(null); }
