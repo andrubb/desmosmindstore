@@ -6215,6 +6215,28 @@ html.loader-dismissed #page-loader { display: none !important; }
   html { overscroll-behavior-y: auto; }
 }
 
+/* ══════════════════════════════════════════════════════════════
+   TOUCH PARADIGM — no hover. Reveal hover-gated affordances by default
+   and neutralize :hover states that "stick" after a tap (the classic
+   mobile bug where a card freezes mid-hover until you tap elsewhere).
+   Tap feedback lives on :active instead. (3D card tilt is already gated
+   off on touch in JS via the isTouch guards.)
+   ══════════════════════════════════════════════════════════════ */
+@media (hover: none) {
+  /* Quick-add ("VER PRODUCTO") visible by default — it's the card's CTA. */
+  .prod-quick-add { transform: translateY(0) !important; opacity: 1 !important; }
+  /* Cancel sticky card/image hover transforms + the scan-line sweep. */
+  .prod-card:hover { transform: none !important; }
+  .prod-card:hover .prod-img-main { opacity: 1 !important; transform: none !important; }
+  .prod-card:hover .prod-img-hover { opacity: 0 !important; }
+  .prod-card:hover .prod-img-wrap::after { animation: none !important; }
+  /* Brand buttons: no hover lift on touch — :active scale (set elsewhere)
+     provides the tactile press. */
+  .btn-primary:hover, .modal-btn-cart:hover, .cart-wa-btn:hover,
+  .qv-add:hover, .cart-empty-cta:hover, .cta-band-btn:hover,
+  .cat-card:hover, .editorial-card:hover { transform: none !important; }
+}
+
 /* ═══════════════════════════════════════════════════════════
    Footer — legal links
 ═══════════════════════════════════════════════════════════ */
@@ -9721,11 +9743,9 @@ body::after {
 }
 
 /* ── 22. BOTTOM TAB BAR — glass morphism ── */
-#bottom-tab-bar {
-  background: rgba(5,5,5,0.88) !important;
-  backdrop-filter: blur(20px) saturate(1.4) !important;
-  border-top: 1px solid rgba(220,17,17,0.12) !important;
-}
+/* (removed dead #bottom-tab-bar rule — the real mobile nav is #bottom-tabs,
+   which is solid #050505. That translucent selector matched no element and
+   was a red herring for the "ghost content behind the bar" report.) */
 
 /* ── 23. CART PANEL — elevated ── */
 #cart-panel {
@@ -10149,6 +10169,62 @@ section + section::before,
     aspect-ratio: auto !important;
     min-height: 0 !important;
   }
+
+  /* ══════════════════════════════════════════════════════════
+     MOBILE DROPS — dedicated thumb-first layout (NOT desktop shrunk).
+     Full-bleed photo + bottom-weighted scrim; content reads top→bottom
+     tag → title → desc → full-width CTA → dots. Arrows/count removed —
+     dots are the touch nav (swipe + auto-advance do the heavy lifting).
+     Bottom-anchored content structurally prevents the old "text floats
+     above an empty box" overflow.
+     ══════════════════════════════════════════════════════════ */
+  .drop-slide::before {
+    background: linear-gradient(180deg,
+      rgba(5,5,5,0.12) 0%, rgba(5,5,5,0.30) 40%,
+      rgba(5,5,5,0.86) 82%, #050505 100%) !important;
+  }
+  .drop-slide-gradient { display: none !important; }
+  .drop-slide-content {
+    position: absolute !important;
+    inset: auto 0 0 0 !important;          /* anchor to the bottom edge */
+    width: 100% !important; max-width: none !important;
+    justify-content: flex-end !important;
+    padding: 0 1.25rem 3.5rem !important;  /* bottom room clears the dots */
+  }
+  .drop-slide-tag    { margin-bottom: 0.7rem !important; }
+  .drop-slide-fecha  { margin-bottom: 0.45rem !important; }
+  .drop-slide-title  {
+    font-size: clamp(2rem, 9vw, 2.7rem) !important;
+    margin-bottom: 0.55rem !important;
+  }
+  .drop-slide-desc {
+    font-size: 0.9rem !important; line-height: 1.55 !important;
+    margin-bottom: 1.15rem !important; max-width: none !important;
+    /* clamp long copy so the CTA can never be pushed off-card */
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .drop-slide-btns { display: block !important; }
+  .drop-slide-btns > * {
+    width: 100% !important; justify-content: center;
+    min-height: 50px;
+  }
+  /* Controls → centered round indicator dots only (swipe + auto-advance are
+     the primary nav; arrows/count/progress removed for a clean thumb zone). */
+  .drop-controls {
+    left: 0 !important; right: 0 !important; bottom: 1.3rem !important;
+    justify-content: center !important; gap: 0 !important;
+    height: auto !important;
+  }
+  .drop-arrows, .drop-count { display: none !important; }
+  .drop-progress { display: none !important; }
+  .drop-dots { justify-content: center; align-items: center; gap: 0.5rem; }
+  .drop-dot {
+    width: 8px !important; height: 8px !important;
+    min-height: 0 !important; min-width: 0 !important;  /* beat the global 48px touch min-height (dots are <button>) */
+    border-radius: 50%; padding: 0 !important; box-sizing: border-box; flex: 0 0 auto;
+  }
+  .drop-dot.active { width: 26px !important; border-radius: 4px; }
 
   /* Footer text sizes + alignment for one-column grid. */
   .footer-grid > * { text-align: left; }
