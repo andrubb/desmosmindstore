@@ -275,7 +275,26 @@ p      { font-family:var(--font-body);    font-size:var(--fs-body); line-height:
 @media(max-width:900px){
   .nav-links,.nav-btn{display:none;}
   .mob-btn{display:flex;}
+  /* Declutter the top bar to logo + cart + hamburger (3 max). Search,
+     language, account and wishlist move into the drawer / bottom tab bar. */
+  .lang-toggle, .nav-search, .nav-account-wrap, .nav-wishlist { display:none !important; }
+  .nav-cart-mobile{ display:flex !important; }
 }
+/* Mobile cart button — hidden on desktop (cart is the floating FAB there). */
+.nav-cart-mobile{
+  display:none; position:relative;
+  width:42px; height:42px; align-items:center; justify-content:center;
+  background:transparent; border:none; color:var(--text); cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.nav-cart-mobile:active{ transform:scale(0.92); }
+.nav-cart-mobile-badge{
+  position:absolute; top:2px; right:2px; min-width:16px; height:16px;
+  padding:0 4px; border-radius:8px; background:var(--red); color:#fff;
+  font-family:var(--font-body); font-size:0.55rem; font-weight:800;
+  display:none; align-items:center; justify-content:center; line-height:1;
+}
+.nav-cart-mobile-badge.visible{ display:flex; }
 
 /* Mobile drawer */
 #mob-drawer{
@@ -303,6 +322,34 @@ p      { font-family:var(--font-body);    font-size:var(--fs-body); line-height:
   z-index:590;
 }
 #mob-overlay.on{display:block;}
+
+/* ── Drawer: search + divider + account actions + language ── */
+#mob-drawer{ overflow-y:auto; }
+#mob-drawer ul li{ margin-bottom:0.4rem; }   /* tighter — links are 44px tall now */
+#mob-drawer .drawer-links a,
+#mob-drawer .drawer-actions a{
+  display:flex; align-items:center; min-height:44px;   /* Fitts-friendly tap target */
+}
+.drawer-search{
+  display:flex; align-items:center; gap:0.6rem; width:100%;
+  margin-bottom:1.8rem; padding:0.9rem 1rem; min-height:48px;
+  background:rgba(255,255,255,0.04); border:1px solid var(--border);
+  color:var(--muted2); cursor:pointer;
+  font-family:var(--font-body); font-size:0.72rem; font-weight:600;
+  letter-spacing:0.1em; text-transform:uppercase;
+  clip-path:polygon(6px 0,100% 0,100% calc(100% - 6px),calc(100% - 6px) 100%,0 100%,0 6px);
+}
+.drawer-search:active{ transform:scale(0.98); }
+.drawer-div{ height:1px; background:var(--border); margin:1.2rem 0 1.4rem; }
+.drawer-wcount{ color:var(--red); font-weight:800; margin-left:0.35rem; }
+.drawer-lang{ display:flex; align-items:center; gap:0.5rem; margin-top:2rem; }
+.drawer-lang .lang-btn{
+  background:none; border:1px solid var(--border); color:var(--muted2);
+  padding:0 0.9rem; min-height:40px; cursor:pointer;
+  font-family:var(--font-body); font-size:0.7rem; font-weight:700; letter-spacing:0.15em;
+}
+.drawer-lang .lang-btn.active{ color:var(--red); border-color:var(--red); }
+.drawer-lang .lang-sep{ color:var(--muted2); }
 
 /* ═══════════════════════════════
    HERO — PREMIUM REDESIGN
@@ -10892,7 +10939,14 @@ window.gsapReady = function(cb){
       </svg>
       <span class="nav-wishlist-count" id="nav-wishlist-count">0</span>
     </button>
-    <button class="mob-btn" onclick="toggleDrawer()">
+    <!-- Mobile-only cart in the top bar (logo + cart + hamburger = 3 max). -->
+    <button class="nav-cart-mobile" onclick="toggleCart()" aria-label="Carrito" type="button">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/>
+      </svg>
+      <span class="nav-cart-mobile-badge" id="nav-cart-mobile-count" aria-live="polite"></span>
+    </button>
+    <button class="mob-btn" onclick="toggleDrawer()" aria-label="Menú">
       <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
         <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
       </svg>
@@ -10903,16 +10957,38 @@ window.gsapReady = function(cb){
 <!-- Mobile drawer -->
 <div id="mob-overlay" onclick="toggleDrawer()"></div>
 <div id="mob-drawer">
-  <button id="close-drawer" onclick="toggleDrawer()">✕</button>
-  <ul>
+  <button id="close-drawer" onclick="toggleDrawer()" aria-label="Cerrar menú">✕</button>
+
+  <!-- Search moved off the cramped top bar into the drawer -->
+  <button class="drawer-search" type="button" onclick="toggleDrawer();openSearch();">
+    <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+      <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/>
+    </svg>
+    <span data-i18n="searchPlaceholderShort">Buscar productos</span>
+  </button>
+
+  <ul class="drawer-links">
     <li><a href="#stock" onclick="toggleDrawer()">Stock</a></li>
     <li><a href="#catalogo" onclick="toggleDrawer()">Catálogo</a></li>
     <li><a href="#testimonios" onclick="toggleDrawer()">Reseñas</a></li>
     <li><a href="#faq" onclick="toggleDrawer()">FAQ</a></li>
     <li><a href="#contacto" onclick="toggleDrawer()">Contacto</a></li>
+  </ul>
+
+  <div class="drawer-div" aria-hidden="true"></div>
+
+  <ul class="drawer-actions">
     <li><a href="#" id="mob-auth-link" onclick="openAuthModal();toggleDrawer();return false;">Iniciar sesión</a></li>
+    <li><a href="#" onclick="toggleDrawer();openWishlist();return false;">Mis Favoritos <span class="drawer-wcount" id="drawer-wishlist-count"></span></a></li>
     <li><a href="#" onclick="openAdmin();toggleDrawer();" style="color:var(--red)">Admin ●</a></li>
   </ul>
+
+  <!-- Language toggle lives at the bottom of the drawer now -->
+  <div class="drawer-lang" role="group" aria-label="Language">
+    <button type="button" class="lang-btn" data-lang="es" onclick="setLang('es')">ES</button>
+    <span class="lang-sep">/</span>
+    <button type="button" class="lang-btn" data-lang="en" onclick="setLang('en')">EN</button>
+  </div>
 </div>
 
 <!-- ═══ HERO — PREMIUM ═══ -->
@@ -18616,6 +18692,14 @@ function updateBottomTabBadges(){
       wlBadge.classList.add('bump');
     }
   }
+  // Mirror to the simplified top bar's cart badge + the drawer wishlist count.
+  const navCart = document.getElementById('nav-cart-mobile-count');
+  if (navCart) {
+    navCart.textContent = cartCount;
+    navCart.classList.toggle('visible', cartCount > 0);
+  }
+  const drawerWl = document.getElementById('drawer-wishlist-count');
+  if (drawerWl) drawerWl.textContent = wlCount > 0 ? '(' + wlCount + ')' : '';
 }
 
 (function initBottomTabs(){
