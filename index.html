@@ -4990,8 +4990,18 @@ html.is-authenticated #mob-auth-link::before {
 }
 .ei-decline:hover { color: var(--text); }
 
-@media (max-width: 480px) {
-  .ei-card { padding: 2rem 1.3rem 1.6rem; }
+@media (max-width: 600px) {
+  /* Bottom-sheet treatment on phones — slides up from the bottom edge like a
+     native sheet, matching the product modal (consistent mobile language). */
+  .ei-modal { align-items: flex-end; padding: 0; }
+  .ei-card {
+    max-width: none; width: 100%;
+    padding: 2rem 1.3rem calc(1.6rem + env(safe-area-inset-bottom, 0px));
+    clip-path: none;
+    border-radius: 18px 18px 0 0;
+    border-left: none; border-right: none; border-bottom: none;
+    animation: modalSlideUp 0.4s cubic-bezier(.16,1,.3,1);
+  }
   .ei-form { flex-direction: column; gap: 0.45rem; }
   .ei-form input { border-right: 1px solid rgba(220,17,17,0.25); }
   .ei-form button { padding: 0.9rem; }
@@ -10440,6 +10450,12 @@ section + section::before,
     transform: none !important;
     perspective: none !important;
   }
+
+  /* 6) Snappier reveals on mobile — the CSS reveal transition drops from
+        320ms to 220ms so content lands fast under a thumb-driven scroll. */
+  .reveal {
+    transition-duration: 0.22s !important;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -13246,6 +13262,7 @@ function toggleWishlist(id, btn){
     btn.classList.add('active');
     if (typeof showToast === 'function') showToast(t('wishlistAdded'));
   }
+  if (typeof haptic === 'function') haptic(12);   // light tick on toggle
   // Pop animation on card heart
   btn.classList.remove('popping');
   void btn.offsetWidth;
@@ -16642,6 +16659,13 @@ function closeCartAndBrowse(){
   }, 320);
 }
 
+// Haptic-style feedback for key tactile actions. Gated to touch devices so
+// it never fires a stray buzz on a laptop that happens to expose the API.
+function haptic(ms){
+  try { if (navigator.vibrate && window.matchMedia('(hover: none)').matches) navigator.vibrate(ms || 15); }
+  catch(e){}
+}
+
 function addToCart(product, size, color){
   const existing = cart.find(i=>i.product.id===product.id && i.size===size && i.color===color);
   if(existing){
@@ -16649,6 +16673,7 @@ function addToCart(product, size, color){
   } else {
     cart.push({product, size, color, qty:1});
   }
+  haptic(18);           // confirm the add with a short pulse
   updateCartUI();
   saveCart();
   if (typeof syncCartSession === 'function') syncCartSession('active');
@@ -18920,18 +18945,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ── 47.6 Editorial card images — subtle parallax on scroll ──
-    document.querySelectorAll('.editorial-card .ec-image').forEach(img => {
-      gsap.to(img, {
-        backgroundPositionY: '60%',
-        ease: 'none',
-        scrollTrigger: {
-          trigger: img,
-          start: 'top bottom',
-          end:   'bottom top',
-          scrub: true
-        }
+    // Desktop only: a scrubbed background-position parallax repaints on every
+    // scroll frame — banned on mobile where it costs 60fps for little payoff.
+    if (!isMobile) {
+      document.querySelectorAll('.editorial-card .ec-image').forEach(img => {
+        gsap.to(img, {
+          backgroundPositionY: '60%',
+          ease: 'none',
+          scrollTrigger: {
+            trigger: img,
+            start: 'top bottom',
+            end:   'bottom top',
+            scrub: true
+          }
+        });
       });
-    });
+    }
 
     // ── 47.7 Hero text parallax — INTENTIONALLY OMITTED
     // The existing bat-scroll system already animates .hero-content
