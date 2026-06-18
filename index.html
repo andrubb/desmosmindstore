@@ -7081,9 +7081,11 @@ img { max-width: 100%; height: auto; }
 .faq-tail a:hover { border-bottom-color: var(--red); }
 
 @media (max-width: 600px) {
-  .faq-q { padding: 1.1rem 1.2rem 1.1rem 3.4rem; font-size: 0.9rem; }
-  .faq-a { padding: 0 1.2rem 0 3.4rem; font-size: 0.88rem; }
-  .faq-item::before { top: 1rem; left: 1.1rem; font-size: 0.85rem; }
+  /* Roomier FAQ: bigger tap area + calmer reading rhythm. */
+  .faq-q { padding: 1.45rem 1.3rem 1.45rem 3.4rem; font-size: 0.92rem; min-height: 60px; line-height: 1.45; }
+  .faq-a { padding: 0 1.3rem 0 3.4rem; font-size: 0.9rem; line-height: 1.7; }
+  .faq-item::before { top: 1.35rem; left: 1.1rem; font-size: 0.85rem; }
+  .faq-list { gap: 0.75rem; }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -10287,10 +10289,12 @@ section + section::before,
   .footer-grid > * { text-align: left; }
   .footer-grid h4 { font-size: 0.78rem !important; letter-spacing: 0.22em; }
 
-  /* Trust grid: stack items so each row has full-width tap area. */
+  /* Trust grid: 2 per row (not a long 4-tall list, not 4 crammed). These are
+     informational, not tap targets, so a balanced 2x2 reads calmer and saves
+     vertical scroll. Generous gap keeps them breathing. */
   .trust-grid {
-    grid-template-columns: 1fr !important;
-    gap: 0.75rem !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1rem !important;
   }
 
   /* Category cards: smaller decorative pixels, bigger tap area. */
@@ -10527,13 +10531,12 @@ section + section::before,
      building extra layers just for hover affordances no phone gets.
 ═══════════════════════════════════════════════════════════ */
 @media (max-width: 767px) {
-  /* Force 2 columns even at <420px — the previous "1 column on tiny
-     phones" rule made the grid feel like a list. With 24px horizontal
-     padding and a 6px gap, two 154px-wide cards fit at 375px viewport
-     and stay tappable. */
+  /* BREATHING ROOM: one column under ~400px so each card has real presence,
+     two columns from ~400px up. auto-fill + minmax(160px) self-selects the
+     count from the available width — no dueling breakpoints. */
   .products-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 8px !important;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
+    gap: 14px !important;
   }
   .prod-card { min-width: 0; max-width: 100%; }
   .prod-img-wrap {
@@ -10748,10 +10751,10 @@ section + section::before,
   .container { padding-left: 16px !important; padding-right: 16px !important; }
   section:not(.hero) { padding-left: 16px !important; padding-right: 16px !important; }
 
-  /* ── 2. PRODUCTS / CATALOG ── */
+  /* ── 2. PRODUCTS / CATALOG ── (see breathing-room rule above) */
   .products-grid {
-    grid-template-columns: repeat(2, minmax(0,1fr)) !important;
-    gap: 8px !important;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)) !important;
+    gap: 14px !important;
   }
   /* Section titles capped 1.8rem on mobile */
   .sec-title, h2, .h2 { font-size: clamp(1.45rem, 5vw, 1.8rem) !important; }
