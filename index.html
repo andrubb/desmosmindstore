@@ -10350,10 +10350,15 @@ section + section::before,
      section's start below the fixed top chrome. */
   section[id] { scroll-margin-top: calc(26px + 56px); }
 
-  /* Section vertical padding: 3.5rem felt empty on phones — Gymshark
-     uses tighter rhythm. Trim to 2.75rem; hero gets its own padding from
-     the mobile-hero-redesign block at the bottom of the stylesheet. */
-  section { padding-top: 2.75rem !important; padding-bottom: 2.75rem !important; }
+  /* Section vertical padding — BREATHING ROOM PASS. The old 2.75rem (44px)
+     made every section feel jammed against the next. Aloyoga / Gymshark /
+     Linear mobile all lean on generous vertical space, so each section reads
+     as its own moment. clamp(80px,16vw,104px) ≈ 80px on a 375–412 phone.
+     Hero keeps its own padding (excluded). */
+  section:not(.hero) {
+    padding-top: clamp(80px, 16vw, 104px) !important;
+    padding-bottom: clamp(80px, 16vw, 104px) !important;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -10384,7 +10389,7 @@ section + section::before,
     letter-spacing: 0.04em !important;
   }
   p, li {
-    line-height: 1.65 !important;
+    line-height: 1.7 !important;   /* breathing body rhythm */
   }
 
   /* ── Section spacing — 24px+ horizontal padding everywhere ── */
@@ -10393,10 +10398,18 @@ section + section::before,
     padding-left: max(24px, env(safe-area-inset-left)) !important;
     padding-right: max(24px, env(safe-area-inset-right)) !important;
   }
-  section {
-    padding-top: 3.5rem !important;
-    padding-bottom: 3.5rem !important;
+  /* Generous vertical rhythm — each section is its own moment. ~80px on a
+     phone (this is the cascade winner over the earlier 10356 rule). */
+  section:not(.hero) {
+    padding-top: clamp(80px, 16vw, 104px) !important;
+    padding-bottom: clamp(80px, 16vw, 104px) !important;
   }
+
+  /* ── Section header gets room to breathe before its content ── */
+  .sec-header { margin-bottom: clamp(2.25rem, 9vw, 3.25rem) !important; }  /* 36–52px */
+  .sec-title  { margin-bottom: 1rem !important; }                          /* 16px under title */
+  .sec-eyebrow { margin-bottom: 1.1rem !important; letter-spacing: 0.28em !important; }
+  .sec-subtitle { line-height: 1.7 !important; }
   /* (Hero padding handled by the mobile-hero-redesign block at the very
      bottom of the stylesheet — it needs top/bottom clearance for the
      fixed navbar and tab bar, so this old `padding: 0` override is gone.) */
