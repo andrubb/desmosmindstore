@@ -10384,9 +10384,21 @@ section + section::before,
   }
   .hero-tagline {
     font-size: 0.92rem !important;
-    line-height: 1.65 !important;
+    line-height: 1.7 !important;
     max-width: 32ch !important;
   }
+  /* Hero = bare essentials on mobile: eyebrow → title → ONE tagline → ONE
+     button → stats. The "Fitness · Street · Culture" sub-line and the ghost
+     "Stock CR" CTA are redundant noise on a phone — drop both. */
+  .hero-sub { display: none !important; }
+  .hero-btns { flex-direction: column; align-items: center; gap: 0; }
+  .hero-btns .btn-ghost { display: none !important; }
+  .hero-btns .btn-primary { width: 100%; max-width: 300px; }
+
+  /* NOISE REDUCTION: the decorative red section dividers now do the same job
+     as the generous 80px section spacing — drop them on mobile so the brand
+     red is rarer and lands harder where it matters (CTAs, active states). */
+  .divider { display: none !important; }
   .sec-title,
   h2, .h2 {
     font-size: clamp(1.5rem, 7vw, 2rem) !important;
@@ -10786,8 +10798,26 @@ section + section::before,
   .prod-price, .prod-card .price { font-size: 1rem !important; }
 
   /* ── 3. TESTIMONIALS ── single column, compact ── */
-  .test-grid { grid-template-columns: 1fr !important; gap: 1rem !important; }
-  .test-card { padding: 1.2rem !important; }
+  /* Testimonials = one at a time. A horizontal scroll-snap carousel (native
+     swipe + momentum) replaces the tall stack — calmer, more focused, and you
+     read one voice at a time. A sliver of the next card hints there's more. */
+  .test-grid {
+    display: flex !important;
+    grid-template-columns: none !important;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 14px !important;
+    padding-bottom: 0.5rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    scroll-padding-left: 24px;
+  }
+  .test-grid::-webkit-scrollbar { display: none; }
+  .test-grid > * {
+    flex: 0 0 86%;
+    scroll-snap-align: center;
+  }
+  .test-card { padding: 1.6rem !important; }
   .test-card::before { font-size: 3rem !important; top: 6px; right: 14px; }
   .test-avatar { width: 36px !important; height: 36px !important; font-size: 0.82rem !important; }
   .test-name-new { font-size: 0.9rem !important; }
