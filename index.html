@@ -325,7 +325,7 @@ p      { font-family:var(--font-body);    font-size:var(--fs-body); line-height:
 
 /* ── Drawer: search + divider + account actions + language ── */
 #mob-drawer{ overflow-y:auto; }
-#mob-drawer ul li{ margin-bottom:0.4rem; }   /* tighter — links are 44px tall now */
+#mob-drawer ul li{ margin-bottom:1.25rem; }   /* generous 20px rhythm between menu items */
 #mob-drawer .drawer-links a,
 #mob-drawer .drawer-actions a{
   display:flex; align-items:center; min-height:44px;   /* Fitts-friendly tap target */
@@ -5837,7 +5837,7 @@ html.loader-dismissed #page-loader { display: none !important; }
   }
   /* Push body up so content doesn't hide behind the bar */
   body {
-    padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px));
   }
   /* Replace floating cart FAB with the bottom-tab cart icon on mobile */
   #cart-btn { display: none !important; }
@@ -5852,8 +5852,9 @@ html.loader-dismissed #page-loader { display: none !important; }
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-  padding: 10px 4px 8px;
+  gap: 6px;
+  padding: 13px 4px 11px;
+  min-height: 67px !important;   /* taller, calmer bar (~68px w/ border); beats the global 48px touch min-height */
   text-decoration: none;
   color: var(--muted2);
   font-family: var(--font-body);
@@ -9932,7 +9933,7 @@ section + section::before,
      fixed ticker+navbar (top) or the bottom tab bar (bottom). */
   body {
     padding-top: calc(26px + 56px + env(safe-area-inset-top, 0px));
-    padding-bottom: calc(62px + env(safe-area-inset-bottom, 0px)) !important;
+    padding-bottom: calc(70px + env(safe-area-inset-bottom, 0px)) !important;
   }
   /* The hero owns its own clearance (it's the first section), so cancel
      the body's padding-top on its container by translating up by the
@@ -10346,7 +10347,7 @@ section + section::before,
   /* WhatsApp float was overlapping the bottom tab bar. Lift it above
      the 62px tab bar + safe-area inset on mobile only. */
   #wa-float {
-    bottom: calc(62px + env(safe-area-inset-bottom, 0px) + 14px) !important;
+    bottom: calc(70px + env(safe-area-inset-bottom, 0px) + 14px) !important;
   }
 
   /* Deep-link anchors / nav clicks were landing under the ticker+navbar
@@ -10422,7 +10423,6 @@ section + section::before,
   .btn-primary,
   .btn-ghost,
   button,
-  .bt-tab,
   a.btn,
   .nav-link,
   .ticker-close,
@@ -10430,6 +10430,8 @@ section + section::before,
     min-height: 48px !important;
     min-width: 48px !important;
   }
+  /* .bt-tab removed from the list above — it sets its own taller 67px min-height
+     for the breathing bottom bar. */
   /* Padding tweak so the increased min-height doesn't make labels float. */
   .btn-primary,
   .btn-ghost {
@@ -10515,10 +10517,10 @@ section + section::before,
     perspective: none !important;
   }
 
-  /* 6) Snappier reveals on mobile — the CSS reveal transition drops from
-        320ms to 220ms so content lands fast under a thumb-driven scroll. */
+  /* 6) Reveals feel instant on mobile — Emil: under 200ms reads as immediate.
+        Drop the CSS reveal transition to 180ms (from 320ms desktop). */
   .reveal {
-    transition-duration: 0.22s !important;
+    transition-duration: 0.18s !important;
   }
 }
 
@@ -17299,6 +17301,13 @@ openProductForm = function(id){
   // truth for section / grid / product-card reveals).
   (window.gsapReady || function(cb){cb();})(function(){
 
+  // Mobile reveals feel instant (Emil: <200ms) and use a tighter stagger so
+  // fewer cards animate in parallel — calmer, faster under a thumb scroll.
+  const isMobile = window.matchMedia('(max-width: 767px)').matches;
+  const D  = isMobile ? 0.18 : 0.42;   // section + product card
+  const DG = isMobile ? 0.18 : 0.38;   // grid items
+  const ST = isMobile ? 0.035 : 0.05;  // stagger step
+
   const STAGGER_GRIDS = [
     '.trust-grid', '.cat-grid', '.how-grid', '.test-grid', '.faq-list', '.editorial-grid'
   ];
@@ -17308,7 +17317,7 @@ openProductForm = function(id){
     section.classList.add('reveal-section');
     gsap.fromTo(section,
       {opacity:0, y:16},
-      {opacity:1, y:0, duration:0.42, ease:'power3.out',
+      {opacity:1, y:0, duration:D, ease:'power3.out',
        scrollTrigger:{trigger:section, start:'top 94%', once:true}}
     );
   });
@@ -17320,8 +17329,8 @@ openProductForm = function(id){
     grid.dataset.gsapReveal = '1';
     gsap.fromTo(Array.from(grid.children),
       {opacity:0, y:14},
-      {opacity:1, y:0, duration:0.38, ease:'power3.out',
-       stagger:{each:0.05, from:'start', amount:Math.min(grid.children.length, 7) * 0.05},
+      {opacity:1, y:0, duration:DG, ease:'power3.out',
+       stagger:{each:ST, from:'start', amount:Math.min(grid.children.length, 7) * ST},
        scrollTrigger:{trigger:grid, start:'top 92%', once:true}}
     );
   }
@@ -17332,7 +17341,7 @@ openProductForm = function(id){
     start: 'top 95%',
     onEnter: batch => gsap.fromTo(batch,
       {opacity:0, y:16},
-      {opacity:1, y:0, duration:0.42, stagger:0.05, ease:'power3.out'}
+      {opacity:1, y:0, duration:D, stagger:ST, ease:'power3.out'}
     ),
     once: true,
   });
