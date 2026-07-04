@@ -1,0 +1,7 @@
+{
+  "files": ["*.html", "articles/**/*.html"],
+  "exclude": ["gothic-3d-card.html"],
+  "insertBefore": "</body>",
+  "commentSyntax": "html",
+  "cspChecked": true
+}

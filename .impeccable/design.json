@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-04T16:00:00Z",
+  "title": "Design System: DESMOSMIND",
+  "extensions": {
+    "colorMeta": {
+      "blood-red": { "role": "primary", "displayName": "Blood Red", "canonical": "#DC1111", "tonalRamp": ["#2a0303", "#560707", "#7f0a0a", "#a50d0d", "#DC1111", "#ff2222", "#ff6b6b", "#ffc9c9"] },
+      "abyss-bg": { "role": "neutral", "displayName": "Abyss", "canonical": "#050505", "tonalRamp": ["#050505", "#090909", "#0e0e0e", "#1a1a1a", "#333330", "#626258", "#82827a", "#d4d0c8"] },
+      "bone-white": { "role": "neutral", "displayName": "Bone White", "canonical": "#f0ece4", "tonalRamp": ["#26241f", "#4d4a42", "#736f64", "#999487", "#b3aea1", "#d4d0c8", "#e2ded6", "#f0ece4"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Hero title only — Bebas Neue, towering, +0.06em tracking." },
+      "headline": { "displayName": "Headline", "purpose": "Section titles, uppercase Bebas Neue." },
+      "body": { "displayName": "Body", "purpose": "Barlow paragraphs, 1.7 line-height, never uppercase." },
+      "label": { "displayName": "Label", "purpose": "Buttons/tags/chips: tiny, heavy, wide-tracked uppercase Barlow." }
+    },
+    "shadows": [
+      { "name": "ambient-lift", "value": "0 4px 20px rgba(0,0,0,0.5)", "purpose": "Floating chrome (modals, drawers, tab bar) above the page." },
+      { "name": "blood-glow", "value": "0 4px 20px rgba(220,17,17,0.4)", "purpose": "Red elements announcing liveness (WA button, live chips, charged CTAs). Signal, never decoration." }
+    ],
+    "motion": [
+      { "name": "t-instant", "value": "0.12s", "purpose": "Micro-feedback: press, focus." },
+      { "name": "t-fast", "value": "0.22s", "purpose": "Icon swaps, color shifts." },
+      { "name": "t-base", "value": "0.32s", "purpose": "Standard hover transitions." },
+      { "name": "t-slow", "value": "0.55s", "purpose": "Panel/drawer slides, scroll reveals." },
+      { "name": "t-cinematic", "value": "0.8s", "purpose": "Hero/brand-feel reveals." },
+      { "name": "ease-out", "value": "cubic-bezier(.16, 1, .3, 1)", "purpose": "Spring-like out for reveals." },
+      { "name": "ease-in-out", "value": "cubic-bezier(.4, 0, .2, 1)", "purpose": "State changes." },
+      { "name": "ease-emph", "value": "cubic-bezier(.22, .62, .36, 1)", "purpose": "Emphasized easeOut for big moves." }
+    ],
+    "breakpoints": [
+      { "name": "phone", "value": "600px" },
+      { "name": "mobile-max", "value": "767px" },
+      { "name": "desktop-cursor", "value": "900px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The blood-red CTA — chamfered, uppercase, tracked.",
+      "html": "<button class=\"ds-btn-primary\">VER CATÁLOGO</button>",
+      "css": ".ds-btn-primary { background: #DC1111; color: #f0ece4; font-family: 'Barlow', sans-serif; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; padding: 1rem 2.5rem; border: none; border-radius: 0; clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px); cursor: pointer; transition: background 0.22s cubic-bezier(.4,0,.2,1), transform 0.12s; } .ds-btn-primary:hover { background: #ff2222; } .ds-btn-primary:active { transform: translateY(1px); } .ds-btn-primary:focus-visible { outline: 2px solid #DC1111; outline-offset: 3px; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Hairline secondary action.",
+      "html": "<button class=\"ds-btn-ghost\">CÓMO FUNCIONA</button>",
+      "css": ".ds-btn-ghost { background: transparent; color: #f0ece4; font-family: 'Barlow', sans-serif; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; padding: 1rem 2.5rem; border: 1px solid rgba(255,255,255,0.2); border-radius: 0; cursor: pointer; transition: background 0.22s, border-color 0.22s; } .ds-btn-ghost:hover { background: rgba(220,17,17,0.12); border-color: rgba(220,17,17,0.5); } .ds-btn-ghost:focus-visible { outline: 2px solid #DC1111; outline-offset: 3px; }"
+    },
+    {
+      "name": "Status Chip",
+      "kind": "chip",
+      "refersTo": "label",
+      "description": "Two-path availability: Stock CR (green) vs Encargo (red).",
+      "html": "<span class=\"ds-chip ds-chip-stock\">STOCK CR</span> <span class=\"ds-chip ds-chip-encargo\">ENCARGO</span>",
+      "css": ".ds-chip { display: inline-block; font-family: 'Barlow', sans-serif; font-size: 0.58rem; font-weight: 800; letter-spacing: 0.14em; text-transform: uppercase; padding: 0.3rem 0.65rem; border-radius: 0; } .ds-chip-stock { background: rgba(40,180,80,0.12); color: #4ade80; border: 1px solid rgba(40,180,80,0.35); } .ds-chip-encargo { background: rgba(220,17,17,0.12); color: #ff6b6b; border: 1px solid rgba(220,17,17,0.35); }"
+    },
+    {
+      "name": "Product Card",
+      "kind": "card",
+      "refersTo": "abyss-2",
+      "description": "Tonal-step card with hairline border; red charges on hover.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-card-img\"></div><div class=\"ds-card-body\"><span class=\"ds-card-brand\">YOUNGLA</span><h4 class=\"ds-card-name\">OVERSIZED TEE — NIGHT</h4><span class=\"ds-card-price\">₡18 500</span></div></div>",
+      "css": ".ds-card { width: 240px; background: #090909; border: 1px solid rgba(255,255,255,0.06); border-radius: 0; overflow: hidden; transition: border-color 0.32s cubic-bezier(.4,0,.2,1), transform 0.32s cubic-bezier(.16,1,.3,1); } .ds-card:hover { border-color: rgba(220,17,17,0.4); transform: translateY(-4px); } .ds-card-img { height: 150px; background: linear-gradient(160deg, #0e0e0e 0%, #1a1a1a 100%); } .ds-card-body { padding: 1rem; } .ds-card-brand { font-family: 'Barlow', sans-serif; font-size: 0.55rem; font-weight: 800; letter-spacing: 0.2em; color: #82827a; } .ds-card-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.15rem; font-weight: 400; letter-spacing: 0.06em; color: #f0ece4; margin: 0.35rem 0; } .ds-card-price { font-family: 'Barlow', sans-serif; font-size: 0.85rem; font-weight: 600; color: #d4d0c8; }"
+    },
+    {
+      "name": "Nav Link",
+      "kind": "nav",
+      "refersTo": "label",
+      "description": "Uppercase nav item with red underline draw.",
+      "html": "<a href=\"#\" class=\"ds-nav-link\">CATÁLOGO</a>",
+      "css": ".ds-nav-link { position: relative; font-family: 'Barlow', sans-serif; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.2em; text-transform: uppercase; color: #d4d0c8; text-decoration: none; padding: 0.5rem 0; transition: color 0.22s; } .ds-nav-link::after { content: ''; position: absolute; left: 0; bottom: 0; width: 100%; height: 1px; background: #DC1111; transform: scaleX(0); transform-origin: left; transition: transform 0.32s cubic-bezier(.16,1,.3,1); } .ds-nav-link:hover { color: #f0ece4; } .ds-nav-link:hover::after { transform: scaleX(1); }"
+    },
+    {
+      "name": "Input Field",
+      "kind": "input",
+      "refersTo": "abyss-2",
+      "description": "Flat dark well; red focus shift.",
+      "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"Tu correo\" />",
+      "css": ".ds-input { background: #090909; color: #d4d0c8; font-family: 'Barlow', sans-serif; font-size: 0.9rem; padding: 0.85rem 1rem; border: 1px solid rgba(255,255,255,0.1); border-radius: 0; width: 260px; transition: border-color 0.22s, box-shadow 0.22s; } .ds-input::placeholder { color: #82827a; } .ds-input:focus { outline: none; border-color: rgba(220,17,17,0.6); box-shadow: 0 0 0 3px rgba(220,17,17,0.12); }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Midnight Armory",
+    "overview": "Gym-wear presented as armor in a night forge: vast near-black surfaces, one blood-red blade of accent, hard chamfered edges cut with clip-path instead of border-radius, and controlled industrial motion (scanlines, glitch, Ken-Burns drift). Intensity comes from restraint: enormous condensed uppercase type on empty black, with red spent only where it draws blood.",
+    "keyCharacteristics": [
+      "Near-black canvas in three steps (#050505 / #090909 / #0e0e0e), hairline white borders for structure",
+      "Single chromatic voice: #DC1111 and its two siblings, nothing else colored",
+      "Bebas Neue condensed uppercase display vs. Barlow workhorse body",
+      "Chamfered (clip-path) corners as the signature shape language; radius is always 0",
+      "Motion is industrial: scan, glitch, drift, stitch — never bounce, never elastic"
+    ],
+    "rules": [
+      { "name": "The One Blade Rule", "body": "Red (#DC1111 family) is the only chroma permitted anywhere. If a design wants a second color, the answer is a different lightness of red or a neutral.", "section": "colors" },
+      { "name": "The No-Daylight Rule", "body": "No surface rises above #0e0e0e. Light exists only as text, hairlines, and glow.", "section": "colors" },
+      { "name": "The All-Caps Ceiling Rule", "body": "Uppercase lives in display, headlines, and short labels. Body copy is never uppercase.", "section": "typography" },
+      { "name": "The 0.06em Rule", "body": "Bebas Neue always gets +0.06em tracking; it is never set tight.", "section": "typography" },
+      { "name": "The Glow-Is-Meaning Rule", "body": "Red glow is a signal (live, urgent, actionable), never decoration on static elements.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep the page ≥90% neutral (Abyss + Ash + Bone) and spend red like ammunition.",
+      "Do cut corners with clip-path chamfers on signature elements (cards, CTAs, badges).",
+      "Do ship a prefers-reduced-motion alternative for every loop and reveal, no exceptions.",
+      "Do judge every change at 375px first — mobile is the storefront.",
+      "Do make Stock CR vs Encargo status legible on every product surface (green vs red chips).",
+      "Do use the canonical motion scale (--t-instant 0.12s → --t-cinematic 0.8s, --ease-out/--ease-emph) for all new motion."
+    ],
+    "donts": [
+      "Don't introduce any hue besides the red family — no purple, cyan, gold, or premium gradients (red is blood, not laser).",
+      "Don't use border-radius anywhere; rounded corners are off-brand (chamfer or hard edge).",
+      "Don't reach for SaaS grammar: gradient text, metric-card heroes, cream backgrounds, icon-above-heading grids.",
+      "Don't stack fake-urgency widgets or discount stickers.",
+      "Don't use serifs or italic editorial type anywhere.",
+      "Don't animate layout properties in new motion; transform/opacity/clip-path only, and never bounce/elastic easing."
+    ]
+  }
+}
