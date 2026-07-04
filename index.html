@@ -10853,6 +10853,21 @@ window.gsapReady = function(cb){
     if (window.gsap && window.ScrollTrigger){ gsap.registerPlugin(ScrollTrigger); cb(); }
   }, { once: true });
 };
+// Re-measure all ScrollTriggers after layout-changing moments (Supabase
+// content renders, font swap). ScrollTrigger only auto-refreshes on resize —
+// dynamic content is NOT covered, so without these calls trigger start
+// positions go stale and a section below a grown/shrunk grid can sit at
+// opacity:0 while in view. No-op before GSAP loads: triggers created later
+// measure the then-current layout anyway.
+window.refreshScrollTriggers = function(){
+  try { if (window.ScrollTrigger) window.ScrollTrigger.refresh(); } catch(e){}
+};
+// One guaranteed post-font refresh: font swap changes text metrics/heights.
+window.gsapReady(function(){
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(function(){ window.refreshScrollTriggers(); });
+  }
+});
 </script>
 
 <!-- ═══ PLAUSIBLE ANALYTICS (privacy-friendly, no cookies) ═══ -->
@@ -12462,6 +12477,12 @@ async function loadAllData(){
       if (catsOk && typeof renderCategories === 'function') renderCategories();
     }
   } catch(e){ console.error('Supabase load error:', e); }
+  finally {
+    // Everything above re-rendered grids/sections — trigger positions are
+    // stale until ScrollTrigger re-measures. Mandatory groundwork before any
+    // pinned mechanic is added (stale measurements + pin = cascade failure).
+    if (typeof refreshScrollTriggers === 'function') refreshScrollTriggers();
+  }
 }
 
 function applySiteContent(){
@@ -13881,6 +13902,7 @@ function renderProducts(filter='all'){
 
   if(!filtered.length){
     grid.innerHTML = buildProductsEmptyState(filter);
+    if (typeof refreshScrollTriggers === 'function') refreshScrollTriggers();
     return;
   }
   const sorted = (typeof sortProducts === 'function') ? sortProducts(filtered) : filtered;
@@ -13973,6 +13995,9 @@ function renderProducts(filter='all'){
       </div>
     </div>`}).join('');
   grid.querySelectorAll('.reveal').forEach(el=>revealObserver.observe(el));
+  // Grid height just changed (skeletons -> cards, filter results) — every
+  // trigger below the grid needs re-measuring.
+  if (typeof refreshScrollTriggers === 'function') refreshScrollTriggers();
 }
 
 // Sort state (shared with sort dropdown)
