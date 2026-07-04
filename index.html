@@ -10468,27 +10468,26 @@ section + section::before,
     -webkit-backdrop-filter: none !important;
   }
 
-  /* 2) Cap animation/transition duration. Anything longer than 0.3s
-        feels sluggish on touch; under that it reads as instant + crisp. */
+  /* 2) Cap TRANSITION duration only (hover/tap feedback, one-shot state
+        changes). Keyframe ANIMATIONS are deliberately NOT capped: a blanket
+        `animation-duration: 0.3s !important` compressed every infinite loop
+        (mind-breathe 4s, topglow 4s, ticker-shimmer 6s, cta-scan 5s, scroll
+        hint 2.5s, skeleton shimmers, bloodDrip, exit-modal stitch …) into a
+        ~3Hz strobe on phones — a WCAG 2.3.1 photosensitivity risk on the red
+        MIND glow, not just a cosmetic bug. Loops keep their designed timing;
+        that also makes the old marquee/bat/wa-float/shimmer re-exemption
+        list unnecessary. */
   *,
   *::before,
   *::after {
-    animation-duration: 0.3s !important;
     transition-duration: 0.3s !important;
     /* Use the same buttery curve everywhere for consistency. */
     transition-timing-function: cubic-bezier(.16,1,.3,1) !important;
   }
-  /* Marquee + particle floats are intentionally long loops — exempt them.
-     NOTE: must restate explicit durations, NOT `revert` — revert drops to
-     the UA value (0s) and freezes the loop. This was the mobile marquee
-     "not animating" bug. */
-  .marquee-track { animation-duration: 25s !important; }
-  .hero-bat-svg  { animation-duration: 7s, 5s !important; }
-  .hero-logo-img { animation-duration: 5s !important; }
-  #wa-float, .wa-float { animation-duration: 3s !important; }
-  /* Hero CTA shimmer keeps its own 2.6s timing (perf cap would make it
-     strobe). */
-  .hero-btns .btn-primary::after { animation-duration: 2.6s !important; }
+  /* The drops Ken-Burns zoom is an intentionally slow 8s TRANSITION — the
+     one long transition that must escape the cap (0.3s turns the slow
+     settle into a pop on every slide change). */
+  .drop-slide-img { transition-duration: 8s !important; }
 
   /* 3) Heavy multi-layer box-shadows → flatten to one cheap shadow.
         Touch any element with multiple shadows by clobbering the
