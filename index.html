@@ -425,11 +425,7 @@ p      { font-family:var(--font-body);    font-size:var(--fs-body); line-height:
     svgGlow  5s ease-in-out infinite;
   /* will-change removed — bat is static, no scroll work to promote for */
 }
-@keyframes svgAtmoReveal{
-  0%  {opacity:0;transform:translate(-50%,-50%) scale(1.06);}
-  70% {opacity:0.88;transform:translate(-50%,-50%) scale(0.99);}
-  100%{opacity:1;transform:translate(-50%,-50%) scale(1);}
-}
+/* (svgAtmoReveal keyframes removed — no rule referenced them) */
 @keyframes svgFloat{
   0%  {transform:translate(-50%,-50%) scale(1)     translateY(0px)   rotate(0deg);}
   25% {transform:translate(-50%,-50%) scale(1.011) translateY(-13px) rotate(0.11deg);}
@@ -1401,10 +1397,7 @@ footer{background:#030303;border-top:1px solid rgba(220,17,17,0.1);padding:5rem 
     from { opacity:0; transform:translateY(18px); }
     to   { opacity:1; transform:translateY(0); }
   }
-  @keyframes breathe {
-    0%, 100% { transform: scale(1); opacity: 0.85; }
-    50% { transform: scale(1.07); opacity: 1; }
-  }
+  /* (breathe keyframes removed — no rule referenced them; hero uses mind-breathe) */
 
 /* ═══ ADMIN TABS ═══ */
 .admin-tabs{
@@ -1642,10 +1635,7 @@ footer{background:#030303;border-top:1px solid rgba(220,17,17,0.1);padding:5rem 
 }
 .import-use-btn:hover { background:var(--red); color:white; }
 
-@keyframes waPulse{
-  0%,100%{box-shadow:0 4px 20px rgba(37,211,102,0.4);}
-  50%{box-shadow:0 4px 30px rgba(37,211,102,0.7),0 0 0 8px rgba(37,211,102,0.1);}
-}
+/* (waPulse keyframes removed — superseded by waPulseGlow below) */
 /* Single canonical WA pulse: box-shadow ONLY, no transform/opacity, so the
    button can't blink or jump. 3s. GPU-stabilized via translateZ. */
 @keyframes waPulseGlow{
@@ -2389,13 +2379,7 @@ footer{background:#030303;border-top:1px solid rgba(220,17,17,0.1);padding:5rem 
 .badge-stock { background: rgba(22,163,74,0.12); color: #4ade80; border: 1px solid rgba(22,163,74,0.25); }
 .badge-encargo { background: rgba(220,17,17,0.12); color: #f87171; border: 1px solid rgba(220,17,17,0.25); }
 
-.prod-sale {
-  position: absolute; top: 0.75rem; right: 0.75rem;
-  background: var(--red); color: white;
-  font-family: var(--font-body); font-size: 0.58rem;
-  font-weight: 700; letter-spacing: 0.1em;
-  padding: 0.25rem 0.6rem;
-}
+/* (.prod-sale removed — sale badges render as .prod-flag.flag-sale) */
 
 /* Stack vertical de flags (NUEVO / BEST SELLER / -X%) en la esquina superior derecha */
 .prod-flags{
@@ -2862,20 +2846,9 @@ footer { background: #030303; border-top: 1px solid rgba(220,17,17,0.08); paddin
   --shadow-red:   0 0 30px rgba(220,17,17,0.08);
 }
 
-/* 2 ── Whole-page vignette (crushed corners) */
-body::after {
-  content: '';
-  position: fixed; inset: 0;
-  background: radial-gradient(
-    ellipse 110% 100% at 50% 50%,
-    transparent 50%,
-    rgba(0,0,0,0.42) 82%,
-    rgba(0,0,0,0.78) 100%
-  );
-  pointer-events: none;
-  z-index: 9998;
-  mix-blend-mode: multiply;
-}
+/* 2 ── (vignette removed — this body::after was fully superseded by the
+   PREMIUM POLISH grain redefinition of body::after later in the sheet;
+   the vignette never rendered) */
 
 /* 3 ── Noise — punch it up slightly */
 body::before {
@@ -3422,7 +3395,7 @@ img { transition: opacity 0.4s ease; }
 ═══════════════════════════════════════════════════════════ */
 @media (prefers-reduced-motion: no-preference) {
   .reveal-section { opacity: 0; transform: translateY(36px); }
-  .reveal-item    { opacity: 0; transform: translateY(24px); }
+  /* (.reveal-item removed — never assigned by any JS or markup) */
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -6485,7 +6458,7 @@ p {
    ANY body-sized text using it to the new accessible token. */
 .sec-subtitle,
 .how-desc, .test-loc-new, .test-loc, .footer-brand-desc,
-.cart-note, .modal-desc-text, .prod-card-meta,
+.cart-note, .modal-desc-text,
 .editorial-card .ec-excerpt {
   color: var(--text-weak);
 }
@@ -9224,14 +9197,8 @@ select:focus, textarea:focus {
               box-shadow 0.32s ease;
 }
 
-/* ── 51.5 Add-to-cart shake on success (used by msb already) ── */
-@keyframes add-success-shake {
-  0%, 100% { transform: translateX(0); }
-  20% { transform: translateX(-3px); }
-  40% { transform: translateX(3px); }
-  60% { transform: translateX(-2px); }
-  80% { transform: translateX(2px); }
-}
+/* ── 51.5 (add-success-shake keyframes removed — nothing referenced them;
+   the old "used by msb" note was stale) ── */
 
 /* ── 51.6 Mobile guards (375px target) ── */
 @media (max-width: 380px) {
@@ -9303,13 +9270,8 @@ body::after {
   100% { transform: translate(1%, 1%); }
 }
 
-/* ── 3. HERO — depth & atmosphere ── */
-#hero {
-  background: 
-    radial-gradient(ellipse 80% 60% at 50% 30%, rgba(220,17,17,0.07) 0%, transparent 65%),
-    radial-gradient(ellipse 40% 30% at 20% 70%, rgba(220,17,17,0.04) 0%, transparent 50%),
-    #050505;
-}
+/* ── 3. (dead #hero rule removed — the hero section's id is "inicio",
+       so this block never matched anything) ── */
 
 /* Hero title — deeper shadow stack */
 .hero-title-desmos {
@@ -9638,12 +9600,7 @@ body::after {
   transform: translateY(-3px);
 }
 
-.trust-label {
-  font-family: var(--font-condensed);
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  font-size: 0.72rem;
-}
+/* (.trust-label removed — markup uses .trust-title) */
 
 /* ── 12. DROPS SLIDER ── */
 .drop-slide {
@@ -9669,12 +9626,7 @@ body::after {
   text-shadow: 0 2px 20px rgba(0,0,0,0.9);
 }
 
-.drop-tag {
-  font-family: var(--font-condensed);
-  font-weight: 700;
-  letter-spacing: 0.3em;
-  font-size: 0.6rem;
-}
+/* (.drop-tag removed — slides use .drop-slide-tag) */
 
 /* ── 13. CATEGORIES ── */
 .cat-card {
@@ -9694,7 +9646,7 @@ body::after {
   background: var(--red);
   transform: scaleX(0);
   transform-origin: left;
-  transition: transform 0.4s var(--ease-emph));
+  transition: transform 0.4s var(--ease-emph);
 }
 .cat-card:hover::before {
   transform: scaleX(1);
@@ -9704,25 +9656,9 @@ body::after {
   box-shadow: 0 15px 50px rgba(0,0,0,0.5), 0 0 0 1px rgba(220,17,17,0.08);
 }
 
-.cat-label {
-  font-family: var(--font-condensed);
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  font-size: 0.78rem;
-  text-transform: uppercase;
-}
+/* (.cat-label removed — markup uses .cat-name) */
 
-/* ── 14. TESTIMONIALS ── */
-.review-card {
-  background: linear-gradient(145deg, rgba(14,14,14,0.9), rgba(9,9,9,0.95));
-  border: 1px solid var(--border-white);
-  transition: transform 0.4s var(--ease-emph), border-color 0.3s ease, box-shadow 0.4s ease;
-}
-.review-card:hover {
-  transform: translateY(-5px);
-  border-color: rgba(220,17,17,0.15);
-  box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-}
+/* ── 14. (dead .review-card rules removed — testimonials use .test-card) ── */
 
 /* ── 15. FAQ ── */
 .faq-q {
@@ -9801,10 +9737,7 @@ body::after {
 #page-loader {
   background: var(--bg) !important;
 }
-#page-loader .loader-logo {
-  font-family: var(--font-display);
-  letter-spacing: 0.15em;
-}
+/* (.loader-logo removed — loader uses .page-loader-text) */
 
 /* ── 22. BOTTOM TAB BAR — glass morphism ── */
 /* (removed dead #bottom-tab-bar rule — the real mobile nav is #bottom-tabs,
@@ -9834,12 +9767,7 @@ body::after {
   background: var(--red) !important;
   border-bottom: none !important;
 }
-.ticker-text {
-  font-family: var(--font-condensed);
-  font-weight: 700;
-  letter-spacing: 0.25em;
-  font-size: 0.65rem;
-}
+/* (.ticker-text removed — ticker messages use .ticker-msg) */
 
 /* ── 27. SECTION dividers — subtle red glow ── */
 section + section::before,
@@ -9847,17 +9775,7 @@ section + section::before,
   background: linear-gradient(90deg, transparent 0%, rgba(220,17,17,0.2) 50%, transparent 100%) !important;
 }
 
-/* ── 28. PRODUCT SECTION editorial header ── */
-.sec-index {
-  font-family: var(--font-condensed);
-  font-weight: 800;
-  color: rgba(220,17,17,0.15);
-  font-size: clamp(5rem, 12vw, 9rem);
-  line-height: 1;
-  letter-spacing: -0.02em;
-  pointer-events: none;
-  user-select: none;
-}
+/* ── 28. (dead .sec-index rule removed — no such element in markup) ── */
 
 /* ── 29. EMPTY STATE ── */
 .products-empty {
@@ -9886,12 +9804,7 @@ section + section::before,
 #admin-panel {
   background: var(--bg) !important;
 }
-.admin-tab {
-  font-family: var(--font-condensed);
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  font-size: 0.7rem;
-}
+/* (.admin-tab removed — admin tabs use .admin-tab-btn) */
 
 /* ── 33. PAGE LOAD ANIMATION ── */
 @keyframes fade-up {
@@ -9913,7 +9826,6 @@ section + section::before,
   .hero-tagline { font-size: 0.88rem; }
   .brand-item { font-size: 0.65rem; letter-spacing: 0.2em; }
   .prod-name { font-size: 1rem; }
-  .sec-index { font-size: 5rem; }
 }
 
 /* ── 35. FOCUS RING — accessibility + brand ── */
@@ -10302,8 +10214,7 @@ section + section::before,
     gap: 1rem !important;
   }
 
-  /* Category cards: smaller decorative pixels, bigger tap area. */
-  .category-card { min-height: 200px; }
+  /* (.category-card min-height removed — real class is .cat-card) */
 
   /* Editorial / lookbook cards stack cleanly. */
   .editorial-grid { grid-template-columns: 1fr !important; }
@@ -10499,8 +10410,6 @@ section + section::before,
   .prod-card,
   .modal-inner,
   .drop-slide,
-  .category-card,
-  .testimonial-card,
   .faq-item,
   .btn-primary,
   .btn-ghost {
@@ -10523,10 +10432,6 @@ section + section::before,
   /* 5) Parallax / transform-on-scroll OFF. No subtle background drift,
         no 3D tilt on cards — anything that recalculates layout on
         scroll is banned on mobile. */
-  [data-parallax],
-  .parallax,
-  .tilt-3d,
-  .category-card,
   .prod-card {
     transform: none !important;
     perspective: none !important;
@@ -10568,7 +10473,7 @@ section + section::before,
     perspective: none !important;
     transform-style: flat !important;
   }
-  .tilt-3d, [data-tilt], .editorial-card, .prod-card {
+  .editorial-card, .prod-card {
     transform: none !important;
   }
 
@@ -10708,18 +10613,9 @@ section + section::before,
 .divider { transform: scaleX(0); transform-origin: 0 50%; transition: transform 0.7s cubic-bezier(.16,1,.3,1); }
 .divider.drawn { transform: scaleX(1); }
 
-/* 7f — Branded loading skeleton (red-tinted shimmer, replaces gray) */
-.skeleton {
-  position: relative; overflow: hidden;
-  background: rgba(220,17,17,0.06);
-}
-.skeleton::after {
-  content: ''; position: absolute; inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(220,17,17,0.14) 45%, rgba(255,60,60,0.10) 55%, transparent);
-  transform: translateX(-100%);
-  animation: skeletonShimmer 1.3s ease-in-out infinite;
-}
-@keyframes skeletonShimmer { to { transform: translateX(100%); } }
+/* 7f — (legacy .skeleton system removed — the live loaders are the
+   .skel-card / .skel-img / .skel-line family rendered by renderSkeletons();
+   nothing ever received the bare .skeleton class) */
 
 /* 5d — Trust badges slide in from alternating sides on scroll */
 @media (prefers-reduced-motion: no-preference) {
@@ -17622,7 +17518,7 @@ openProductForm = function(id){
       </select>
     </div>
 
-    <div style="margin-bottom:1.75rem;" id="df-tag-custom-wrap" style="display:none;">
+    <div style="margin-bottom:1.75rem;display:none;" id="df-tag-custom-wrap">
       <label class="form-label">TIPO PERSONALIZADO</label>
       <input class="form-input" type="text" id="df-tag-custom" placeholder="Ej: GYMSHARK EXCLUSIVO">
     </div>
