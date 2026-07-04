@@ -15029,34 +15029,36 @@ async function loadReviewsFromSupabase(){
 }
 
 function saveReviews(){ safeStorage.setJSON('dm_reviews', reviews); }
-async function persistReviewRemote(r, isUpdate){
+// Mirror the FULL local reviews set to Supabase: wipe + bulk insert, position
+// = index. Reviews have no stable business key (no slug), so any id-keyed
+// PATCH is unfixably collision-prone — DEFAULT_REVIEWS seed ids 1/2/3 are the
+// exact values the table's serial ids start at (verified live). Mirroring the
+// whole set sidesteps ids entirely: the table always equals what the admin
+// sees, same guarantee the categories slug-upsert provides. Throws on failure
+// so callers show a real error instead of a fake "saved ✓" — the silent
+// swallow is what hid this bug (table sat at 0 rows while saves "succeeded").
+// Failure modes: if DELETE succeeds and INSERT fails, the table is briefly
+// empty — loadReviewsFromSupabase treats an empty table as "keep local
+// cache", so the public site keeps rendering the cached reviews until the
+// next successful save repopulates.
+async function syncReviewsToSupabase(){
   if (typeof sbFetch !== 'function') return;
-  const row = {
+  const rows = reviews.map((r, i) => ({
     name: r.name,
     location: r.loc || '',
     rating: r.stars || 5,
     text: r.text || '',
     verified: true,
     initials: getInitials(r.name),
-    position: r.position || 0,
+    position: i,
     active: true
-  };
-  try {
-    if (isUpdate && typeof r.id === 'number' && r.id < 1e12) {
-      // Real DB id (small numeric bigserial)
-      await sbFetch('reviews', 'PATCH', row, `?id=eq.${r.id}`);
-    } else {
-      const saved = await sbFetch('reviews', 'POST', row, '');
-      if (Array.isArray(saved) && saved[0]) r.id = saved[0].id;
-    }
-  } catch (e) {
-    console.warn('Review remote persist failed:', e.message || e);
+  }));
+  await sbFetch('reviews', 'DELETE', null, '?id=gt.0');
+  if (!rows.length) return;                       // deleting the last review = empty mirror
+  const saved = await sbFetch('reviews', 'POST', rows, '');   // bulk insert (PostgREST array body)
+  if (Array.isArray(saved)) {
+    saved.forEach((s, i) => { if (reviews[i] && s && s.id != null) reviews[i].id = s.id; });
   }
-}
-async function deleteReviewRemote(r){
-  if (typeof sbFetch !== 'function' || !r || r.id == null) return;
-  try { await sbFetch('reviews', 'DELETE', null, `?id=eq.${r.id}`); }
-  catch (e) { console.warn('Review remote delete failed:', e.message || e); }
 }
 
 // Construye iniciales del nombre (ej. "Diego M." -> "DM", "Sofía R." -> "SR")
@@ -15145,30 +15147,28 @@ async function saveReviewForm(){
   try {
     if(isEdit){
       const r = reviews[parseInt(idxRaw)];
-      const updated = {...r, ...data};
-      await persistReviewRemote(updated, true);
-      reviews[parseInt(idxRaw)] = updated;
-      showToast('Reseña actualizada ✓');
+      reviews[parseInt(idxRaw)] = {...r, ...data};
     } else {
-      const r = { id: Date.now(), ...data };
-      await persistReviewRemote(r, false);
-      reviews.push(r);
-      showToast('Reseña agregada ✓');
+      reviews.push({ id: Date.now(), ...data });
     }
+    // Mirror the FULL set (throws on failure → real error, no fake success).
+    await syncReviewsToSupabase();
     saveReviews(); renderReviews(); renderAdminReviews();
     closeReviewForm();
-  } catch(e){ showToast('Error: ' + (e.message || 'desconocido')); }
+    showToast(isEdit ? 'Reseña actualizada ✓' : 'Reseña agregada ✓');
+  } catch(e){ showToast('Error al guardar: ' + (e.message || 'desconocido')); }
 }
 
 function addReview(){ openReviewForm(null); }
 function editReview(i){ openReviewForm(i); }
 async function deleteReview(i){
   if(!confirm(t('confirmDelReview'))) return;
-  const r = reviews[i];
-  await deleteReviewRemote(r);
   reviews.splice(i,1);
-  saveReviews(); renderReviews(); renderAdminReviews();
-  showToast('Reseña eliminada');
+  try {
+    await syncReviewsToSupabase();
+    saveReviews(); renderReviews(); renderAdminReviews();
+    showToast('Reseña eliminada');
+  } catch(e){ showToast('Error al eliminar: ' + (e.message || 'desconocido')); }
 }
 
 // ════════════════════════════════════
@@ -15290,6 +15290,7 @@ async function loadDropsFromSupabase(){
       _dropsSupabaseOk = true;
       drops = data.map(r => ({
         id: r.id,
+        fromDb: true,   // provenance marker: this id is a genuine DB id (see saveDropToSupabase)
         tag: r.tag||'',
         fecha: r.fecha||'',
         titulo: r.titulo||'',
@@ -15336,12 +15337,28 @@ async function saveDropToSupabase(dropData, isEdit){
     position: dropData.position,
     active: true,
   };
-  if(isEdit && typeof dropData.id === 'number' && dropData.id > 10000){
-    // id > 10000 means it was created from Supabase (real DB id), use PATCH
-    await sbFetch('drops','PATCH', row, `?id=eq.${dropData.id}`);
-  } else {
-    const saved = await sbFetch('drops','POST', row, '');
-    if(Array.isArray(saved) && saved[0]) dropData.id = saved[0].id;
+  // Collision-free update — same fix family as the categories slug-upsert.
+  // The old `id > 10000` heuristic assumed DB ids are huge; live serial ids
+  // are small (9, 11 at time of fix), so every edit fell into the POST
+  // branch and DUPLICATED the slide. Drops have no slug column, so the
+  // stable key is the DB id itself — but only when we know it's genuine:
+  // `fromDb` is set by loadDropsFromSupabase / after a successful POST
+  // (client seeds from DEFAULT_DROPS never carry it, so a seed id can
+  // never PATCH-overwrite an unrelated real row). Existence is verified
+  // before PATCH; a vanished row falls through to INSERT.
+  if (isEdit && dropData.fromDb && typeof dropData.id === 'number') {
+    const q = `?id=eq.${dropData.id}`;
+    const existing = await sbFetch('drops', 'GET', null, q + '&select=id');
+    if (Array.isArray(existing) && existing.length) {
+      await sbFetch('drops', 'PATCH', row, q);
+      return;
+    }
+    // Row no longer exists (deleted from another device) — insert fresh.
+  }
+  const saved = await sbFetch('drops','POST', row, '');
+  if(Array.isArray(saved) && saved[0]){
+    dropData.id = saved[0].id;
+    dropData.fromDb = true;
   }
 }
 
@@ -15636,6 +15653,7 @@ async function saveDropForm(){
 
     const dropData = {
       id: isEdit ? drops[idx].id : Date.now(),
+      fromDb: isEdit ? !!drops[idx].fromDb : false,   // provenance must survive the rebuild
       tag, fecha, titulo, desc, img, cta, ctaLink,
       position: isEdit ? (drops[idx].position || idx) : drops.length,
     };
