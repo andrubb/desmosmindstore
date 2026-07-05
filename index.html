@@ -10948,6 +10948,92 @@ section + section::before,
   text-shadow: 0 0 14px rgba(220,17,17,0.5);
 }
 
+/* ═══════════════════════════════════════════════════════════
+   BOLD PASS (2026-07-04) — confident type scale, ghost-type
+   texture, loud moments. Later-wins layer; overrides above rules
+   deliberately. Hero-rule exception documented in this pass only.
+═══════════════════════════════════════════════════════════ */
+
+/* 1. Type scale push — the display voice gets ~20% louder. */
+:root {
+  --fs-h1: clamp(4.5rem, 12vw, 11rem);
+  --fs-h2: clamp(2.4rem, 5vw, 4rem);
+}
+
+/* Nav labels never wrap ("Cómo Funciona" is two words now). */
+.nav-links a { white-space: nowrap; }
+
+/* 2. Hero voice: tagline in full ivory (was 72% grey), stats grow. */
+.hero-tagline {
+  color: rgba(240,236,228,0.92);
+  font-size: clamp(0.95rem, 1.6vw, 1.15rem);
+  font-weight: 400;
+}
+.hero-stat-num { font-size: clamp(2.2rem, 4.5vw, 3.4rem); }
+
+/* 3. Brands marquee → big-type ghost brand band. The brand names ARE
+   the credibility — they were 0.72rem whispers; now they're 1.5–2.5rem
+   Bebas outlines that fill solid white + red glow on hover. */
+.brands-band { padding: 1.5rem 0; }
+.marquee-track { animation-duration: 34s; }
+.brand-item {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 4.2vw, 2.5rem);
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(212,208,200,0.38);
+  transition: color 0.25s cubic-bezier(.4,0,.2,1),
+              text-shadow 0.25s cubic-bezier(.4,0,.2,1);
+}
+.brand-item:hover {
+  color: var(--white);
+  -webkit-text-stroke-color: transparent;
+  text-shadow: 0 0 24px rgba(220,17,17,0.55);
+}
+@supports not (-webkit-text-stroke: 1px #fff) {
+  .brand-item { color: rgba(212,208,200,0.4); }
+}
+
+/* 4. Stock masthead — the money section opens like a cover, not a label. */
+#stock .drop-title {
+  font-size: clamp(3.2rem, 9vw, 6.5rem);
+  line-height: 0.9;
+}
+
+/* 5. CTA band — giant outlined wordmark drifting behind the offer
+   (scrubbed by 47.12). Pure texture: aria-hidden, stroke-only, z0. */
+.cta-ghost {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-display);
+  font-size: clamp(7rem, 24vw, 20rem);
+  letter-spacing: 0.04em;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(240,236,228,0.14);
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 0;
+  will-change: transform;
+}
+.cta-band-inner { position: relative; z-index: 1; }
+
+/* 6. Mobile loud-moment exceptions — the old authoritative cap crushed
+   every h2 to 1.8rem, which read timid at 375px. Headlines now land. */
+@media (max-width: 767px) {
+  .sec-title, h2, .h2 { font-size: clamp(1.9rem, 7.5vw, 2.5rem) !important; }
+  .cta-band-title { font-size: clamp(2.3rem, 9vw, 3.2rem) !important; }
+  #stock .drop-title { font-size: clamp(2.6rem, 11vw, 3.6rem) !important; line-height: 0.92; }
+  /* Hero (rule exception, this pass): title +15%, stats and tagline
+     step out of whisper range. Same layout, more conviction. */
+  .hero-title { font-size: clamp(4.6rem, 17vw, 6.5rem) !important; }
+  .hero-stat-num { font-size: 1.9rem !important; }
+  .hero-tagline { font-size: 0.95rem !important; color: rgba(240,236,228,0.92) !important; }
+}
+
 </style>
 
 <!-- ═══ GSAP + ScrollTrigger ═══ -->
@@ -11719,6 +11805,7 @@ window.gsapReady(function(){
   <span class="cta-corner bl" aria-hidden="true"></span>
   <span class="cta-corner br" aria-hidden="true"></span>
   <span class="cta-scan" aria-hidden="true"></span>
+  <div class="cta-ghost" aria-hidden="true">DESMOSMIND</div>
   <div class="container cta-band-inner">
     <span class="cta-band-eyebrow">PEDIDOS A LA MEDIDA · IMPORT ON DEMAND</span>
     <h2 class="cta-band-title" id="cta-title-text">¿Querés algo<br><em>específico?</em></h2>
@@ -19307,6 +19394,57 @@ document.addEventListener('DOMContentLoaded', () => {
           });
       });
     }
+
+    // ── 47.11 HERO DEPARTURE — the one pinned moment (1 of 3 pin budget)
+    // BOLD PASS 2026-07: hero-rule exception, this pass only. Desktop
+    // (≥900px, non-touch cursors) pins the hero for 55% of a viewport and
+    // scrubs a cinematic dissolve: content lifts and fades, the bat and
+    // particles recede, the scroll hint dies first. Only tweens props the
+    // hero's CSS keyframes don't own (content container transform/alpha,
+    // bat OPACITY only — svgFloat owns its transform, svgGlow its filter).
+    // Mobile keeps the untouched static hero (no pin under 900px).
+    const heroEl = document.querySelector('.hero');
+    const heroContentEl = document.querySelector('.hero-content');
+    if (heroEl && heroContentEl) {
+      const mmHero = gsap.matchMedia();
+      mmHero.add('(min-width: 900px)', () => {
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: heroEl,
+            start: 'top top',
+            end: '+=55%',
+            scrub: 0.6,
+            pin: true,
+            anticipatePin: 1
+          }
+        });
+        tl.to('.scroll-hint', { autoAlpha: 0, duration: 0.25 }, 0);
+        tl.to(heroContentEl, { yPercent: -16, autoAlpha: 0, duration: 1, ease: 'none' }, 0);
+        tl.to('.hero-bat-svg', { opacity: 0.3, duration: 1, ease: 'none' }, 0);
+        tl.to('#hero-particles', { opacity: 0.15, duration: 1, ease: 'none' }, 0);
+      });
+    }
+
+    // ── 47.12 CTA band — giant ghost wordmark drifts on scrub ──
+    // Transform-only, no pin, same tween on all viewports (no responsive
+    // branch → no matchMedia needed per the standing rule's own terms).
+    const ctaGhost = document.querySelector('.cta-ghost');
+    if (ctaGhost) {
+      gsap.fromTo(ctaGhost,
+        { xPercent: -56 },
+        {
+          xPercent: -44, yPercent: -50, ease: 'none',
+          scrollTrigger: { trigger: '.cta-band', start: 'top bottom', end: 'bottom top', scrub: true }
+        });
+    }
+
+    // Settle-refresh: if this boot coincided with an in-flight smooth
+    // scroll (browser scroll restoration, anchor jump — html has
+    // scroll-behavior:smooth), the pin geometry above measures garbage.
+    // One refresh after the scroll settles makes it deterministic.
+    setTimeout(function(){
+      try { if (window.ScrollTrigger) ScrollTrigger.refresh(); } catch(e){}
+    }, 400);
 
     // ── 47.7 Hero text parallax — INTENTIONALLY OMITTED
     // The existing bat-scroll system already animates .hero-content
