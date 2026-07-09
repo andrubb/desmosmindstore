@@ -11034,6 +11034,130 @@ section + section::before,
   .hero-tagline { font-size: 0.95rem !important; color: rgba(240,236,228,0.92) !important; }
 }
 
+/* ═══════════════════════════════════════════════════════════
+   NATIVE SCROLL-DRIVEN TITLE WIPES — section headings unveil via
+   clip-path as they cross into view. Zero JS (animation-timeline),
+   feature-gated; unsupported browsers keep the existing IO/GSAP
+   reveal fades. Scroll-linked = deterministic (no hidden-tab or
+   never-fired risk); reduced-motion switches it off explicitly.
+═══════════════════════════════════════════════════════════ */
+@supports (animation-timeline: view()) {
+  .sec-title {
+    animation: secTitleWipe linear both;
+    animation-timeline: view();
+    animation-range: entry 10% entry 55%;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .sec-title { animation: none; }
+  }
+}
+@keyframes secTitleWipe {
+  from { clip-path: inset(0 100% 0 0); }
+  to   { clip-path: inset(0 0% 0 0); }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   EL VIAJE — the encargo route, USA → CR. A scroll-scrubbed SVG
+   line draws the real import journey with the FAQ's real numbers.
+   Static-safe: with no JS/reduced motion the route ships fully
+   drawn and every milestone lit; gsapEnhancements "arms" it
+   (.viaje-armed) before taking over the draw.
+═══════════════════════════════════════════════════════════ */
+.viaje-section {
+  background: var(--bg2);
+  border-top: 1px solid var(--border-white);
+  border-bottom: 1px solid var(--border-white);
+  overflow: hidden;
+}
+.viaje-stage {
+  position: relative;
+  max-width: 1060px;
+  margin: 1.5rem auto 0;
+}
+.viaje-svg { display: block; width: 100%; height: auto; }
+.viaje-endpoint {
+  font-family: var(--font-display);
+  font-size: 44px;
+  letter-spacing: 0.08em;
+  fill: rgba(240,236,228,0.14);
+}
+.viaje-route-bg {
+  stroke: rgba(255,255,255,0.08);
+  stroke-width: 1;
+  stroke-dasharray: 5 7;
+}
+.viaje-route {
+  stroke: var(--red);
+  stroke-width: 2;
+  filter: drop-shadow(0 0 6px rgba(220,17,17,0.55));
+}
+.viaje-node {
+  fill: var(--red);
+  transition: fill 0.22s cubic-bezier(.4,0,.2,1), r 0.22s cubic-bezier(.16,1,.3,1);
+}
+.viaje-armed .viaje-node:not(.lit) { fill: var(--muted); opacity: 0.55; }
+.viaje-node.lit { fill: var(--red); }
+
+.viaje-miles { list-style: none; margin: 0; padding: 0; }
+.viaje-mile-num {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  letter-spacing: 0.08em;
+  color: var(--red);
+}
+.viaje-mile-t {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--white);
+  margin: 0.15rem 0 0.1rem;
+}
+.viaje-mile-d {
+  display: block;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  color: var(--muted2);
+}
+
+@media (min-width: 768px) {
+  /* Milestones ride the route: absolute at each node's coordinates. */
+  .viaje-miles { position: absolute; inset: 0; pointer-events: none; }
+  .viaje-mile {
+    position: absolute;
+    left: var(--mx); top: var(--my);
+    transform: translate(-50%, -130%);
+    text-align: center;
+    max-width: 200px;
+    transition: opacity 0.22s cubic-bezier(.4,0,.2,1);
+  }
+  .viaje-armed .viaje-mile:not(.lit) { opacity: 0.28; }
+  /* Last stop label sits below its node (route ends bottom-right). */
+  .viaje-mile:last-child { transform: translate(-72%, 28%); }
+}
+@media (max-width: 767px) {
+  /* Phones: the SVG stays the drawing; milestones stack as a clean
+     vertical itinerary beneath it. */
+  .viaje-miles {
+    display: grid;
+    gap: 1.1rem;
+    margin-top: 1.5rem;
+    padding-left: 0.25rem;
+  }
+  .viaje-mile {
+    display: grid;
+    grid-template-columns: 2rem 1fr;
+    align-items: baseline;
+    column-gap: 0.6rem;
+    transition: opacity 0.22s cubic-bezier(.4,0,.2,1);
+  }
+  .viaje-mile-num { grid-row: 1 / span 2; }
+  .viaje-armed .viaje-mile:not(.lit) { opacity: 0.35; }
+}
+
 </style>
 
 <!-- ═══ GSAP + ScrollTrigger ═══ -->
@@ -11506,6 +11630,55 @@ window.gsapReady(function(){
         <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
         Hacer Pedido
       </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ EL VIAJE — la ruta real del encargo, USA → CR ═══ -->
+<section class="viaje-section" id="viaje" aria-label="El viaje de tu encargo desde USA hasta Costa Rica">
+  <div class="container">
+    <div class="sec-header reveal">
+      <div class="sec-eyebrow">
+        <div class="eyebrow-line"></div>
+        <svg width="16" height="10" viewBox="0 0 100 60" fill="#DC1111"><path d="M50 38 C44 36 36 32 26 28 C18 25 10 24 2 26 C0 26 0 24 2 22 C8 17 18 14 26 16 C32 17 38 20 44 26 C46 28 48 32 50 38Z"/><path d="M50 38 C56 36 64 32 74 28 C82 25 90 24 98 26 C100 26 100 24 98 22 C92 17 82 14 74 16 C68 17 62 20 56 26 C54 28 52 32 50 38Z"/></svg>
+        <div class="eyebrow-line"></div>
+      </div>
+      <h2 class="sec-title">El Viaje de tu Pieza</h2>
+      <p class="sec-subtitle">De la tienda oficial en USA a tus manos — te avisamos por WhatsApp en cada paso</p>
+    </div>
+    <div class="viaje-stage">
+      <svg class="viaje-svg" viewBox="0 0 1000 420" fill="none" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        <text class="viaje-endpoint" x="52" y="150">USA</text>
+        <text class="viaje-endpoint" x="700" y="330">COSTA RICA</text>
+        <path class="viaje-route-bg" d="M60 80 C 300 40, 620 120, 940 360"/>
+        <path class="viaje-route" d="M60 80 C 300 40, 620 120, 940 360"/>
+        <circle class="viaje-node" cx="60" cy="80" r="6"/>
+        <circle class="viaje-node" cx="338" cy="84" r="6"/>
+        <circle class="viaje-node" cx="654" cy="186" r="6"/>
+        <circle class="viaje-node" cx="940" cy="360" r="6"/>
+      </svg>
+      <ol class="viaje-miles">
+        <li class="viaje-mile" style="--mx:6%;--my:19%">
+          <span class="viaje-mile-num">I</span>
+          <span class="viaje-mile-t">Pedido confirmado</span>
+          <span class="viaje-mile-d">SINPE Móvil o transferencia</span>
+        </li>
+        <li class="viaje-mile" style="--mx:33.8%;--my:20%">
+          <span class="viaje-mile-num">II</span>
+          <span class="viaje-mile-t">Compra en USA</span>
+          <span class="viaje-mile-d">Directo en la tienda oficial</span>
+        </li>
+        <li class="viaje-mile" style="--mx:65.4%;--my:44.3%">
+          <span class="viaje-mile-num">III</span>
+          <span class="viaje-mile-t">Vuelo + aduana</span>
+          <span class="viaje-mile-d">Te avisamos por WhatsApp</span>
+        </li>
+        <li class="viaje-mile" style="--mx:94%;--my:85.7%">
+          <span class="viaje-mile-num">IV</span>
+          <span class="viaje-mile-t">Entrega en CR</span>
+          <span class="viaje-mile-d">2–3 semanas · todo el país</span>
+        </li>
+      </ol>
     </div>
   </div>
 </section>
@@ -14067,7 +14240,9 @@ function updateResultRow(filter, count){
     clearBtn.hidden = (filter === 'all' || count === 0);
   }
   if (metaCountEl) {
-    metaCountEl.textContent = (Array.isArray(products) ? products.length : 0);
+    const n = (Array.isArray(products) ? products.length : 0);
+    metaCountEl.dataset.final = n;   // scrub count-up reads this target
+    metaCountEl.textContent = n;     // full value = the no-JS/reduced default
   }
 }
 
@@ -19445,6 +19620,71 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(function(){
       try { if (window.ScrollTrigger) ScrollTrigger.refresh(); } catch(e){}
     }, 400);
+
+    // ── 47.15 Piezas counter — scroll-scrubbed count-up ──
+    // Real stat (#drop-meta-count = live products.length). Non-pin scrub;
+    // updateResultRow keeps writing the full value, so users who never
+    // scroll through the range (or run reduced motion) still see it.
+    const metaCount = document.getElementById('drop-meta-count');
+    if (metaCount) {
+      ScrollTrigger.create({
+        trigger: '#stock',
+        start: 'top 88%',
+        end: 'top 40%',
+        scrub: 0.4,
+        onUpdate(self){
+          const target = parseInt(metaCount.dataset.final || '', 10);
+          if (!isNaN(target)) metaCount.textContent = Math.round(self.progress * target);
+        }
+      });
+    }
+
+    // ── 47.16 EL VIAJE — route draw, USA → CR (the pass's one new pin) ──
+    // Desktop: section pins for +75% while the route draws and milestones
+    // light in sequence (pin #2 of the hard ceiling of 3). Mobile: same
+    // scrub tied to the section crossing the viewport, NO pin. Static
+    // default is fully drawn + lit; .viaje-armed hands control to GSAP,
+    // so no-JS / reduced-motion visitors always see the finished route.
+    const viajeSec = document.querySelector('.viaje-section');
+    const viajeRoute = viajeSec ? viajeSec.querySelector('.viaje-route') : null;
+    if (viajeSec && viajeRoute && viajeRoute.getTotalLength) {
+      const routeLen = viajeRoute.getTotalLength();
+      const viajeMiles = gsap.utils.toArray('.viaje-mile');
+      const viajeNodes = gsap.utils.toArray('.viaje-node');
+      const lightMiles = (self) => {
+        const p = self.progress;
+        viajeMiles.forEach((m, i) => {
+          const lit = p >= (i / Math.max(1, viajeMiles.length - 1)) - 0.02;
+          m.classList.toggle('lit', lit);
+          if (viajeNodes[i]) viajeNodes[i].classList.toggle('lit', lit);
+        });
+      };
+      const armViaje = () => {
+        viajeSec.classList.add('viaje-armed');
+        gsap.set(viajeRoute, { strokeDasharray: routeLen, strokeDashoffset: routeLen });
+      };
+      const mmViaje = gsap.matchMedia();
+      mmViaje.add('(min-width: 900px)', () => {
+        armViaje();
+        gsap.to(viajeRoute, {
+          strokeDashoffset: 0, ease: 'none',
+          scrollTrigger: {
+            trigger: viajeSec, start: 'top top', end: '+=75%',
+            scrub: 0.6, pin: true, anticipatePin: 1, onUpdate: lightMiles
+          }
+        });
+      });
+      mmViaje.add('(max-width: 899px)', () => {
+        armViaje();
+        gsap.to(viajeRoute, {
+          strokeDashoffset: 0, ease: 'none',
+          scrollTrigger: {
+            trigger: viajeSec, start: 'top 78%', end: 'bottom 55%',
+            scrub: 0.6, onUpdate: lightMiles
+          }
+        });
+      });
+    }
 
     // ── 47.7 Hero text parallax — INTENTIONALLY OMITTED
     // The existing bat-scroll system already animates .hero-content

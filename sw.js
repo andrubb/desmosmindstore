@@ -6,7 +6,7 @@
 //   • Supabase API / Plausible / fonts: bypass (always network)
 // Bump CACHE_VERSION whenever you ship a breaking change.
 // ════════════════════════════════════════════════════════════
-const CACHE_VERSION = 'desmos-v14';
+const CACHE_VERSION = 'desmos-v15';
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const STATIC_CACHE  = `${CACHE_VERSION}-static`;
 
