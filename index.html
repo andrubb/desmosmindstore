@@ -11158,6 +11158,123 @@ section + section::before,
   .viaje-armed .viaje-mile:not(.lit) { opacity: 0.35; }
 }
 
+/* ═══════════════════════════════════════════════════════════
+   HERO DEPARTURE (premium pass redesign) — the wordmark is the
+   doorway. Supporting cast fades via .hero-departing (author
+   !important outranks the entrance animations' fill); the content
+   container owns the scale. Toggled by the pin's onUpdate at 6%.
+═══════════════════════════════════════════════════════════ */
+.hero .hero-eyebrow,
+.hero .hero-sub,
+.hero .hero-tagline,
+.hero .hero-btns,
+.hero .hero-stats {
+  transition: opacity 0.35s cubic-bezier(.4, 0, .2, 1);
+}
+.hero-departing .hero-eyebrow,
+.hero-departing .hero-sub,
+.hero-departing .hero-tagline,
+.hero-departing .hero-btns,
+.hero-departing .hero-stats {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+.hero-departing .hero-content { will-change: transform, opacity; }
+
+/* ═══════════════════════════════════════════════════════════
+   BRAND ROLL-CALL — replaces the infinite marquee. One giant
+   Bebas row per imported brand; scroll lights them in sequence
+   (ghost outline → bone white). Static default: all solid.
+═══════════════════════════════════════════════════════════ */
+.brands-band { padding: clamp(3.5rem, 9vh, 6.5rem) 0; }
+.brands-band::before,
+.brands-band::after { display: none; }   /* old horizontal edge fades */
+.brands-roll-label {
+  font-family: var(--font-body);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--muted2);
+  margin: 0 0 1.4rem;
+}
+.brands-roll { list-style: none; margin: 0; padding: 0; }
+.brand-row {
+  border-top: 1px solid var(--border-white);
+  padding: 0.4rem 0;
+}
+.brand-row:last-child { border-bottom: 1px solid var(--border-white); }
+.brand-row-name {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: clamp(2.3rem, 6.5vw, 5rem);
+  letter-spacing: 0.06em;
+  line-height: 1.05;
+  color: var(--white);
+  transition: color 0.32s cubic-bezier(.4, 0, .2, 1),
+              opacity 0.32s cubic-bezier(.4, 0, .2, 1),
+              transform 0.32s cubic-bezier(.16, 1, .3, 1);
+}
+.brands-armed .brand-row:not(.on) .brand-row-name {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(240,236,228,0.18);
+  opacity: 0.65;
+  transform: translateX(-8px);
+}
+.brand-row.on .brand-row-name { transform: translateX(0); }
+@media (hover: hover) and (pointer: fine) {
+  .brand-row:hover .brand-row-name {
+    color: var(--white);
+    -webkit-text-stroke: 0;
+    opacity: 1;
+    text-shadow: 0 0 26px rgba(220,17,17,0.55);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   CÓMO FUNCIONA — scroll-driven treatment (copy untouched).
+   Cards wipe in from their own side; the steps rise in sequence.
+   Native animation-timeline, feature-gated, reduce-safe.
+═══════════════════════════════════════════════════════════ */
+@supports (animation-timeline: view()) {
+  .how-grid .how-card:first-child {
+    animation: howWipeL linear both;
+    animation-timeline: view();
+    animation-range: entry 5% entry 50%;
+  }
+  .how-grid .how-card:last-child {
+    animation: howWipeR linear both;
+    animation-timeline: view();
+    animation-range: entry 10% entry 55%;
+  }
+  .steps-grid > div:nth-child(1),
+  .steps-grid > div:nth-child(2),
+  .steps-grid > div:nth-child(3) {
+    animation: stepRise linear both;
+    animation-timeline: view();
+  }
+  .steps-grid > div:nth-child(1) { animation-range: entry 5% entry 40%; }
+  .steps-grid > div:nth-child(2) { animation-range: entry 15% entry 50%; }
+  .steps-grid > div:nth-child(3) { animation-range: entry 25% entry 60%; }
+  @media (prefers-reduced-motion: reduce) {
+    .how-grid .how-card:first-child,
+    .how-grid .how-card:last-child,
+    .steps-grid > div { animation: none; }
+  }
+}
+@keyframes howWipeL {
+  from { clip-path: inset(0 100% 0 0); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+@keyframes howWipeR {
+  from { clip-path: inset(0 0 0 100%); }
+  to   { clip-path: inset(0 0 0 0); }
+}
+@keyframes stepRise {
+  from { opacity: 0.1; transform: translateY(20px); }
+  to   { opacity: 1;   transform: translateY(0); }
+}
+
 </style>
 
 <!-- ═══ GSAP + ScrollTrigger ═══ -->
@@ -11489,54 +11606,20 @@ window.gsapReady(function(){
 
 <!-- ═══ BRANDS MARQUEE ═══ -->
 <div class="brands-band">
-  <div class="marquee-track" id="marquee">
-    <span class="brand-item">GYMSHARK</span><span class="brand-sep">✦</span><span class="brand-item">YOUNGLA</span><span class="brand-sep">✦</span><span class="brand-item">BREATH THE DIVINITY</span><span class="brand-sep">✦</span><span class="brand-item">DARCSPORT</span><span class="brand-sep">✦</span><span class="brand-item">RYDERWEAR</span><span class="brand-sep">✦</span><span class="brand-item">GYMSHARK</span><span class="brand-sep">✦</span><span class="brand-item">YOUNGLA</span><span class="brand-sep">✦</span><span class="brand-item">BREATH THE DIVINITY</span><span class="brand-sep">✦</span><span class="brand-item">DARCSPORT</span><span class="brand-sep">✦</span><span class="brand-item">RYDERWEAR</span><span class="brand-sep">✦</span><span class="brand-item">GYMSHARK</span><span class="brand-sep">✦</span><span class="brand-item">YOUNGLA</span><span class="brand-sep">✦</span><span class="brand-item">BREATH THE DIVINITY</span><span class="brand-sep">✦</span><span class="brand-item">DARCSPORT</span><span class="brand-sep">✦</span><span class="brand-item">RYDERWEAR</span><span class="brand-sep">✦</span><span class="brand-item">GYMSHARK</span><span class="brand-sep">✦</span><span class="brand-item">YOUNGLA</span><span class="brand-sep">✦</span><span class="brand-item">BREATH THE DIVINITY</span><span class="brand-sep">✦</span><span class="brand-item">DARCSPORT</span><span class="brand-sep">✦</span><span class="brand-item">RYDERWEAR</span><span class="brand-sep">✦</span><span class="brand-item">GYMSHARK</span><span class="brand-sep">✦</span><span class="brand-item">YOUNGLA</span><span class="brand-sep">✦</span><span class="brand-item">BREATH THE DIVINITY</span><span class="brand-sep">✦</span><span class="brand-item">DARCSPORT</span><span class="brand-sep">✦</span><span class="brand-item">RYDERWEAR</span><span class="brand-sep">✦</span><span class="brand-item">GYMSHARK</span><span class="brand-sep">✦</span><span class="brand-item">YOUNGLA</span><span class="brand-sep">✦</span><span class="brand-item">BREATH THE DIVINITY</span><span class="brand-sep">✦</span><span class="brand-item">DARCSPORT</span><span class="brand-sep">✦</span><span class="brand-item">RYDERWEAR</span><span class="brand-sep">✦</span>
+  <div class="container">
+    <p class="brands-roll-label">Marcas que importamos</p>
+    <ol class="brands-roll" id="marquee">
+      <li class="brand-row"><span class="brand-row-name">GYMSHARK</span></li>
+      <li class="brand-row"><span class="brand-row-name">YOUNGLA</span></li>
+      <li class="brand-row"><span class="brand-row-name">DARCSPORT</span></li>
+      <li class="brand-row"><span class="brand-row-name">BREATH THE DIVINITY</span></li>
+      <li class="brand-row"><span class="brand-row-name">RYDERWEAR</span></li>
+    </ol>
   </div>
 </div>
 
-<!-- ═══ TRUST BADGES ═══ -->
-<section class="trust-band">
-  <div class="container">
-    <div class="trust-grid">
-      <div class="trust-item reveal">
-        <div class="trust-icon">
-          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c2.04 0 3.92.68 5.43 1.83"/></svg>
-        </div>
-        <div class="trust-text">
-          <span class="trust-title">100% Originales</span>
-          <span class="trust-desc">Comprados directo en tiendas oficiales USA</span>
-        </div>
-      </div>
-      <div class="trust-item reveal" style="transition-delay:0.08s">
-        <div class="trust-icon">
-          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
-        </div>
-        <div class="trust-text">
-          <span class="trust-title">Stock en CR</span>
-          <span class="trust-desc">Productos listos para envío inmediato</span>
-        </div>
-      </div>
-      <div class="trust-item reveal" style="transition-delay:0.16s">
-        <div class="trust-icon">
-          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M16 3h5v5"/><path d="M8 21H3v-5"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>
-        </div>
-        <div class="trust-text">
-          <span class="trust-title">Envío Nacional</span>
-          <span class="trust-desc">A todo Costa Rica vía Correos CR</span>
-        </div>
-      </div>
-      <div class="trust-item reveal" style="transition-delay:0.24s">
-        <div class="trust-icon">
-          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20"/><path d="M7 15h2"/></svg>
-        </div>
-        <div class="trust-text">
-          <span class="trust-title">SINPE / Transferencia</span>
-          <span class="trust-desc">Pagos seguros, sin comisiones extra</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+<!-- (trust band moved: now sits right before #stock, where reassurance
+     meets purchase intent — brands → drops keeps credibility → urgency tight) -->
 
 <!-- ═══ DROPS SLIDER ═══ -->
 <section class="drops-section" id="drops">
@@ -11683,22 +11766,8 @@ window.gsapReady(function(){
   </div>
 </section>
 
-<!-- ═══ RECENTLY VIEWED ═══ -->
-<section class="recent-section" id="recent-viewed-section" aria-label="Vistos recientemente">
-  <div class="container">
-    <div class="recent-header">
-      <div class="recent-header-left">
-        <div class="recent-eyebrow">
-          <span class="recent-eyebrow-line"></span>
-          <span data-i18n="recentEyebrow">Vistos recientemente</span>
-        </div>
-        <h2 class="recent-title" data-i18n="recentTitle">Continuá donde quedaste</h2>
-      </div>
-      <button type="button" class="recent-clear" onclick="clearRecentViewed()" data-i18n="recentClear">Borrar historial</button>
-    </div>
-    <div class="recent-strip" id="recent-strip"></div>
-  </div>
-</section>
+<!-- (recently-viewed moved below testimonios — it renders only with real
+     history and no longer sits between education and the product grid) -->
 
 <!-- Product Modal — LUXURY -->
 <div id="prod-modal" class="luxury-modal">
@@ -11853,6 +11922,50 @@ window.gsapReady(function(){
 
 <div class="divider"></div>
 
+<!-- ═══ TRUST BADGES — repositioned to the conversion point ═══ -->
+<section class="trust-band">
+  <div class="container">
+    <div class="trust-grid">
+      <div class="trust-item reveal">
+        <div class="trust-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4"/><path d="M21 12c0 4.97-4.03 9-9 9s-9-4.03-9-9 4.03-9 9-9c2.04 0 3.92.68 5.43 1.83"/></svg>
+        </div>
+        <div class="trust-text">
+          <span class="trust-title">100% Originales</span>
+          <span class="trust-desc">Comprados directo en tiendas oficiales USA</span>
+        </div>
+      </div>
+      <div class="trust-item reveal" style="transition-delay:0.08s">
+        <div class="trust-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+        </div>
+        <div class="trust-text">
+          <span class="trust-title">Stock en CR</span>
+          <span class="trust-desc">Productos listos para envío inmediato</span>
+        </div>
+      </div>
+      <div class="trust-item reveal" style="transition-delay:0.16s">
+        <div class="trust-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><path d="M16 3h5v5"/><path d="M8 21H3v-5"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>
+        </div>
+        <div class="trust-text">
+          <span class="trust-title">Envío Nacional</span>
+          <span class="trust-desc">A todo Costa Rica vía Correos CR</span>
+        </div>
+      </div>
+      <div class="trust-item reveal" style="transition-delay:0.24s">
+        <div class="trust-icon">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20"/><path d="M7 15h2"/></svg>
+        </div>
+        <div class="trust-text">
+          <span class="trust-title">SINPE / Transferencia</span>
+          <span class="trust-desc">Pagos seguros, sin comisiones extra</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ═══ PRODUCTS — EDITORIAL DROP ═══ -->
 <section class="products-section editorial-drop" id="stock">
   <div class="container">
@@ -11971,31 +12084,7 @@ window.gsapReady(function(){
 
 </section>
 
-<!-- ═══ CTA BAND ═══ -->
-<div class="cta-band">
-  <span class="cta-corner tl" aria-hidden="true"></span>
-  <span class="cta-corner tr" aria-hidden="true"></span>
-  <span class="cta-corner bl" aria-hidden="true"></span>
-  <span class="cta-corner br" aria-hidden="true"></span>
-  <span class="cta-scan" aria-hidden="true"></span>
-  <div class="cta-ghost" aria-hidden="true">DESMOSMIND</div>
-  <div class="container cta-band-inner">
-    <span class="cta-band-eyebrow">PEDIDOS A LA MEDIDA · IMPORT ON DEMAND</span>
-    <h2 class="cta-band-title" id="cta-title-text">¿Querés algo<br><em>específico?</em></h2>
-    <p class="cta-band-sub" id="cta-sub-text">YoungLA · Gymshark · Darc Sport · Breath The Divinity · Alphalete<br>Traemos lo que sea — directo desde USA a Costa Rica.</p>
-    <div class="cta-actions">
-      <a href="https://wa.me/50685946741?text=Hola!%20Quiero%20hacer%20un%20encargo%20personalizado%20a%20DESMOSMIND" target="_blank" rel="noopener" class="btn-white cta-band-btn">
-        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-        Hacer mi encargo
-        <span class="cta-band-btn-arrow" aria-hidden="true">→</span>
-      </a>
-      <span class="cta-band-trust">
-        <span class="cta-trust-dot" aria-hidden="true"></span>
-        Respondemos en menos de 1 hora
-      </span>
-    </div>
-  </div>
-</div>
+<!-- (CTA band moved below testimonios: products → proof → push) -->
 
 <!-- ═══ TESTIMONIALS ═══ -->
 <section class="testimonials" id="testimonios">
@@ -12044,6 +12133,49 @@ window.gsapReady(function(){
         <p class="test-text">"La creatina Optimum Nutrition llegó súper rápido desde su stock. Definitivamente ya no compro en ningún otro lado mi suplementación."</p>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- ═══ CTA BAND — the push, right after the proof ═══ -->
+<div class="cta-band">
+  <span class="cta-corner tl" aria-hidden="true"></span>
+  <span class="cta-corner tr" aria-hidden="true"></span>
+  <span class="cta-corner bl" aria-hidden="true"></span>
+  <span class="cta-corner br" aria-hidden="true"></span>
+  <span class="cta-scan" aria-hidden="true"></span>
+  <div class="cta-ghost" aria-hidden="true">DESMOSMIND</div>
+  <div class="container cta-band-inner">
+    <span class="cta-band-eyebrow">PEDIDOS A LA MEDIDA · IMPORT ON DEMAND</span>
+    <h2 class="cta-band-title" id="cta-title-text">¿Querés algo<br><em>específico?</em></h2>
+    <p class="cta-band-sub" id="cta-sub-text">YoungLA · Gymshark · Darc Sport · Breath The Divinity · Alphalete<br>Traemos lo que sea — directo desde USA a Costa Rica.</p>
+    <div class="cta-actions">
+      <a href="https://wa.me/50685946741?text=Hola!%20Quiero%20hacer%20un%20encargo%20personalizado%20a%20DESMOSMIND" target="_blank" rel="noopener" class="btn-white cta-band-btn">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        Hacer mi encargo
+        <span class="cta-band-btn-arrow" aria-hidden="true">→</span>
+      </a>
+      <span class="cta-band-trust">
+        <span class="cta-trust-dot" aria-hidden="true"></span>
+        Respondemos en menos de 1 hora
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ RECENTLY VIEWED (secondary strip — renders only with history) ═══ -->
+<section class="recent-section" id="recent-viewed-section" aria-label="Vistos recientemente">
+  <div class="container">
+    <div class="recent-header">
+      <div class="recent-header-left">
+        <div class="recent-eyebrow">
+          <span class="recent-eyebrow-line"></span>
+          <span data-i18n="recentEyebrow">Vistos recientemente</span>
+        </div>
+        <h2 class="recent-title" data-i18n="recentTitle">Continuá donde quedaste</h2>
+      </div>
+      <button type="button" class="recent-clear" onclick="clearRecentViewed()" data-i18n="recentClear">Borrar historial</button>
+    </div>
+    <div class="recent-strip" id="recent-strip"></div>
   </div>
 </section>
 
@@ -12925,12 +13057,15 @@ function applySiteContent(){
 }
 
 function renderMarquee(){
-  const track = document.getElementById('marquee');
-  if(!track || !siteBrands.length) return;
-  // Need enough copies so the track width >> viewport width for seamless -50% loop
-  const copies = [...siteBrands,...siteBrands,...siteBrands,...siteBrands,...siteBrands,...siteBrands,...siteBrands,...siteBrands];
-  const items = copies.map(b=>`<span class="brand-item">${b.name}</span><span class="brand-sep">✦</span>`).join('');
-  track.innerHTML = items;
+  // Brand roll-call: one giant typographic row per brand, lit in
+  // sequence by scroll (armBrandRoll). Replaces the old infinite
+  // equal-weight marquee loop.
+  const roll = document.getElementById('marquee');
+  if(!roll || !siteBrands.length) return;
+  roll.innerHTML = siteBrands.map(b =>
+    `<li class="brand-row"><span class="brand-row-name">${b.name}</span></li>`
+  ).join('');
+  if (typeof window.armBrandRoll === 'function') window.armBrandRoll();
 }
 
 // ════════════════════════════════════
@@ -19578,25 +19713,66 @@ document.addEventListener('DOMContentLoaded', () => {
     // hero's CSS keyframes don't own (content container transform/alpha,
     // bat OPACITY only — svgFloat owns its transform, svgGlow its filter).
     // Mobile keeps the untouched static hero (no pin under 900px).
+    // REDESIGNED (premium pass): the WORDMARK is the doorway. Supporting
+    // cast (sub/tagline/btns/stats, bat, particles) recedes early; the
+    // title scales up massively through the viewport while its glitch
+    // layers keep firing, then fades into the black. ALL motion settles
+    // by 70% of the timeline — the last 30% of pinned scroll is a frozen
+    // buffer, so releasing the pin is imperceptible (the Apple technique:
+    // nothing may be visibly changing at the release point). Children's
+    // opacity is driven by the .hero-departing class (author !important
+    // beats the entrance animations' fill), the container owns transform.
     const heroEl = document.querySelector('.hero');
     const heroContentEl = document.querySelector('.hero-content');
     if (heroEl && heroContentEl) {
+      const setDeparting = (self) => {
+        heroEl.classList.toggle('hero-departing', self.progress > 0.06);
+      };
       const mmHero = gsap.matchMedia();
       mmHero.add('(min-width: 900px)', () => {
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: heroEl,
             start: 'top top',
-            end: '+=55%',
+            end: '+=130%',
             scrub: 0.6,
             pin: true,
-            anticipatePin: 1
+            anticipatePin: 1,
+            onUpdate: setDeparting
           }
         });
-        tl.to('.scroll-hint', { autoAlpha: 0, duration: 0.25 }, 0);
-        tl.to(heroContentEl, { yPercent: -16, autoAlpha: 0, duration: 1, ease: 'none' }, 0);
-        tl.to('.hero-bat-svg', { opacity: 0.3, duration: 1, ease: 'none' }, 0);
-        tl.to('#hero-particles', { opacity: 0.15, duration: 1, ease: 'none' }, 0);
+        tl.to('.scroll-hint', { autoAlpha: 0, duration: 0.06, ease: 'none' }, 0);
+        tl.to('.hero-bat-svg', { opacity: 0.18, duration: 0.5, ease: 'power1.inOut' }, 0.04);
+        tl.to('#hero-particles', { opacity: 0.08, duration: 0.5, ease: 'power1.inOut' }, 0.04);
+        // The wordmark grows through the frame — power3.out means the
+        // drama happens early and velocity is ~0 approaching the buffer.
+        tl.to(heroContentEl, {
+          scale: 9, transformOrigin: '50% 42%', ease: 'power3.out', duration: 0.7
+        }, 0);
+        tl.to(heroContentEl, { autoAlpha: 0, ease: 'power1.inOut', duration: 0.24 }, 0.46);
+        // 0.70 → 1.00: settle buffer. Nothing tweens; the pin holds a
+        // frozen frame for ~39vh of scroll before releasing.
+        tl.to({}, { duration: 0.3 }, 0.7);
+      });
+      mmHero.add('(max-width: 899px)', () => {
+        // Mobile: same typographic departure, scrubbed WITHOUT a pin as
+        // the hero scrolls away naturally. Subtler scale (small screens
+        // magnify blur), same star.
+        const tlm = gsap.timeline({
+          scrollTrigger: {
+            trigger: heroEl,
+            start: 'top top',
+            end: 'bottom 25%',
+            scrub: 0.5,
+            onUpdate: setDeparting
+          }
+        });
+        tlm.to('.scroll-hint', { autoAlpha: 0, duration: 0.08, ease: 'none' }, 0);
+        tlm.to('.hero-bat-svg', { opacity: 0.22, duration: 0.5, ease: 'power1.inOut' }, 0.05);
+        tlm.to(heroContentEl, {
+          scale: 3.2, transformOrigin: '50% 40%', ease: 'power3.out', duration: 0.75
+        }, 0);
+        tlm.to(heroContentEl, { autoAlpha: 0, ease: 'power1.inOut', duration: 0.25 }, 0.5);
       });
     }
 
@@ -19620,6 +19796,30 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(function(){
       try { if (window.ScrollTrigger) ScrollTrigger.refresh(); } catch(e){}
     }, 400);
+
+    // ── 47.17 BRAND ROLL-CALL — scroll-lit lineup (non-pin scrub) ──
+    // Each imported brand gets its own giant typographic row; rows fill
+    // from ghost outline to bone white in sequence as the band crosses
+    // the viewport. Exposed as window.armBrandRoll so renderMarquee can
+    // re-arm after Supabase re-renders the list. Static default (no JS /
+    // reduced motion): all rows solid — .brands-armed hands over control.
+    window.armBrandRoll = function(){
+      const band = document.querySelector('.brands-band');
+      const rows = gsap.utils.toArray('.brand-row');
+      if (!band || !rows.length) return;
+      if (window._brandRollST) { try { window._brandRollST.kill(); } catch(e){} window._brandRollST = null; }
+      band.classList.add('brands-armed');
+      window._brandRollST = ScrollTrigger.create({
+        trigger: band, start: 'top 80%', end: 'bottom 62%', scrub: 0.4,
+        onUpdate(self){
+          const p = self.progress;
+          rows.forEach((row, i) => {
+            row.classList.toggle('on', p >= (i + 0.35) / rows.length);
+          });
+        }
+      });
+    };
+    window.armBrandRoll();
 
     // ── 47.15 Piezas counter — scroll-scrubbed count-up ──
     // Real stat (#drop-meta-count = live products.length). Non-pin scrub;
