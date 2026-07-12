@@ -11309,7 +11309,53 @@ section + section::before,
 .hk-p2,
 .hk-p3,
 .hk-p4 { font-size: clamp(2.6rem, 8vw, 7rem); }
-.hk-p4half { display: inline-block; }
+/* Editorial confidence at rest: settled phrases breathe — size does the
+   work; the loud treatment lives in the transitions only. */
+.hk-p2, .hk-p3, .hk-p4 { letter-spacing: 0.09em; line-height: 1.12; }
+
+/* Correction reveal (phrase 4): a ghost "draft" gets struck through in
+   red, then the true version stamps over it. */
+.hk-p4 { position: absolute; }
+.hk-p4draft {
+  position: relative;
+  display: inline-block;
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(240,236,228,0.38);
+}
+.hk-strike {
+  position: absolute;
+  left: -2%;
+  right: -2%;
+  top: 50%;
+  height: 3px;
+  margin-top: -1.5px;
+  background: var(--red);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+.hk-p4true {
+  position: absolute;
+  inset: 0;
+  display: inline-block;
+  color: var(--white);
+}
+
+/* Fractional journey counter — bymonolog-style progress marker in the
+   Desmos palette: red current index, bone total. Text swaps only; the
+   element itself never animates beyond the stage's own opacity. */
+.hk-counter {
+  position: absolute;
+  bottom: 8%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.34em;
+  color: rgba(240,236,228,0.55);
+}
+.hk-idx { color: var(--red); }
+.hk-counter-sep { margin: 0 0.45em; }
 /* ── Kinetic backdrop: breathing blood glow (same 4s rhythm as
    mind-breathe), plus a slow scanline drift. Pure gradients +
    transform-only motion — renders identically on mobile. */
@@ -11640,7 +11686,8 @@ window.gsapReady(function(){
     <h2 class="hk-phrase hk-p1">DESMOS<span class="hk-red">MIND</span></h2>
     <p class="hk-phrase hk-p2">ENTRENA <span class="hk-red">DURO</span></p>
     <p class="hk-phrase hk-p3">DOMINA LA <span class="hk-red">OSCURIDAD</span></p>
-    <p class="hk-phrase hk-p4"><span class="hk-p4half hk-p4l">DEFINE&nbsp;</span><span class="hk-p4half hk-p4r">TU <span class="hk-red">CALLE</span></span></p>
+    <p class="hk-phrase hk-p4"><span class="hk-p4draft">DEFINE TU CALLE<i class="hk-strike" aria-hidden="true"></i></span><span class="hk-p4true">DEFINE TU <span class="hk-red">CALLE</span></span></p>
+    <div class="hk-counter"><span class="hk-idx" id="hk-idx">01</span><span class="hk-counter-sep">/</span><span class="hk-counter-total">04</span></div>
   </div>
 
   <!-- (gap spacer lives right after the hero — see .hero-gap below) -->
@@ -19868,8 +19915,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const heroEl = document.querySelector('.hero');
     const heroContentEl = document.querySelector('.hero-content');
     if (heroEl && heroContentEl) {
+      // onUpdate driver: departing class + the fractional journey
+      // counter. The counter is a guarded text swap (writes only when
+      // the phrase index actually changes — nothing animates per tick).
+      const hkIdxEl = document.getElementById('hk-idx');
+      let hkCurIdx = 0;
       const setDeparting = (self) => {
         heroEl.classList.toggle('hero-departing', self.progress > 0.06);
+        if (hkIdxEl) {
+          const p = self.progress;
+          const idx = p < 0.31 ? 1 : p < 0.52 ? 2 : p < 0.705 ? 3 : 4;
+          if (idx !== hkCurIdx) { hkCurIdx = idx; hkIdxEl.textContent = '0' + idx; }
+        }
       };
       // MULTI-PHRASE KINETIC BUILD (this pass): one pin, two phrases.
       // Four-phrase zoom-through (take 4): ZOOM → IMPACT SLAM → 3D FLIP
@@ -19884,14 +19941,17 @@ document.addEventListener('DOMContentLoaded', () => {
       const P2  = document.querySelector('.hk-p2');
       const P3  = document.querySelector('.hk-p3');
       const P4  = document.querySelector('.hk-p4');
-      const P4L = document.querySelector('.hk-p4l');
-      const P4R = document.querySelector('.hk-p4r');
+      const P4D = document.querySelector('.hk-p4draft');
+      const P4T = document.querySelector('.hk-p4true');
+      const P4S = document.querySelector('.hk-strike');
       const armKinetic = (zoomFrom) => {
         gsap.set(P1,  { scale: zoomFrom, autoAlpha: 0 });
         gsap.set(P2,  { xPercent: -220, skewX: 12, scale: 1.05, autoAlpha: 0 });
         gsap.set(P3,  { rotationY: -92, transformPerspective: 900, autoAlpha: 0 });
-        gsap.set(P4L, { xPercent: -260, autoAlpha: 0 });
-        gsap.set(P4R, { xPercent: 260,  autoAlpha: 0 });
+        gsap.set(P4,  { autoAlpha: 0 });
+        gsap.set(P4D, { y: 22, autoAlpha: 0 });
+        gsap.set(P4S, { scaleX: 0 });
+        gsap.set(P4T, { scale: 1.12, autoAlpha: 0 });
       };
       // will-change held ONLY while a phrase is actively animating.
       const wcWindow = (tl, el, from, to) => {
@@ -19934,16 +19994,18 @@ document.addEventListener('DOMContentLoaded', () => {
         tl.to(P3, { rotationY: 0, duration: 0.10, ease: 'power2.out' }, 0.52);
         tl.to(P3, { rotationY: 18, autoAlpha: 0, duration: 0.04, ease: 'power2.in' }, 0.66);
 
-        // PHRASE 4 — DEFINE TU CALLE: SPLIT-CONVERGE. Two halves from
-        // opposite edges meet at center (power4.out = decisive landing),
-        // sealed with a single unified 1.03→1 settle pulse. All motion
-        // ends at 0.78 — the rest of the pin is the frozen settle buffer.
-        wcWindow(tl, P4L, 0.70, 0.79);
-        wcWindow(tl, P4R, 0.70, 0.79);
-        tl.to([P4L, P4R], { autoAlpha: 1, duration: 0.02, ease: 'none' }, 0.705);
-        tl.to(P4L, { xPercent: 0, duration: 0.05, ease: 'power4.out' }, 0.705);
-        tl.to(P4R, { xPercent: 0, duration: 0.05, ease: 'power4.out' }, 0.705);
-        tl.fromTo(P4, { scale: 1.03 }, { scale: 1, duration: 0.02, ease: 'power2.out' }, 0.76);
+        // PHRASE 4 — DEFINE TU CALLE: CORRECTION REVEAL. A ghost-outline
+        // "draft" of the line rises, a red strike slashes through it,
+        // then the TRUE version stamps over it (power4.out, 1.12→1) as
+        // the draft dims behind — the sequence closes on the corrected
+        // truth, frozen through the settle buffer. All motion ends 0.775.
+        wcWindow(tl, P4D, 0.70, 0.79);
+        wcWindow(tl, P4T, 0.70, 0.79);
+        tl.to(P4, { autoAlpha: 1, duration: 0.01, ease: 'none' }, 0.70);
+        tl.to(P4D, { y: 0, autoAlpha: 1, duration: 0.02, ease: 'power2.out' }, 0.70);
+        tl.to(P4S, { scaleX: 1, duration: 0.02, ease: 'power1.inOut' }, 0.725);
+        tl.to(P4T, { scale: 1, autoAlpha: 1, duration: 0.03, ease: 'power4.out' }, 0.748);
+        tl.to(P4D, { autoAlpha: 0.16, duration: 0.025, ease: 'power1.out' }, 0.748);
 
         // 0.78 → 1.00: settle buffer. Frozen final frame until release.
         tl.to({}, { duration: 0.22 }, 0.78);
