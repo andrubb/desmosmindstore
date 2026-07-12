@@ -11306,12 +11306,11 @@ section + section::before,
 }
 .hk-red { color: var(--red); }   /* static color — no animated shadow/filter */
 .hk-p1 { font-size: clamp(4.2rem, 13.5vw, 12rem); }
-.hk-p2,
 .hk-p3,
-.hk-p4 { font-size: clamp(2.6rem, 8vw, 7rem); }
-/* Editorial confidence at rest: settled phrases breathe — size does the
-   work; the loud treatment lives in the transitions only. */
-.hk-p2, .hk-p3, .hk-p4 { letter-spacing: 0.09em; line-height: 1.12; }
+.hk-p4 { font-size: clamp(3rem, 9vw, 8rem); }
+/* Editorial confidence at rest (take 6): enormous type, generous air —
+   the size and the silence around it do the work. */
+.hk-p3, .hk-p4 { letter-spacing: 0.12em; line-height: 1.2; }
 
 /* Correction reveal (phrase 4): a ghost "draft" gets struck through in
    red, then the true version stamps over it. */
@@ -11340,52 +11339,8 @@ section + section::before,
   color: var(--white);
 }
 
-/* Fractional journey counter — bymonolog-style progress marker in the
-   Desmos palette: red current index, bone total. Text swaps only; the
-   element itself never animates beyond the stage's own opacity. */
-.hk-counter {
-  position: absolute;
-  bottom: 8%;
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: var(--font-body);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.34em;
-  color: rgba(240,236,228,0.55);
-}
-.hk-idx { color: var(--red); }
-.hk-counter-sep { margin: 0 0.45em; }
-/* ── Kinetic backdrop: breathing blood glow (same 4s rhythm as
-   mind-breathe), plus a slow scanline drift. Pure gradients +
-   transform-only motion — renders identically on mobile. */
-.hk-bg { position: absolute; inset: 0; pointer-events: none; }
-.hk-glow {
-  position: absolute;
-  inset: -12%;
-  background: radial-gradient(ellipse 56% 44% at 50% 50%,
-    rgba(220,17,17,0.17),
-    rgba(220,17,17,0.055) 46%,
-    transparent 72%);
-  animation: hkGlowBreathe 4s ease-in-out infinite;
-}
-@keyframes hkGlowBreathe {
-  0%, 100% { opacity: 0.55; transform: scale(1); }
-  50%      { opacity: 1;    transform: scale(1.07); }
-}
-.hk-scan {
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(to bottom,
-    rgba(240,236,228,0.03) 0 1px,
-    transparent 1px 5px);
-  opacity: 0.55;
-  animation: hkScanDrift 8s linear infinite;
-}
-@keyframes hkScanDrift {
-  from { transform: translateY(0); }
-  to   { transform: translateY(5px); }   /* pattern period → seamless */
-}
+/* (take 6: fractional counter + glow/scanline backdrop removed — near-
+   total empty black; the hero's faint static noise is the only texture) */
 
 /* Breathing room after the pinned hero, before the brand roll-call —
    pure black; nothing renders here by design. */
@@ -11395,7 +11350,7 @@ section + section::before,
   /* The mobile loud-moments block caps every h2 with !important —
      the kinetic wordmark must stay huge (it IS the moment). */
   .hk-p1 { font-size: clamp(3.6rem, 17vw, 5.5rem) !important; }
-  .hk-p2, .hk-p3, .hk-p4 { font-size: clamp(2rem, 9.5vw, 3.4rem) !important; }
+  .hk-p3, .hk-p4 { font-size: clamp(2.2rem, 11vw, 3.8rem) !important; }
   .hero-gap { height: 30svh; }
 }
 
@@ -11677,17 +11632,16 @@ window.gsapReady(function(){
        Decorative duplicate (real h1 stays for a11y/SEO); hidden until
        GSAP arms it, so no-JS / reduced-motion visitors never see it. -->
   <div class="hero-kinetic" aria-hidden="true">
-    <div class="hk-bg">
-      <div class="hk-glow"></div>
-      <div class="hk-scan"></div>
-    </div>
+    <!-- (backdrop removed — take 6: the emptiness is the point; the
+         hero's own faint static noise layer is the only texture) -->
     <!-- Four-phrase zoom-through. Word/phrase-level nodes only — no
          per-letter fragmentation; every tween is transform/opacity. -->
     <h2 class="hk-phrase hk-p1">DESMOS<span class="hk-red">MIND</span></h2>
-    <p class="hk-phrase hk-p2">ENTRENA <span class="hk-red">DURO</span></p>
+    <!-- (ENTRENA DURO / slam retired — take 6 runs three unhurried beats) -->
     <p class="hk-phrase hk-p3">DOMINA LA <span class="hk-red">OSCURIDAD</span></p>
     <p class="hk-phrase hk-p4"><span class="hk-p4draft">DEFINE TU CALLE<i class="hk-strike" aria-hidden="true"></i></span><span class="hk-p4true">DEFINE TU <span class="hk-red">CALLE</span></span></p>
-    <div class="hk-counter"><span class="hk-idx" id="hk-idx">01</span><span class="hk-counter-sep">/</span><span class="hk-counter-total">04</span></div>
+    <!-- (fractional counter removed — take 6: gamified progress fought
+         the calm editorial confidence) -->
   </div>
 
   <!-- (gap spacer lives right after the hero — see .hero-gap below) -->
@@ -19918,27 +19872,15 @@ document.addEventListener('DOMContentLoaded', () => {
       // onUpdate driver: departing class + the fractional journey
       // counter. The counter is a guarded text swap (writes only when
       // the phrase index actually changes — nothing animates per tick).
-      const hkIdxEl = document.getElementById('hk-idx');
-      let hkCurIdx = 0;
       const setDeparting = (self) => {
-        heroEl.classList.toggle('hero-departing', self.progress > 0.06);
-        if (hkIdxEl) {
-          const p = self.progress;
-          const idx = p < 0.31 ? 1 : p < 0.52 ? 2 : p < 0.705 ? 3 : 4;
-          if (idx !== hkCurIdx) { hkCurIdx = idx; hkIdxEl.textContent = '0' + idx; }
-        }
+        heroEl.classList.toggle('hero-departing', self.progress > 0.04);
       };
-      // MULTI-PHRASE KINETIC BUILD (this pass): one pin, two phrases.
-      // Four-phrase zoom-through (take 4): ZOOM → IMPACT SLAM → 3D FLIP
-      // → SPLIT-CONVERGE, each fully resolving before the next. ALL
-      // motion settles by 78% of the timeline; the remaining 22% is the
-      // frozen settle buffer, so the release stays imperceptible.
+      // TAKE 6 — radical simplification: THREE unhurried beats on near-
+      // total empty black. No backdrop, no counter, no slam/flip. Size
+      // and silence do the work (bymonolog's feel, Desmos's identity).
+      // Word-level nodes only; every tween is transform/opacity.
       const kinetic = document.querySelector('.hero-kinetic');
-      // TAKE 4 — four word-level phrase nodes. No per-letter
-      // fragmentation, and every tween below animates ONLY
-      // transform (scale/translate/skew/rotate) and opacity.
       const P1  = document.querySelector('.hk-p1');
-      const P2  = document.querySelector('.hk-p2');
       const P3  = document.querySelector('.hk-p3');
       const P4  = document.querySelector('.hk-p4');
       const P4D = document.querySelector('.hk-p4draft');
@@ -19946,69 +19888,56 @@ document.addEventListener('DOMContentLoaded', () => {
       const P4S = document.querySelector('.hk-strike');
       const armKinetic = (zoomFrom) => {
         gsap.set(P1,  { scale: zoomFrom, autoAlpha: 0 });
-        gsap.set(P2,  { xPercent: -220, skewX: 12, scale: 1.05, autoAlpha: 0 });
-        gsap.set(P3,  { rotationY: -92, transformPerspective: 900, autoAlpha: 0 });
+        gsap.set(P3,  { scale: 0.96, autoAlpha: 0 });
         gsap.set(P4,  { autoAlpha: 0 });
-        gsap.set(P4D, { y: 22, autoAlpha: 0 });
+        gsap.set(P4D, { y: 18, autoAlpha: 0 });
         gsap.set(P4S, { scaleX: 0 });
-        gsap.set(P4T, { scale: 1.12, autoAlpha: 0 });
+        gsap.set(P4T, { scale: 1.1, autoAlpha: 0 });
       };
       // will-change held ONLY while a phrase is actively animating.
       const wcWindow = (tl, el, from, to) => {
         tl.set(el, { willChange: 'transform, opacity' }, from);
         tl.set(el, { willChange: 'auto' }, to);
       };
-      // One shared phase map (desktop + mobile use the same generous
-      // spread; only zoom depth differs). Each phrase fully resolves
-      // before the next begins — clean cuts, no mechanic overlap.
+      // Shared phase map. Beats fully resolve, then HOLD — the holds ARE
+      // the design. All motion ends at 0.775; the rest is settle buffer.
+      // Easing capped at power3: weighted and considered, never snappy.
       const buildPhases = (tl, zoomMax) => {
         tl.to('.scroll-hint', { autoAlpha: 0, duration: 0.05, ease: 'none' }, 0);
-        tl.to(heroContentEl, { autoAlpha: 0, duration: 0.07, ease: 'power1.in' }, 0.02);
-        tl.to('.hero-bat-svg', { opacity: 0.14, duration: 0.3, ease: 'power1.inOut' }, 0.02);
-        // Backdrop amplification is OPACITY-ONLY (no filter animation —
-        // the take-3 brightness/saturate tween was part of the lag class).
-        tl.to('#hero-particles', { opacity: 1, duration: 0.12, ease: 'none' }, 0.03);
+        tl.to(heroContentEl, { autoAlpha: 0, duration: 0.08, ease: 'power1.inOut' }, 0.02);
+        // Near-total empty black: the supporting cast doesn't dim — it leaves.
+        tl.to('.hero-bat-svg', { opacity: 0.06, duration: 0.3, ease: 'power1.inOut' }, 0.02);
+        tl.to('#hero-particles', { opacity: 0.04, duration: 0.3, ease: 'power1.inOut' }, 0.02);
         tl.to(kinetic, { autoAlpha: 1, duration: 0.04, ease: 'none' }, 0.05);
 
-        // PHRASE 1 — DESMOSMIND: ZOOM. A steady accelerating camera-push
-        // (power1.in reads as continuous approach under scrub), then a
-        // cross-dissolve out at full frame.
-        wcWindow(tl, P1, 0.06, 0.30);
-        tl.to(P1, { autoAlpha: 1, duration: 0.04, ease: 'none' }, 0.07);
-        tl.to(P1, { scale: zoomMax, duration: 0.20, ease: 'power1.in' }, 0.07);
-        tl.to(P1, { autoAlpha: 0, duration: 0.05, ease: 'power1.out' }, 0.24);
+        // BEAT 1 — DESMOSMIND: the approved zoom, slowed. One continuous
+        // unhurried approach (power1.in under scrub), long dissolve out.
+        wcWindow(tl, P1, 0.06, 0.36);
+        tl.to(P1, { autoAlpha: 1, duration: 0.05, ease: 'none' }, 0.07);
+        tl.to(P1, { scale: zoomMax, duration: 0.26, ease: 'power1.in' }, 0.07);
+        tl.to(P1, { autoAlpha: 0, duration: 0.06, ease: 'power1.out' }, 0.29);
 
-        // PHRASE 2 — ENTRENA DURO: IMPACT SLAM. Arrives at full speed
-        // (power3.in = no easing-out glide), then a sharp two-step snap:
-        // skew and scale release with power4.out — impact, not glide.
-        wcWindow(tl, P2, 0.30, 0.51);
-        tl.to(P2, { autoAlpha: 1, duration: 0.02, ease: 'none' }, 0.31);
-        tl.to(P2, { xPercent: 0, duration: 0.055, ease: 'power3.in' }, 0.31);
-        tl.to(P2, { skewX: 0, scale: 1, duration: 0.035, ease: 'power4.out' }, 0.365);
-        tl.to(P2, { xPercent: 40, autoAlpha: 0, duration: 0.04, ease: 'power2.in' }, 0.46);
+        // BEAT 2 — DOMINA LA OSCURIDAD: a quiet, weighted settle. It
+        // simply arrives (0.96→1 + fade, power2.out) and then HOLDS in
+        // empty space — the silence 0.47→0.56 is the beat.
+        wcWindow(tl, P3, 0.37, 0.62);
+        tl.to(P3, { autoAlpha: 1, scale: 1, duration: 0.09, ease: 'power2.out' }, 0.38);
+        tl.to(P3, { autoAlpha: 0, duration: 0.055, ease: 'power1.inOut' }, 0.56);
 
-        // PHRASE 3 — DOMINA LA OSCURIDAD: 3D FLIP REVEAL. Card turns to
-        // face the viewer on its Y axis — smooth cinematic power2.out.
-        wcWindow(tl, P3, 0.51, 0.71);
-        tl.to(P3, { autoAlpha: 1, duration: 0.04, ease: 'none' }, 0.52);
-        tl.to(P3, { rotationY: 0, duration: 0.10, ease: 'power2.out' }, 0.52);
-        tl.to(P3, { rotationY: 18, autoAlpha: 0, duration: 0.04, ease: 'power2.in' }, 0.66);
+        // BEAT 3 — DEFINE TU CALLE: the correction reveal (kept), slowed
+        // to match. Draft rises and breathes, the strike draws, a pause,
+        // then the truth settles over it — power3.out, weighted, not
+        // stamped. Ends 0.775; the corrected line holds to release.
+        wcWindow(tl, P4D, 0.63, 0.78);
+        wcWindow(tl, P4T, 0.63, 0.78);
+        tl.to(P4, { autoAlpha: 1, duration: 0.01, ease: 'none' }, 0.63);
+        tl.to(P4D, { y: 0, autoAlpha: 1, duration: 0.045, ease: 'power2.out' }, 0.63);
+        tl.to(P4S, { scaleX: 1, duration: 0.035, ease: 'power1.inOut' }, 0.685);
+        tl.to(P4T, { scale: 1, autoAlpha: 1, duration: 0.045, ease: 'power3.out' }, 0.73);
+        tl.to(P4D, { autoAlpha: 0.14, duration: 0.04, ease: 'power1.out' }, 0.73);
 
-        // PHRASE 4 — DEFINE TU CALLE: CORRECTION REVEAL. A ghost-outline
-        // "draft" of the line rises, a red strike slashes through it,
-        // then the TRUE version stamps over it (power4.out, 1.12→1) as
-        // the draft dims behind — the sequence closes on the corrected
-        // truth, frozen through the settle buffer. All motion ends 0.775.
-        wcWindow(tl, P4D, 0.70, 0.79);
-        wcWindow(tl, P4T, 0.70, 0.79);
-        tl.to(P4, { autoAlpha: 1, duration: 0.01, ease: 'none' }, 0.70);
-        tl.to(P4D, { y: 0, autoAlpha: 1, duration: 0.02, ease: 'power2.out' }, 0.70);
-        tl.to(P4S, { scaleX: 1, duration: 0.02, ease: 'power1.inOut' }, 0.725);
-        tl.to(P4T, { scale: 1, autoAlpha: 1, duration: 0.03, ease: 'power4.out' }, 0.748);
-        tl.to(P4D, { autoAlpha: 0.16, duration: 0.025, ease: 'power1.out' }, 0.748);
-
-        // 0.78 → 1.00: settle buffer. Frozen final frame until release.
-        tl.to({}, { duration: 0.22 }, 0.78);
+        // 0.775 → 1.00: settle buffer. Frozen truth until release.
+        tl.to({}, { duration: 0.225 }, 0.775);
       };
       const mmHero = gsap.matchMedia();
       mmHero.add('(min-width: 900px)', () => {
@@ -20017,8 +19946,8 @@ document.addEventListener('DOMContentLoaded', () => {
           scrollTrigger: {
             trigger: heroEl,
             start: 'top top',
-            end: '+=300%',
-            scrub: 0.6,
+            end: '+=380%',
+            scrub: 0.7,
             pin: true,
             anticipatePin: 1,
             onUpdate: setDeparting
@@ -20027,10 +19956,10 @@ document.addEventListener('DOMContentLoaded', () => {
         buildPhases(tl, 6.2);
       });
       mmHero.add('(max-width: 899px)', () => {
-        // Mobile: same four mechanics over the hero's FULL scroll-away
-        // (~100svh) — identical phase map, gentler zoom depth so small
-        // screens don't blur. Counter-translate capped at 50% keeps the
-        // stage in frame through phrase 4. Still 0 pins on mobile.
+        // Mobile: same three beats over the hero's FULL scroll-away —
+        // identical phase map (no compression), gentler zoom depth so
+        // small screens don't blur. Counter-translate capped at 50%
+        // keeps the stage in frame. Still 0 pins on mobile.
         armKinetic(0.6);
         const tlm = gsap.timeline({
           scrollTrigger: {
