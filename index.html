@@ -11396,8 +11396,13 @@ section + section::before,
 @media (max-width: 767px) {
   /* The mobile loud-moments block caps every h2 with !important —
      the kinetic wordmark must stay huge (it IS the moment). */
-  .hk-p1 { font-size: clamp(3.6rem, 17vw, 5.5rem) !important; }
-  .hk-p3, .hk-p4 { font-size: clamp(2.2rem, 11vw, 3.8rem) !important; }
+  .hk-p1 { font-size: clamp(3.4rem, 16vw, 5rem) !important; }
+  /* The long multi-word phrases must fit ONE line at 375px — smaller size
+     + tighter tracking so "DOMINA LA OSCURIDAD" never clips at the edges. */
+  .hk-p3, .hk-p4 {
+    font-size: clamp(1.4rem, 6.4vw, 2.3rem) !important;
+    letter-spacing: 0.04em !important;
+  }
   .hero-gap { height: 30svh; }
 }
 
@@ -20044,21 +20049,26 @@ document.addEventListener('DOMContentLoaded', () => {
         buildPhases(tl);
       });
       mmHero.add('(max-width: 899px)', () => {
-        // Mobile: same three beats over the hero's FULL scroll-away —
-        // identical phase map (no compression). Shallower depth + tighter
-        // scatter so forward-projected letters never overflow a 375 frame.
-        // Counter-translate capped at 50% keeps the stage in frame. 0 pins.
+        // Mobile: PIN the hero too (this reuses the hero's single pin —
+        // viaje's pin is desktop-only via matchMedia, so mobile still runs
+        // at 1 pin, within budget). Pinning holds the kinetic stage dead-
+        // centre through all three beats and releases cleanly into the gap.
+        // The old non-pin counter-translate drifted Beats 2–3 out of view
+        // (it capped at 50% while scroll kept advancing) — that was the
+        // "no se ven las segundas animaciones" bug. Shallower depth +
+        // tighter scatter keep forward-projected letters inside the frame.
         armKinetic({ p1From: 0.86, zBack: -850, zFwd: 110, sc: 150 });
         const tlm = gsap.timeline({
           scrollTrigger: {
             trigger: heroEl,
             start: 'top top',
-            end: 'bottom top',
+            end: '+=320%',
             scrub: 0.7,
+            pin: true,
+            anticipatePin: 1,
             onUpdate: setDeparting
           }
         });
-        tlm.to(kinetic, { yPercent: 50, ease: 'none', duration: 0.5 }, 0);
         buildPhases(tlm);
       });
     }
