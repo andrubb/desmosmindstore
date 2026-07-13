@@ -11312,6 +11312,53 @@ section + section::before,
    the size and the silence around it do the work. */
 .hk-p3, .hk-p4 { letter-spacing: 0.12em; line-height: 1.2; }
 
+/* ── BEAT 1 (take 7): DESMOSMIND as a 3D letter constellation. The
+   phrase is a preserve-3d stage viewed through a real perspective; each
+   letter tumbles in Z-space and locks to the plane. Perspective lives
+   on the STAGE so all letters share one vanishing point (one coherent
+   scene, not per-letter mini-scenes). GPU transform only. */
+.hk-p1 {
+  transform-style: preserve-3d;
+  perspective: 900px;
+  perspective-origin: 50% 45%;
+}
+.hk-l {
+  display: inline-block;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;   /* tumbling letters never flash mirrored */
+}
+
+/* ── BEAT 2 (take 7): DOMINA LA OSCURIDAD behind a 3D door. The wrap is
+   a perspective stage; the text sits on the back plane, the .hk-door
+   panel covers it and swings open on the Y-axis (origin left). */
+.hk-p3wrap {
+  position: absolute;
+  transform-style: preserve-3d;
+  perspective: 1100px;
+}
+.hk-p3wrap .hk-p3 { position: relative; margin: 0; }
+.hk-door {
+  position: absolute;
+  left: -6%; right: -6%; top: -18%; bottom: -18%;
+  background: #050505;
+  transform-origin: left center;
+  backface-visibility: hidden;
+  will-change: transform;
+}
+/* Red backlight behind the revealed line — the glow-pulse is an OPACITY +
+   scale animation (no filter/box-shadow tween), so it stays inside the
+   transform/opacity discipline. */
+.hk-p3glow {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 120%; height: 260%;
+  transform: translate(-50%, -50%) translateZ(-60px);
+  background: radial-gradient(ellipse 50% 42% at 50% 50%,
+    rgba(220,17,17,0.55), rgba(220,17,17,0.14) 45%, transparent 72%);
+  opacity: 0;
+  pointer-events: none;
+}
+
 /* Correction reveal (phrase 4): a ghost "draft" gets struck through in
    red, then the true version stamps over it. */
 .hk-p4 { position: absolute; }
@@ -11636,9 +11683,13 @@ window.gsapReady(function(){
          hero's own faint static noise layer is the only texture) -->
     <!-- Four-phrase zoom-through. Word/phrase-level nodes only — no
          per-letter fragmentation; every tween is transform/opacity. -->
-    <h2 class="hk-phrase hk-p1">DESMOS<span class="hk-red">MIND</span></h2>
+    <h2 class="hk-phrase hk-p1"><span class="hk-l">D</span><span class="hk-l">E</span><span class="hk-l">S</span><span class="hk-l">M</span><span class="hk-l">O</span><span class="hk-l">S</span><span class="hk-l hk-red">M</span><span class="hk-l hk-red">I</span><span class="hk-l hk-red">N</span><span class="hk-l hk-red">D</span></h2>
     <!-- (ENTRENA DURO / slam retired — take 6 runs three unhurried beats) -->
-    <p class="hk-phrase hk-p3">DOMINA LA <span class="hk-red">OSCURIDAD</span></p>
+    <div class="hk-phrase hk-p3wrap">
+      <div class="hk-p3glow" aria-hidden="true"></div>
+      <p class="hk-p3">DOMINA LA <span class="hk-red">OSCURIDAD</span></p>
+      <div class="hk-door" aria-hidden="true"></div>
+    </div>
     <p class="hk-phrase hk-p4"><span class="hk-p4draft">DEFINE TU CALLE<i class="hk-strike" aria-hidden="true"></i></span><span class="hk-p4true">DEFINE TU <span class="hk-red">CALLE</span></span></p>
     <!-- (fractional counter removed — take 6: gamified progress fought
          the calm editorial confidence) -->
@@ -19881,18 +19932,39 @@ document.addEventListener('DOMContentLoaded', () => {
       // Word-level nodes only; every tween is transform/opacity.
       const kinetic = document.querySelector('.hero-kinetic');
       const P1  = document.querySelector('.hk-p1');
+      const hkLetters = gsap.utils.toArray('.hk-l');
+      const P3W = document.querySelector('.hk-p3wrap');
       const P3  = document.querySelector('.hk-p3');
+      const DOOR = document.querySelector('.hk-door');
+      const GLOW = document.querySelector('.hk-p3glow');
       const P4  = document.querySelector('.hk-p4');
       const P4D = document.querySelector('.hk-p4draft');
       const P4T = document.querySelector('.hk-p4true');
       const P4S = document.querySelector('.hk-strike');
-      const armKinetic = (zoomFrom) => {
-        gsap.set(P1,  { scale: zoomFrom, autoAlpha: 0 });
-        gsap.set(P3,  { scale: 0.96, autoAlpha: 0 });
-        gsap.set(P4,  { autoAlpha: 0 });
-        gsap.set(P4D, { y: 18, autoAlpha: 0 });
-        gsap.set(P4S, { scaleX: 0 });
-        gsap.set(P4T, { scale: 1.1, autoAlpha: 0 });
+      // Scatter the Beat-1 letters into a real 3D constellation and set
+      // the Beat-2 door closed / text recessed. cfg bounds the depth so
+      // forward-projected (magnified) letters never overflow small frames.
+      const armKinetic = (cfg) => {
+        gsap.set(P1, { scale: cfg.p1From, autoAlpha: 0 });
+        hkLetters.forEach(el => {
+          const z = gsap.utils.random(cfg.zBack, cfg.zFwd);
+          gsap.set(el, {
+            z: z,
+            x: gsap.utils.random(-cfg.sc, cfg.sc),
+            y: gsap.utils.random(-cfg.sc * 0.7, cfg.sc * 0.7),
+            rotationX: gsap.utils.random(-90, 90),
+            rotationY: gsap.utils.random(-125, 125),
+            autoAlpha: gsap.utils.mapRange(cfg.zBack, cfg.zFwd, 0.12, 0.55, z)
+          });
+        });
+        gsap.set(P3W,  { autoAlpha: 0 });
+        gsap.set(P3,   { z: -320, autoAlpha: 1 });
+        gsap.set(DOOR, { rotationY: 0 });
+        gsap.set(GLOW, { autoAlpha: 0, scale: 0.6 });
+        gsap.set(P4,   { autoAlpha: 0 });
+        gsap.set(P4D,  { y: 18, autoAlpha: 0 });
+        gsap.set(P4S,  { scaleX: 0 });
+        gsap.set(P4T,  { scale: 1.1, autoAlpha: 0 });
       };
       // will-change held ONLY while a phrase is actively animating.
       const wcWindow = (tl, el, from, to) => {
@@ -19902,7 +19974,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Shared phase map. Beats fully resolve, then HOLD — the holds ARE
       // the design. All motion ends at 0.775; the rest is settle buffer.
       // Easing capped at power3: weighted and considered, never snappy.
-      const buildPhases = (tl, zoomMax) => {
+      const buildPhases = (tl) => {
         tl.to('.scroll-hint', { autoAlpha: 0, duration: 0.05, ease: 'none' }, 0);
         tl.to(heroContentEl, { autoAlpha: 0, duration: 0.08, ease: 'power1.inOut' }, 0.02);
         // Near-total empty black: the supporting cast doesn't dim — it leaves.
@@ -19910,19 +19982,35 @@ document.addEventListener('DOMContentLoaded', () => {
         tl.to('#hero-particles', { opacity: 0.04, duration: 0.3, ease: 'power1.inOut' }, 0.02);
         tl.to(kinetic, { autoAlpha: 1, duration: 0.04, ease: 'none' }, 0.05);
 
-        // BEAT 1 — DESMOSMIND: the approved zoom, slowed. One continuous
-        // unhurried approach (power1.in under scrub), long dissolve out.
-        wcWindow(tl, P1, 0.06, 0.36);
-        tl.to(P1, { autoAlpha: 1, duration: 0.05, ease: 'none' }, 0.07);
-        tl.to(P1, { scale: zoomMax, duration: 0.26, ease: 'power1.in' }, 0.07);
-        tl.to(P1, { autoAlpha: 0, duration: 0.06, ease: 'power1.out' }, 0.29);
+        // BEAT 1 — DESMOSMIND: 3D LETTER CONSTELLATION. Ten letters tumble
+        // in from real depth (translateZ) with rotateX/Y under one shared
+        // perspective, locking to the plane left→right — z, rotation and
+        // opacity all resolving together per letter. MIND (red) locks last.
+        // The container carries a gentle camera-push scale. Stagger 0.02 vs
+        // 0.03 flight ⇒ ~2 letters mid-air at once: bounded GPU load.
+        wcWindow(tl, P1, 0.06, 0.34);
+        hkLetters.forEach(el => wcWindow(tl, el, 0.08, 0.33));
+        tl.to(P1, { autoAlpha: 1, duration: 0.04, ease: 'none' }, 0.07);
+        tl.to(P1, { scale: 1, duration: 0.24, ease: 'power2.out' }, 0.07);
+        tl.to(hkLetters, {
+          z: 0, x: 0, y: 0, rotationX: 0, rotationY: 0, autoAlpha: 1,
+          duration: 0.03, ease: 'power3.out', stagger: { each: 0.02, from: 'start' }
+        }, 0.09);
+        tl.to(P1, { autoAlpha: 0, duration: 0.05, ease: 'power1.out' }, 0.31);
 
-        // BEAT 2 — DOMINA LA OSCURIDAD: a quiet, weighted settle. It
-        // simply arrives (0.96→1 + fade, power2.out) and then HOLDS in
-        // empty space — the silence 0.47→0.56 is the beat.
-        wcWindow(tl, P3, 0.37, 0.62);
-        tl.to(P3, { autoAlpha: 1, scale: 1, duration: 0.09, ease: 'power2.out' }, 0.38);
-        tl.to(P3, { autoAlpha: 0, duration: 0.055, ease: 'power1.inOut' }, 0.56);
+        // BEAT 2 — DOMINA LA OSCURIDAD: 3D DOOR REVEAL. A black panel swings
+        // open on the Y-axis (origin left) to uncover the line recessed in
+        // Z-space; as it clears, the text pushes toward the viewer (z −320→0)
+        // while a red backlight pulses — several properties in one coherent
+        // moment. Then it holds before dissolving.
+        wcWindow(tl, P3W, 0.37, 0.62);
+        wcWindow(tl, DOOR, 0.37, 0.50);
+        tl.to(P3W, { autoAlpha: 1, duration: 0.02, ease: 'none' }, 0.38);
+        tl.to(DOOR, { rotationY: -108, duration: 0.09, ease: 'power2.out' }, 0.40);
+        tl.to(P3, { z: 0, duration: 0.075, ease: 'power2.out' }, 0.45);
+        tl.to(GLOW, { autoAlpha: 0.85, scale: 1.15, duration: 0.04, ease: 'power2.out' }, 0.46);
+        tl.to(GLOW, { autoAlpha: 0.32, scale: 1, duration: 0.05, ease: 'power1.inOut' }, 0.50);
+        tl.to(P3W, { autoAlpha: 0, duration: 0.055, ease: 'power1.inOut' }, 0.56);
 
         // BEAT 3 — DEFINE TU CALLE: the correction reveal (kept), slowed
         // to match. Draft rises and breathes, the strike draws, a pause,
@@ -19941,7 +20029,7 @@ document.addEventListener('DOMContentLoaded', () => {
       };
       const mmHero = gsap.matchMedia();
       mmHero.add('(min-width: 900px)', () => {
-        armKinetic(0.55);
+        armKinetic({ p1From: 0.82, zBack: -1500, zFwd: 220, sc: 300 });
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: heroEl,
@@ -19953,14 +20041,14 @@ document.addEventListener('DOMContentLoaded', () => {
             onUpdate: setDeparting
           }
         });
-        buildPhases(tl, 6.2);
+        buildPhases(tl);
       });
       mmHero.add('(max-width: 899px)', () => {
         // Mobile: same three beats over the hero's FULL scroll-away —
-        // identical phase map (no compression), gentler zoom depth so
-        // small screens don't blur. Counter-translate capped at 50%
-        // keeps the stage in frame. Still 0 pins on mobile.
-        armKinetic(0.6);
+        // identical phase map (no compression). Shallower depth + tighter
+        // scatter so forward-projected letters never overflow a 375 frame.
+        // Counter-translate capped at 50% keeps the stage in frame. 0 pins.
+        armKinetic({ p1From: 0.86, zBack: -850, zFwd: 110, sc: 150 });
         const tlm = gsap.timeline({
           scrollTrigger: {
             trigger: heroEl,
@@ -19971,7 +20059,7 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         });
         tlm.to(kinetic, { yPercent: 50, ease: 'none', duration: 0.5 }, 0);
-        buildPhases(tlm, 4.2);
+        buildPhases(tlm);
       });
     }
 
