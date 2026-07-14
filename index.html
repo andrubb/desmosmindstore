@@ -10014,7 +10014,10 @@ section + section::before,
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
     z-index: 1 !important;
-    opacity: 0.9 !important;
+    opacity: 0.9;   /* resting dim — NO !important, so the GSAP hero-departure
+                       recede (opacity → 0.06) can override it during the
+                       kinetic sequence. The !important here was pinning the
+                       bat bright in front of the text on mobile (BUG 1). */
     animation: none !important;          /* completely static */
     will-change: auto !important;
   }
@@ -11402,6 +11405,15 @@ section + section::before,
   .hk-p3, .hk-p4 {
     font-size: clamp(1.4rem, 6.4vw, 2.3rem) !important;
     letter-spacing: 0.04em !important;
+  }
+  /* BUG 2 — the darkness-reveal panel read as a stray flat black BOX on
+     mobile (hard rectangular edge against the textured hero background).
+     Feather its edges to nothing so it hides the text (opaque centre) with
+     NO visible boundary — seamless until it swings. Mask is static (no
+     animated property), so the perf discipline is untouched. */
+  .hk-door {
+    -webkit-mask: radial-gradient(ellipse 68% 62% at 50% 50%, #000 55%, transparent 100%);
+    mask: radial-gradient(ellipse 68% 62% at 50% 50%, #000 55%, transparent 100%);
   }
   .hero-gap { height: 30svh; }
 }
@@ -19796,6 +19808,14 @@ document.addEventListener('DOMContentLoaded', () => {
   function bootEnhancements(){
     if (!window.gsap || !window.ScrollTrigger) return;
     gsap.registerPlugin(ScrollTrigger);
+
+    // BUG 3 — jarring scroll jump on the mobile pin release. Mobile browser
+    // address bars show/hide as you scroll, resizing the viewport; by
+    // default ScrollTrigger refreshes on that resize, which recomputes the
+    // pin's end and snaps the scroll position. ignoreMobileResize skips the
+    // refresh for these small vertical-only resizes, so the pin releases
+    // smoothly. Desktop never fires this resize, so it's desktop-neutral.
+    ScrollTrigger.config({ ignoreMobileResize: true });
 
     // ── Mobile motion budget ──
     // Antigravity reference: animations should feel fast and subtle on
