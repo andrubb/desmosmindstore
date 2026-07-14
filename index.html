@@ -11701,12 +11701,8 @@ window.gsapReady(function(){
     <!-- Four-phrase zoom-through. Word/phrase-level nodes only — no
          per-letter fragmentation; every tween is transform/opacity. -->
     <h2 class="hk-phrase hk-p1"><span class="hk-l">D</span><span class="hk-l">E</span><span class="hk-l">S</span><span class="hk-l">M</span><span class="hk-l">O</span><span class="hk-l">S</span><span class="hk-l hk-red">M</span><span class="hk-l hk-red">I</span><span class="hk-l hk-red">N</span><span class="hk-l hk-red">D</span></h2>
-    <!-- (ENTRENA DURO / slam retired — take 6 runs three unhurried beats) -->
-    <div class="hk-phrase hk-p3wrap">
-      <div class="hk-p3glow" aria-hidden="true"></div>
-      <p class="hk-p3">DOMINA LA <span class="hk-red">OSCURIDAD</span></p>
-      <div class="hk-door" aria-hidden="true"></div>
-    </div>
+    <!-- (ENTRENA DURO slam + DOMINA LA OSCURIDAD door beat both removed —
+         the sequence is now DESMOSMIND → DEFINE TU CALLE) -->
     <p class="hk-phrase hk-p4"><span class="hk-p4draft">DEFINE TU CALLE<i class="hk-strike" aria-hidden="true"></i></span><span class="hk-p4true">DEFINE TU <span class="hk-red">CALLE</span></span></p>
     <!-- (fractional counter removed — take 6: gamified progress fought
          the calm editorial confidence) -->
@@ -19951,24 +19947,20 @@ document.addEventListener('DOMContentLoaded', () => {
       const setDeparting = (self) => {
         heroEl.classList.toggle('hero-departing', self.progress > 0.04);
       };
-      // TAKE 6 — radical simplification: THREE unhurried beats on near-
-      // total empty black. No backdrop, no counter, no slam/flip. Size
-      // and silence do the work (bymonolog's feel, Desmos's identity).
-      // Word-level nodes only; every tween is transform/opacity.
+      // TWO unhurried beats on near-total empty black (the middle "DOMINA
+      // LA OSCURIDAD" door beat was removed by request): DESMOSMIND 3D
+      // constellation → DEFINE TU CALLE correction reveal. Size and silence
+      // do the work. Word-level nodes only; every tween is transform/opacity.
       const kinetic = document.querySelector('.hero-kinetic');
       const P1  = document.querySelector('.hk-p1');
       const hkLetters = gsap.utils.toArray('.hk-l');
-      const P3W = document.querySelector('.hk-p3wrap');
-      const P3  = document.querySelector('.hk-p3');
-      const DOOR = document.querySelector('.hk-door');
-      const GLOW = document.querySelector('.hk-p3glow');
       const P4  = document.querySelector('.hk-p4');
       const P4D = document.querySelector('.hk-p4draft');
       const P4T = document.querySelector('.hk-p4true');
       const P4S = document.querySelector('.hk-strike');
-      // Scatter the Beat-1 letters into a real 3D constellation and set
-      // the Beat-2 door closed / text recessed. cfg bounds the depth so
-      // forward-projected (magnified) letters never overflow small frames.
+      // Scatter the Beat-1 letters into a real 3D constellation. cfg bounds
+      // the depth so forward-projected (magnified) letters never overflow
+      // small frames.
       const armKinetic = (cfg) => {
         gsap.set(P1, { scale: cfg.p1From, autoAlpha: 0 });
         hkLetters.forEach(el => {
@@ -19982,10 +19974,6 @@ document.addEventListener('DOMContentLoaded', () => {
             autoAlpha: gsap.utils.mapRange(cfg.zBack, cfg.zFwd, 0.12, 0.55, z)
           });
         });
-        gsap.set(P3W,  { autoAlpha: 0 });
-        gsap.set(P3,   { z: -320, autoAlpha: 1 });
-        gsap.set(DOOR, { rotationY: 0 });
-        gsap.set(GLOW, { autoAlpha: 0, scale: 0.6 });
         gsap.set(P4,   { autoAlpha: 0 });
         gsap.set(P4D,  { y: 18, autoAlpha: 0 });
         gsap.set(P4S,  { scaleX: 0 });
@@ -20013,7 +20001,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // opacity all resolving together per letter. MIND (red) locks last.
         // The container carries a gentle camera-push scale. Stagger 0.02 vs
         // 0.03 flight ⇒ ~2 letters mid-air at once: bounded GPU load.
-        wcWindow(tl, P1, 0.06, 0.34);
+        wcWindow(tl, P1, 0.06, 0.54);
         hkLetters.forEach(el => wcWindow(tl, el, 0.08, 0.33));
         tl.to(P1, { autoAlpha: 1, duration: 0.04, ease: 'none' }, 0.07);
         tl.to(P1, { scale: 1, duration: 0.24, ease: 'power2.out' }, 0.07);
@@ -20021,23 +20009,11 @@ document.addEventListener('DOMContentLoaded', () => {
           z: 0, x: 0, y: 0, rotationX: 0, rotationY: 0, autoAlpha: 1,
           duration: 0.03, ease: 'power3.out', stagger: { each: 0.02, from: 'start' }
         }, 0.09);
-        tl.to(P1, { autoAlpha: 0, duration: 0.05, ease: 'power1.out' }, 0.31);
+        // Long unhurried hold on the wordmark (fills where the removed
+        // "DOMINA LA OSCURIDAD" beat used to sit), then a slow dissolve.
+        tl.to(P1, { autoAlpha: 0, duration: 0.06, ease: 'power1.out' }, 0.48);
 
-        // BEAT 2 — DOMINA LA OSCURIDAD: 3D DOOR REVEAL. A black panel swings
-        // open on the Y-axis (origin left) to uncover the line recessed in
-        // Z-space; as it clears, the text pushes toward the viewer (z −320→0)
-        // while a red backlight pulses — several properties in one coherent
-        // moment. Then it holds before dissolving.
-        wcWindow(tl, P3W, 0.37, 0.62);
-        wcWindow(tl, DOOR, 0.37, 0.50);
-        tl.to(P3W, { autoAlpha: 1, duration: 0.02, ease: 'none' }, 0.38);
-        tl.to(DOOR, { rotationY: -108, duration: 0.09, ease: 'power2.out' }, 0.40);
-        tl.to(P3, { z: 0, duration: 0.075, ease: 'power2.out' }, 0.45);
-        tl.to(GLOW, { autoAlpha: 0.85, scale: 1.15, duration: 0.04, ease: 'power2.out' }, 0.46);
-        tl.to(GLOW, { autoAlpha: 0.32, scale: 1, duration: 0.05, ease: 'power1.inOut' }, 0.50);
-        tl.to(P3W, { autoAlpha: 0, duration: 0.055, ease: 'power1.inOut' }, 0.56);
-
-        // BEAT 3 — DEFINE TU CALLE: the correction reveal (kept), slowed
+        // BEAT 2 — DEFINE TU CALLE: the correction reveal (kept), slowed
         // to match. Draft rises and breathes, the strike draws, a pause,
         // then the truth settles over it — power3.out, weighted, not
         // stamped. Ends 0.775; the corrected line holds to release.
