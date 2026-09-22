@@ -70,7 +70,7 @@
   "name": "DESMOSMIND",
   "alternateName": "DESMOS MIND",
   "description": "Ropa fitness y streetwear premium importada desde USA, distribuida en Costa Rica.",
-  "url": "https://desmosmind.com/",
+  "url": "https://desmosmind.vercel.app/",
   "telephone": "+506-8594-6741",
   "address": {
     "@type": "PostalAddress",
@@ -11752,7 +11752,10 @@ window.gsapReady(function(){
     // a safety net for everything they miss.
     document.addEventListener('error', function (e) {
       var t = e.target;
-      if (t && t.tagName === 'IMG' && !t.dataset.fallbackApplied) {
+      // Empty src="" slots (modal/admin images JS fills later) fire error
+      // too — skip them so they don't fetch a placeholder and get flagged
+      // before their real image arrives. Loop guard = "already the placeholder".
+      if (t && t.tagName === 'IMG' && t.getAttribute('src') && t.src.indexOf('placehold.co') === -1) {
         t.dataset.fallbackApplied = '1';
         t.onerror = null;
         t.src = 'https://placehold.co/600x800/0a0a0a/DC1111?text=DESMOS';
@@ -13180,6 +13183,8 @@ async function loadAllData(){
       if (typeof injectProductSchemas === 'function') injectProductSchemas();
       // Open realtime stock subscription (lazy-loads supabase-js)
       if (typeof initRealtimeStock === 'function') initRealtimeStock();
+    } else if (!products.length) {
+      renderProductsUnavailable();
     }
     const content = await sbFetch('site_content','GET',null,'?order=key.asc');
     if(content && content.length){
@@ -13199,7 +13204,12 @@ async function loadAllData(){
       const catsOk = await loadCategoriesFromSupabase();
       if (catsOk && typeof renderCategories === 'function') renderCategories();
     }
-  } catch(e){ console.error('Supabase load error:', e); }
+  } catch(e){
+    console.error('Supabase load error:', e);
+    // Backend unreachable and nothing to show — replace the loading
+    // skeletons (which would otherwise spin forever) with a real state.
+    if (!products.length) renderProductsUnavailable();
+  }
   finally {
     // Everything above re-rendered grids/sections — trigger positions are
     // stale until ScrollTrigger re-measures. Mandatory groundwork before any
@@ -14528,12 +14538,17 @@ function buildFeaturedHeroHtml(p){
 
 function buildProductsEmptyState(filter){
   const isWishlist = filter === '__wishlist__';
-  const eyebrow = isWishlist ? 'TU LISTA' : 'SIN RESULTADOS';
-  const title   = isWishlist ? 'Nada en favoritos.' : 'Nada por aquí.';
-  const text    = isWishlist
+  const isOffline  = filter === '__offline__';
+  const eyebrow = isOffline ? 'CATÁLOGO EN PAUSA' : isWishlist ? 'TU LISTA' : 'SIN RESULTADOS';
+  const title   = isOffline ? 'Estamos renovando el stock.' : isWishlist ? 'Nada en favoritos.' : 'Nada por aquí.';
+  const text    = isOffline
+    ? 'El catálogo en línea no está disponible en este momento. Escribinos por WhatsApp y te pasamos lo que hay en stock — o te encargamos cualquier pieza desde USA.'
+    : isWishlist
     ? 'Tocá el corazón en cualquier pieza del catálogo y la guardamos para que volvás luego.'
     : 'Esta categoría está vacía por ahora. Probá con otra o escribinos qué andás buscando — lo conseguimos.';
-  const primaryAction = isWishlist
+  const primaryAction = isOffline
+    ? `<button type="button" class="products-empty-btn" onclick="this.disabled=true;this.textContent='Cargando…';loadAllData()">Reintentar</button>`
+    : isWishlist
     ? `<button type="button" class="products-empty-btn" onclick="filterProducts('all', document.querySelector('.filter-btn'))">Ver todo el catálogo</button>`
     : `<button type="button" class="products-empty-btn" onclick="filterProducts('all', document.querySelector('.filter-btn'))">Ver todas las piezas</button>`;
   return `
@@ -14555,6 +14570,14 @@ function buildProductsEmptyState(filter){
         </a>
       </div>
     </div>`;
+}
+
+function renderProductsUnavailable(){
+  const grid = document.getElementById('products-grid');
+  if (!grid) return;
+  grid.innerHTML = buildProductsEmptyState('__offline__');
+  updateFilterCounts();
+  updateResultRow('all', 0);
 }
 
 function updateFilterCounts(){
